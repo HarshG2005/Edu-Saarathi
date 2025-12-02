@@ -76,16 +76,16 @@ const studyTools = [
     description: "Test your knowledge",
   },
   {
-    title: "Progress",
-    id: "progress",
-    icon: LayoutDashboard,
-    description: "Track your learning",
-  },
-  {
     title: "Study Guide",
     id: "study-guide",
     icon: BookOpen,
     description: "Review all materials",
+  },
+  {
+    title: "Progress",
+    id: "progress",
+    icon: LayoutDashboard,
+    description: "Track your learning",
   },
 ];
 

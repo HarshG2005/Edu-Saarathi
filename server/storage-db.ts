@@ -164,6 +164,10 @@ export class DbStorage implements IStorage {
         return db.select().from(highlights).where(eq(highlights.documentId, documentId)).orderBy(desc(highlights.createdAt));
     }
 
+    async getAllHighlights(userId: string): Promise<Highlight[]> {
+        return db.select().from(highlights).where(eq(highlights.userId, userId)).orderBy(desc(highlights.createdAt));
+    }
+
     async createHighlight(highlight: Omit<Highlight, "id">): Promise<Highlight> {
         const [newHighlight] = await db.insert(highlights).values(highlight).returning();
         return newHighlight;
@@ -179,6 +183,10 @@ export class DbStorage implements IStorage {
         return db.select().from(userNotes).where(eq(userNotes.documentId, documentId)).orderBy(desc(userNotes.createdAt));
     }
 
+    async getAllUserNotes(userId: string): Promise<UserNote[]> {
+        return db.select().from(userNotes).where(eq(userNotes.userId, userId)).orderBy(desc(userNotes.createdAt));
+    }
+
     async createUserNote(note: Omit<UserNote, "id">): Promise<UserNote> {
         const [newNote] = await db.insert(userNotes).values(note).returning();
         return newNote;
@@ -187,6 +195,10 @@ export class DbStorage implements IStorage {
     // User Flashcards
     async getUserFlashcards(documentId: string): Promise<UserFlashcard[]> {
         return db.select().from(userFlashcards).where(eq(userFlashcards.documentId, documentId)).orderBy(desc(userFlashcards.createdAt));
+    }
+
+    async getAllUserFlashcards(userId: string): Promise<UserFlashcard[]> {
+        return db.select().from(userFlashcards).where(eq(userFlashcards.userId, userId)).orderBy(desc(userFlashcards.createdAt));
     }
 
     async createUserFlashcard(flashcard: Omit<UserFlashcard, "id">): Promise<UserFlashcard> {

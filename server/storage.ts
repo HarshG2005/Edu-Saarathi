@@ -65,15 +65,18 @@ export interface IStorage {
   updateChatSession(id: string, session: Partial<ChatSession>): Promise<ChatSession | undefined>;
   // Highlights
   getHighlights(documentId: string): Promise<Highlight[]>;
+  getAllHighlights(userId: string): Promise<Highlight[]>;
   createHighlight(highlight: Omit<Highlight, "id">): Promise<Highlight>;
   deleteHighlight(id: string): Promise<boolean>;
 
   // User Notes
   getUserNotes(documentId: string): Promise<UserNote[]>;
+  getAllUserNotes(userId: string): Promise<UserNote[]>;
   createUserNote(note: Omit<UserNote, "id">): Promise<UserNote>;
 
   // User Flashcards
   getUserFlashcards(documentId: string): Promise<UserFlashcard[]>;
+  getAllUserFlashcards(userId: string): Promise<UserFlashcard[]>;
   createUserFlashcard(flashcard: Omit<UserFlashcard, "id">): Promise<UserFlashcard>;
 }
 
@@ -275,6 +278,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.highlights.values()).filter(h => h.documentId === documentId);
   }
 
+  async getAllHighlights(userId: string): Promise<Highlight[]> {
+    return Array.from(this.highlights.values()).filter(h => h.userId === userId);
+  }
+
   async createHighlight(highlight: Omit<Highlight, "id">): Promise<Highlight> {
     const id = randomUUID();
     const newHighlight: Highlight = { ...highlight, id };
@@ -291,6 +298,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.userNotes.values()).filter(n => n.documentId === documentId);
   }
 
+  async getAllUserNotes(userId: string): Promise<UserNote[]> {
+    return Array.from(this.userNotes.values()).filter(n => n.userId === userId);
+  }
+
   async createUserNote(note: Omit<UserNote, "id">): Promise<UserNote> {
     const id = randomUUID();
     const newNote: UserNote = { ...note, id };
@@ -301,6 +312,10 @@ export class MemStorage implements IStorage {
   // User Flashcards
   async getUserFlashcards(documentId: string): Promise<UserFlashcard[]> {
     return Array.from(this.userFlashcards.values()).filter(f => f.documentId === documentId);
+  }
+
+  async getAllUserFlashcards(userId: string): Promise<UserFlashcard[]> {
+    return Array.from(this.userFlashcards.values()).filter(f => f.userId === userId);
   }
 
   async createUserFlashcard(flashcard: Omit<UserFlashcard, "id">): Promise<UserFlashcard> {

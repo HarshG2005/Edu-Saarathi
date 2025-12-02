@@ -555,10 +555,13 @@ export async function registerRoutes(
       const userId = (req.user as any).id;
       const { documentId, range } = req.query;
 
-      const [quizResults, mcqSets, flashcardSets] = await Promise.all([
+      const [quizResults, mcqSets, flashcardSets, highlights, userNotes, userFlashcards] = await Promise.all([
         storage.getQuizResults(userId),
         storage.getMCQSets(userId),
-        storage.getFlashcardSets(userId)
+        storage.getFlashcardSets(userId),
+        storage.getAllHighlights(userId),
+        storage.getAllUserNotes(userId),
+        storage.getAllUserFlashcards(userId)
       ]);
 
       const mcqSetMap = new Map(mcqSets.map(s => [s.id, s]));
@@ -566,6 +569,9 @@ export async function registerRoutes(
       // Filter by Document
       let filteredQuizResults = quizResults;
       let filteredFlashcardSets = flashcardSets;
+      let filteredHighlights = highlights;
+      let filteredUserNotes = userNotes;
+      let filteredUserFlashcards = userFlashcards;
 
       if (documentId && documentId !== "all") {
         filteredQuizResults = quizResults.filter(r => {
@@ -573,6 +579,9 @@ export async function registerRoutes(
           return set?.documentId === documentId;
         });
         filteredFlashcardSets = flashcardSets.filter(s => s.documentId === documentId);
+        filteredHighlights = highlights.filter(h => h.documentId === documentId);
+        filteredUserNotes = userNotes.filter(n => n.documentId === documentId);
+        filteredUserFlashcards = userFlashcards.filter(f => f.documentId === documentId);
       }
 
       // Filter by Time Range (for trends/activity)
@@ -616,6 +625,11 @@ export async function registerRoutes(
 
       const studyTime = filteredQuizResults.reduce((acc, r) => acc + (r.timeTaken || 0), 0) / 60; // Minutes
 
+      // Study Guide Stats
+      const totalHighlights = filteredHighlights.length;
+      const totalUserNotes = filteredUserNotes.length;
+      const totalUserFlashcards = filteredUserFlashcards.length;
+
       // Quiz Scores Trend
       const quizScores = filteredQuizResults
         .filter(r => new Date(r.completedAt) >= startDate)
@@ -650,7 +664,12 @@ export async function registerRoutes(
         studyTime,
         quizScores,
         topicMastery,
-        recentActivity
+        recentActivity,
+        studyGuideStats: {
+          highlights: totalHighlights,
+          notes: totalUserNotes,
+          flashcards: totalUserFlashcards
+        }
       });
 
     } catch (error: any) {

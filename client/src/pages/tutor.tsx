@@ -126,11 +126,13 @@ export function TutorPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">No document context</SelectItem>
-              {documents.map((doc) => (
-                <SelectItem key={doc.id} value={doc.id}>
-                  {doc.name}
-                </SelectItem>
-              ))}
+              {[...documents]
+                .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
+                .map((doc) => (
+                  <SelectItem key={doc.id} value={doc.id}>
+                    {doc.name}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
           <Button variant="outline" onClick={handleNewChat} data-testid="button-new-chat">

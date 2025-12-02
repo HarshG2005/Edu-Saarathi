@@ -16,6 +16,11 @@ type StatsData = {
   quizScores: { date: string; score: number; topic: string }[];
   topicMastery: { name: string; value: number }[];
   recentActivity: { type: string; topic: string; date: string; score?: number }[];
+  studyGuideStats: {
+    highlights: number;
+    notes: number;
+    flashcards: number;
+  };
 };
 
 export function ProgressPage() {
@@ -60,11 +65,13 @@ export function ProgressPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Documents</SelectItem>
-              {documents.map((doc) => (
-                <SelectItem key={doc.id} value={doc.id}>
-                  {doc.name}
-                </SelectItem>
-              ))}
+              {[...documents]
+                .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
+                .map((doc) => (
+                  <SelectItem key={doc.id} value={doc.id}>
+                    {doc.name}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
 
@@ -116,12 +123,24 @@ export function ProgressPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Study Time</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Study Guide</CardTitle>
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{Math.round((stats?.studyTime || 0) / 60)}h {(stats?.studyTime || 0) % 60}m</div>
-            <p className="text-xs text-muted-foreground">Total time spent learning</p>
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Highlights:</span>
+                <span className="font-bold">{stats?.studyGuideStats?.highlights || 0}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Notes:</span>
+                <span className="font-bold">{stats?.studyGuideStats?.notes || 0}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Cards:</span>
+                <span className="font-bold">{stats?.studyGuideStats?.flashcards || 0}</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
