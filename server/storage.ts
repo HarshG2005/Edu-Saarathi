@@ -1,13 +1,13 @@
 import { randomUUID } from "crypto";
-import type { 
-  Document, 
-  MCQSet, 
-  FlashcardSet, 
-  Summary, 
-  Mindmap, 
-  Notes, 
+import type {
+  Document,
+  MCQSet,
+  FlashcardSet,
+  Summary,
+  Mindmap,
+  Notes,
   QuizResult,
-  ChatSession 
+  ChatSession
 } from "@shared/schema";
 
 export interface IStorage {
@@ -16,38 +16,38 @@ export interface IStorage {
   getDocuments(): Promise<Document[]>;
   createDocument(doc: Omit<Document, "id">): Promise<Document>;
   deleteDocument(id: string): Promise<boolean>;
-  
+
   // MCQ Sets
   getMCQSet(id: string): Promise<MCQSet | undefined>;
   getMCQSets(): Promise<MCQSet[]>;
   createMCQSet(set: Omit<MCQSet, "id">): Promise<MCQSet>;
-  
+
   // Flashcard Sets
   getFlashcardSet(id: string): Promise<FlashcardSet | undefined>;
   getFlashcardSets(): Promise<FlashcardSet[]>;
   createFlashcardSet(set: Omit<FlashcardSet, "id">): Promise<FlashcardSet>;
   updateFlashcardSet(id: string, set: Partial<FlashcardSet>): Promise<FlashcardSet | undefined>;
-  
+
   // Summaries
   getSummary(id: string): Promise<Summary | undefined>;
   getSummaries(): Promise<Summary[]>;
   createSummary(summary: Omit<Summary, "id">): Promise<Summary>;
-  
+
   // Mindmaps
   getMindmap(id: string): Promise<Mindmap | undefined>;
   getMindmaps(): Promise<Mindmap[]>;
   createMindmap(mindmap: Omit<Mindmap, "id">): Promise<Mindmap>;
-  
+
   // Notes
   getNotes(id: string): Promise<Notes | undefined>;
   getAllNotes(): Promise<Notes[]>;
   createNotes(notes: Omit<Notes, "id">): Promise<Notes>;
-  
+
   // Quiz Results
   getQuizResult(id: string): Promise<QuizResult | undefined>;
   getQuizResults(): Promise<QuizResult[]>;
   createQuizResult(result: Omit<QuizResult, "id">): Promise<QuizResult>;
-  
+
   // Chat Sessions
   getChatSession(id: string): Promise<ChatSession | undefined>;
   getChatSessions(): Promise<ChatSession[]>;
@@ -225,4 +225,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+import { JsonStorage } from "./storage-json";
+
+export const storage = new JsonStorage();
