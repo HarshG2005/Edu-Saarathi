@@ -34,12 +34,6 @@ const mainFeatures = [
     description: "Upload & manage PDFs",
   },
   {
-    title: "MCQ Generator",
-    id: "mcq",
-    icon: ListChecks,
-    description: "Create multiple choice questions",
-  },
-  {
     title: "Flashcards",
     id: "flashcards",
     icon: Lightbulb,

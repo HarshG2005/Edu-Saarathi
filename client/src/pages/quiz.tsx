@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
-import { HelpCircle, Play, Clock, Check, X, Trophy, RotateCcw, ChevronRight, BarChart2 } from "lucide-react";
+import { HelpCircle, Play, Clock, Check, X, Trophy, RotateCcw, ChevronRight, BarChart2, Loader2, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getStoredProvider, AISettings } from "@/components/ai-settings";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -17,19 +19,28 @@ import {
 } from "@/components/ui/select";
 import { useAppStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import type { MCQSet, QuizResult, QuizAnswer } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from "recharts";
 
 type QuizState = "setup" | "active" | "results";
 
 export function QuizPage() {
-  const { mcqSets, quizResults, addQuizResult } = useAppStore();
+  const { mcqSets, quizResults, addQuizResult, documents, currentDocumentId, addMCQSet } = useAppStore();
   const { toast } = useToast();
 
   const [quizState, setQuizState] = useState<QuizState>("setup");
   const [selectedSetId, setSelectedSetId] = useState("");
   const [timedMode, setTimedMode] = useState(false);
   const [timePerQuestion, setTimePerQuestion] = useState(30);
+
+  // MCQ generation states
+  const [setupTab, setSetupTab] = useState<"existing" | "generate">("existing");
+  const [genTopic, setGenTopic] = useState("");
+  const [genCount, setGenCount] = useState<"5" | "10" | "20">("10");
+  const [genDifficulty, setGenDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+  const [genDocId, setGenDocId] = useState(currentDocumentId || "");
 
   const [currentMCQSet, setCurrentMCQSet] = useState<MCQSet | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -39,6 +50,46 @@ export function QuizPage() {
   const [questionStartTime, setQuestionStartTime] = useState<number>(0);
 
   const [currentResult, setCurrentResult] = useState<QuizResult | null>(null);
+
+  const hasDocumentSelected = genDocId && genDocId !== "none";
+
+  // MCQ generation mutation
+  const generateMCQsMutation = useMutation({
+    mutationFn: async (): Promise<MCQSet> => {
+      const payload = {
+        documentId: hasDocumentSelected ? genDocId : undefined,
+        topic: genTopic || undefined,
+        count: genCount,
+        difficulty: genDifficulty,
+        provider: getStoredProvider(),
+      };
+      const response = await apiRequest("POST", "/api/mcq/generate", payload);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      addMCQSet(data);
+      setCurrentMCQSet(data);
+      setCurrentIndex(0);
+      setAnswers([]);
+      setStartTime(Date.now());
+      setQuestionStartTime(Date.now());
+      if (timedMode) {
+        setTimeRemaining(timePerQuestion);
+      }
+      setQuizState("active");
+      toast({
+        title: "Quiz started!",
+        description: `${data.mcqs.length} questions generated. Good luck!`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Generation failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const currentMCQ = currentMCQSet?.mcqs[currentIndex];
 
@@ -228,27 +279,126 @@ export function QuizPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="mcq-set">Select MCQ Set</Label>
-                <Select value={selectedSetId} onValueChange={setSelectedSetId}>
-                  <SelectTrigger id="mcq-set" data-testid="select-mcq-set">
-                    <SelectValue placeholder="Choose an MCQ set to quiz on" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mcqSets.length === 0 ? (
-                      <SelectItem value="empty" disabled>
-                        No MCQ sets available - generate some first!
-                      </SelectItem>
+              <Tabs value={setupTab} onValueChange={(v) => setSetupTab(v as "existing" | "generate")}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="existing">Select Existing</TabsTrigger>
+                  <TabsTrigger value="generate">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate New
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="existing" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="mcq-set">Select MCQ Set</Label>
+                    <Select value={selectedSetId} onValueChange={setSelectedSetId}>
+                      <SelectTrigger id="mcq-set" data-testid="select-mcq-set">
+                        <SelectValue placeholder="Choose an MCQ set to quiz on" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {mcqSets.length === 0 ? (
+                          <SelectItem value="empty" disabled>
+                            No MCQ sets available - generate some first!
+                          </SelectItem>
+                        ) : (
+                          mcqSets.slice().reverse().slice(0, 5).map((set) => (
+                            <SelectItem key={set.id} value={set.id}>
+                              {set.topic || "MCQ Set"} ({set.mcqs.length} questions) - {formatDate(set.createdAt)}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button
+                    onClick={startQuiz}
+                    disabled={!selectedSetId || mcqSets.length === 0}
+                    className="w-full"
+                    data-testid="button-start-quiz"
+                  >
+                    <Play className="mr-2 h-4 w-4" />
+                    Start Quiz
+                  </Button>
+                </TabsContent>
+
+                <TabsContent value="generate" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="gen-doc">Source Document (Optional)</Label>
+                    <Select value={genDocId} onValueChange={setGenDocId}>
+                      <SelectTrigger id="gen-doc">
+                        <SelectValue placeholder="Or enter a topic below" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No document - use topic only</SelectItem>
+                        {documents.map((doc) => (
+                          <SelectItem key={doc.id} value={doc.id}>
+                            {doc.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gen-topic">Topic</Label>
+                    <Input
+                      id="gen-topic"
+                      placeholder="e.g., Machine Learning, Solar System, Web Development"
+                      value={genTopic}
+                      onChange={(e) => setGenTopic(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Question Count</Label>
+                      <Select value={genCount} onValueChange={(v) => setGenCount(v as "5" | "10" | "20")}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="5">5 questions</SelectItem>
+                          <SelectItem value="10">10 questions</SelectItem>
+                          <SelectItem value="20">20 questions</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Difficulty</Label>
+                      <Select value={genDifficulty} onValueChange={(v) => setGenDifficulty(v as "easy" | "medium" | "hard")}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="easy">Easy</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="hard">Hard</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => generateMCQsMutation.mutate()}
+                    disabled={generateMCQsMutation.isPending || (!hasDocumentSelected && !genTopic)}
+                    className="w-full"
+                  >
+                    {generateMCQsMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Generating Quiz...
+                      </>
                     ) : (
-                      mcqSets.slice().reverse().slice(0, 5).map((set) => (
-                        <SelectItem key={set.id} value={set.id}>
-                          {set.topic || "MCQ Set"} ({set.mcqs.length} questions) - {formatDate(set.createdAt)}
-                        </SelectItem>
-                      ))
+                      <>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Generate & Start Quiz
+                      </>
                     )}
-                  </SelectContent>
-                </Select>
-              </div>
+                  </Button>
+                </TabsContent>
+              </Tabs>
 
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="flex items-center gap-3">
@@ -288,16 +438,6 @@ export function QuizPage() {
                   </Select>
                 </div>
               )}
-
-              <Button
-                onClick={startQuiz}
-                disabled={!selectedSetId || mcqSets.length === 0}
-                className="w-full"
-                data-testid="button-start-quiz"
-              >
-                <Play className="mr-2 h-4 w-4" />
-                Start Quiz
-              </Button>
             </CardContent>
           </Card>
 

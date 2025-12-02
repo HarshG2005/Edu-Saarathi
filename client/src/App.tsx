@@ -8,7 +8,6 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppStore } from "@/lib/store";
 
 import { LibraryPage } from "@/pages/library";
-import { MCQGeneratorPage } from "@/pages/mcq-generator";
 import { FlashcardsPage } from "@/pages/flashcards";
 import { SummaryPage } from "@/pages/summary";
 import { MindmapPage } from "@/pages/mindmap";
@@ -26,8 +25,6 @@ function MainContent() {
     switch (currentFeature) {
       case "library":
         return <LibraryPage />;
-      case "mcq":
-        return <MCQGeneratorPage />;
       case "flashcards":
         return <FlashcardsPage />;
       case "summary":
