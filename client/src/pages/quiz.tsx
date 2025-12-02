@@ -230,9 +230,30 @@ export function QuizPage() {
       completedAt: new Date(),
     };
 
-    addQuizResult(result);
-    setCurrentResult(result);
-    setQuizState("results");
+    // Save to backend
+    apiRequest("POST", "/api/quiz/results", result)
+      .then(async (res) => {
+        const savedResult = await res.json();
+        addQuizResult(savedResult);
+        setCurrentResult(savedResult);
+        setQuizState("results");
+        toast({
+          title: "Quiz Completed!",
+          description: `You scored ${percentage}%. Results saved.`,
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to save quiz result:", error);
+        // Still show results even if save fails, but warn user
+        addQuizResult(result);
+        setCurrentResult(result);
+        setQuizState("results");
+        toast({
+          title: "Saved Locally Only",
+          description: "Failed to save to server. Progress may not update.",
+          variant: "destructive",
+        });
+      });
   };
 
   const resetQuiz = () => {
