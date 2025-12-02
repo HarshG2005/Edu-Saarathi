@@ -481,8 +481,13 @@ export async function registerRoutes(
   // Quiz Results
   app.post("/api/quiz/results", async (req, res) => {
     try {
+      if (!req.user) {
+        throw new Error("User not authenticated");
+      }
+
       const result = await storage.createQuizResult({
         ...req.body,
+        completedAt: req.body.completedAt ? new Date(req.body.completedAt) : new Date(),
         userId: (req.user as any).id,
       });
       res.json(result);

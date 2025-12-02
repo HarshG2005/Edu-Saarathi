@@ -218,8 +218,7 @@ export function QuizPage() {
     const total = currentMCQSet.mcqs.length;
     const percentage = Math.round((correct / total) * 100);
 
-    const result: QuizResult = {
-      id: crypto.randomUUID(),
+    const resultData = {
       mcqSetId: currentMCQSet.id,
       topic: currentMCQSet.topic || "Quiz",
       answers: finalAnswers,
@@ -227,11 +226,11 @@ export function QuizPage() {
       totalQuestions: total,
       percentage,
       timeTaken: totalTime,
-      completedAt: new Date(),
+      completedAt: new Date().toISOString(),
     };
 
     // Save to backend
-    apiRequest("POST", "/api/quiz/results", result)
+    apiRequest("POST", "/api/quiz/results", resultData)
       .then(async (res) => {
         const savedResult = await res.json();
         addQuizResult(savedResult);
@@ -245,8 +244,15 @@ export function QuizPage() {
       .catch((error) => {
         console.error("Failed to save quiz result:", error);
         // Still show results even if save fails, but warn user
-        addQuizResult(result);
-        setCurrentResult(result);
+        // We need to create a local result object with an ID for the store
+        const localResult: QuizResult = {
+          ...resultData,
+          id: crypto.randomUUID(),
+          userId: "local-user", // Placeholder, store might ignore or overwrite
+          completedAt: new Date(resultData.completedAt)
+        };
+        addQuizResult(localResult);
+        setCurrentResult(localResult);
         setQuizState("results");
         toast({
           title: "Saved Locally Only",
