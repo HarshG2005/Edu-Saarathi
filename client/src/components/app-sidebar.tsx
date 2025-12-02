@@ -9,7 +9,8 @@ import {
   Network,
   GraduationCap,
   StickyNote,
-  LogOut
+  LogOut,
+  Settings
 } from "lucide-react";
 import {
   Sidebar,
@@ -22,9 +23,11 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { useAppStore } from "@/lib/store";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth";
 
 const mainFeatures = [
   {
@@ -80,29 +83,27 @@ const studyTools = [
   },
 ];
 
-import { useAuth } from "@/hooks/use-auth";
-
 export function AppSidebar() {
   const { currentFeature, setCurrentFeature, documents, quizResults } = useAppStore();
   const { logoutMutation } = useAuth();
 
   return (
-    <Sidebar>
-      <SidebarHeader className="border-b border-sidebar-border p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <GraduationCap className="h-6 w-6 text-primary-foreground" />
+    <Sidebar className="border-r border-sidebar-border bg-sidebar">
+      <SidebarHeader className="p-4 pb-2">
+        <div className="flex items-center gap-3 px-1">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <GraduationCap className="h-5 w-5" />
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-sidebar-foreground">EduQuest</h1>
-            <p className="text-xs text-muted-foreground">AI Study Buddy</p>
+          <div className="flex flex-col gap-0.5">
+            <h1 className="text-sm font-bold tracking-tight text-sidebar-foreground">EduQuest</h1>
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">AI Study Buddy</p>
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-2">
+      <SidebarContent className="px-3 py-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <SidebarGroupLabel className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
             Content Tools
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -112,15 +113,19 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     onClick={() => setCurrentFeature(item.id)}
                     data-active={currentFeature === item.id}
-                    className="w-full justify-start gap-3 data-[active=true]:bg-sidebar-accent"
+                    className="group relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-sm"
                     data-testid={`nav-${item.id}`}
                   >
-                    <item.icon className="h-5 w-5" />
-                    <div className="flex flex-col items-start">
-                      <span className="text-sm font-medium">{item.title}</span>
-                    </div>
+                    {/* Active State Accent Bar */}
+                    {currentFeature === item.id && (
+                      <div className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-primary" />
+                    )}
+
+                    <item.icon className="h-4 w-4 transition-colors group-hover:text-foreground group-data-[active=true]:text-primary" />
+                    <span className="flex-1">{item.title}</span>
+
                     {item.id === "library" && documents.length > 0 && (
-                      <Badge variant="secondary" className="ml-auto">
+                      <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-[10px] font-normal">
                         {documents.length}
                       </Badge>
                     )}
@@ -131,8 +136,12 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        <div className="my-2 px-2">
+          <div className="h-px w-full bg-sidebar-border/50" />
+        </div>
+
         <SidebarGroup>
-          <SidebarGroupLabel className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <SidebarGroupLabel className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
             Study Tools
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -142,13 +151,19 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     onClick={() => setCurrentFeature(item.id)}
                     data-active={currentFeature === item.id}
-                    className="w-full justify-start gap-3 data-[active=true]:bg-sidebar-accent"
+                    className="group relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-sm"
                     data-testid={`nav-${item.id}`}
                   >
-                    <item.icon className="h-5 w-5" />
-                    <span className="text-sm font-medium">{item.title}</span>
+                    {/* Active State Accent Bar */}
+                    {currentFeature === item.id && (
+                      <div className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-primary" />
+                    )}
+
+                    <item.icon className="h-4 w-4 transition-colors group-hover:text-foreground group-data-[active=true]:text-primary" />
+                    <span className="flex-1">{item.title}</span>
+
                     {item.id === "quiz" && quizResults.length > 0 && (
-                      <Badge variant="secondary" className="ml-auto">
+                      <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-[10px] font-normal">
                         {quizResults.length}
                       </Badge>
                     )}
@@ -161,16 +176,16 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <div className="h-2 w-2 rounded-full bg-status-online" />
-            <span>Local-first • Offline capable</span>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 px-2 py-1.5 text-[10px] font-medium text-muted-foreground">
+            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+            <span>Online • v1.0.0</span>
           </div>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => logoutMutation.mutate()}
-                className="text-muted-foreground hover:text-foreground"
+                className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                 disabled={logoutMutation.isPending}
               >
                 <LogOut className="h-4 w-4" />

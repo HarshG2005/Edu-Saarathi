@@ -258,11 +258,11 @@ export function SummaryPage() {
                   >
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <p className="font-medium line-clamp-1">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium line-clamp-1 break-words" title={summary.topic || "Summary"}>
                             {summary.topic || "Summary"}
                           </p>
-                          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                          <p className="mt-1 text-sm text-muted-foreground line-clamp-2 break-words">
                             {summary.content.slice(0, 100)}...
                           </p>
                         </div>
