@@ -79,6 +79,8 @@ function App() {
   );
 }
 
+import { DocumentViewerPage } from "@/pages/document-viewer";
+
 function AppContent() {
   const { user } = useAuth();
 
@@ -90,6 +92,7 @@ function AppContent() {
   return (
     <Switch>
       <Route path="/auth" component={AuthPage} />
+      <ProtectedRoute path="/documents/:id" component={() => <DocumentViewerPage />} />
       <Route path="/">
         {user ? (
           <ProtectedRoute

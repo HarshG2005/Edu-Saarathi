@@ -9,7 +9,10 @@ import type {
   QuizResult,
   ChatSession,
   User,
-  InsertUser
+  InsertUser,
+  Highlight,
+  UserNote,
+  UserFlashcard
 } from "@shared/schema";
 
 export interface IStorage {
@@ -60,6 +63,18 @@ export interface IStorage {
   getChatSessions(userId: string): Promise<ChatSession[]>;
   createChatSession(session: Omit<ChatSession, "id">): Promise<ChatSession>;
   updateChatSession(id: string, session: Partial<ChatSession>): Promise<ChatSession | undefined>;
+  // Highlights
+  getHighlights(documentId: string): Promise<Highlight[]>;
+  createHighlight(highlight: Omit<Highlight, "id">): Promise<Highlight>;
+  deleteHighlight(id: string): Promise<boolean>;
+
+  // User Notes
+  getUserNotes(documentId: string): Promise<UserNote[]>;
+  createUserNote(note: Omit<UserNote, "id">): Promise<UserNote>;
+
+  // User Flashcards
+  getUserFlashcards(documentId: string): Promise<UserFlashcard[]>;
+  createUserFlashcard(flashcard: Omit<UserFlashcard, "id">): Promise<UserFlashcard>;
 }
 
 export class MemStorage implements IStorage {
@@ -72,6 +87,9 @@ export class MemStorage implements IStorage {
   private quizResults: Map<string, QuizResult>;
   private chatSessions: Map<string, ChatSession>;
   private users: Map<string, User>;
+  private highlights: Map<string, Highlight>;
+  private userNotes: Map<string, UserNote>;
+  private userFlashcards: Map<string, UserFlashcard>;
 
   constructor() {
     this.documents = new Map();
@@ -83,6 +101,9 @@ export class MemStorage implements IStorage {
     this.quizResults = new Map();
     this.chatSessions = new Map();
     this.users = new Map();
+    this.highlights = new Map();
+    this.userNotes = new Map();
+    this.userFlashcards = new Map();
   }
 
   // Users
@@ -247,6 +268,46 @@ export class MemStorage implements IStorage {
     const updated = { ...existing, ...updates };
     this.chatSessions.set(id, updated);
     return updated;
+  }
+
+  // Highlights
+  async getHighlights(documentId: string): Promise<Highlight[]> {
+    return Array.from(this.highlights.values()).filter(h => h.documentId === documentId);
+  }
+
+  async createHighlight(highlight: Omit<Highlight, "id">): Promise<Highlight> {
+    const id = randomUUID();
+    const newHighlight: Highlight = { ...highlight, id };
+    this.highlights.set(id, newHighlight);
+    return newHighlight;
+  }
+
+  async deleteHighlight(id: string): Promise<boolean> {
+    return this.highlights.delete(id);
+  }
+
+  // User Notes
+  async getUserNotes(documentId: string): Promise<UserNote[]> {
+    return Array.from(this.userNotes.values()).filter(n => n.documentId === documentId);
+  }
+
+  async createUserNote(note: Omit<UserNote, "id">): Promise<UserNote> {
+    const id = randomUUID();
+    const newNote: UserNote = { ...note, id };
+    this.userNotes.set(id, newNote);
+    return newNote;
+  }
+
+  // User Flashcards
+  async getUserFlashcards(documentId: string): Promise<UserFlashcard[]> {
+    return Array.from(this.userFlashcards.values()).filter(f => f.documentId === documentId);
+  }
+
+  async createUserFlashcard(flashcard: Omit<UserFlashcard, "id">): Promise<UserFlashcard> {
+    const id = randomUUID();
+    const newFlashcard: UserFlashcard = { ...flashcard, id };
+    this.userFlashcards.set(id, newFlashcard);
+    return newFlashcard;
   }
 }
 

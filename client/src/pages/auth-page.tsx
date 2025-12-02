@@ -61,12 +61,12 @@ export default function AuthPage() {
     });
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0F172A] p-4">
+        <div className="min-h-screen flex items-center justify-center bg-[#0F172A] p-4 font-sans">
             <div className="w-full max-w-[420px]">
-                <Card className="w-full bg-[#0D1B2A] border-white/5 shadow-2xl rounded-xl overflow-hidden">
+                <Card className="w-full bg-[#0D1B2A] border-[rgba(255,255,255,0.06)] shadow-2xl rounded-xl overflow-hidden">
                     <CardHeader className="space-y-3 pb-6 text-center">
                         <div className="flex justify-center mb-2">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#3B82F6]/10 text-[#3B82F6] ring-1 ring-[#3B82F6]/20">
                                 <Brain className="h-6 w-6" />
                             </div>
                         </div>
@@ -84,8 +84,8 @@ export default function AuthPage() {
                             <button
                                 onClick={() => setActiveTab("login")}
                                 className={`text-sm font-medium py-1.5 rounded-md transition-all ${activeTab === "login"
-                                        ? "bg-primary text-primary-foreground shadow-sm"
-                                        : "text-muted-foreground hover:text-foreground"
+                                    ? "bg-[#3B82F6] text-white shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
                                     }`}
                             >
                                 Login
@@ -93,8 +93,8 @@ export default function AuthPage() {
                             <button
                                 onClick={() => setActiveTab("register")}
                                 className={`text-sm font-medium py-1.5 rounded-md transition-all ${activeTab === "register"
-                                        ? "bg-primary text-primary-foreground shadow-sm"
-                                        : "text-muted-foreground hover:text-foreground"
+                                    ? "bg-[#3B82F6] text-white shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
                                     }`}
                             >
                                 Register
@@ -109,6 +109,12 @@ export default function AuthPage() {
                                     )}
                                     className="space-y-4"
                                 >
+                                    {loginMutation.error && (
+                                        <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md flex items-center gap-2" role="alert">
+                                            <span className="font-medium">Error:</span>
+                                            {loginMutation.error.message}
+                                        </div>
+                                    )}
                                     <FormField
                                         control={loginForm.control}
                                         name="username"
@@ -119,7 +125,8 @@ export default function AuthPage() {
                                                     <Input
                                                         placeholder="johndoe"
                                                         {...field}
-                                                        className="bg-[#0F172A] border-white/10 focus:border-primary/50 focus:ring-primary/20 h-10 transition-all text-white"
+                                                        autoFocus
+                                                        className="bg-[#0F172A] border-[rgba(255,255,255,0.06)] focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20 h-10 transition-all text-white"
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -137,7 +144,7 @@ export default function AuthPage() {
                                                         <Input
                                                             type={showPassword ? "text" : "password"}
                                                             {...field}
-                                                            className="bg-[#0F172A] border-white/10 focus:border-primary/50 focus:ring-primary/20 h-10 pr-10 transition-all relative z-20 text-white"
+                                                            className="bg-[#0F172A] border-[rgba(255,255,255,0.06)] focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20 h-10 pr-10 transition-all relative z-20 text-white"
                                                         />
                                                         <Button
                                                             type="button"
@@ -161,7 +168,7 @@ export default function AuthPage() {
 
                                     <div className="flex items-center justify-between text-sm">
                                         <div className="flex items-center space-x-2">
-                                            <Checkbox id="remember" className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                                            <Checkbox id="remember" className="border-white/20 data-[state=checked]:bg-[#3B82F6] data-[state=checked]:border-[#3B82F6]" />
                                             <label
                                                 htmlFor="remember"
                                                 className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#93A4B2]"
@@ -169,7 +176,7 @@ export default function AuthPage() {
                                                 Remember me
                                             </label>
                                         </div>
-                                        <Button variant="link" className="px-0 font-normal text-xs text-primary h-auto" type="button">
+                                        <Button variant="link" className="px-0 font-normal text-xs text-[#3B82F6] h-auto" type="button">
                                             Forgot password?
                                         </Button>
                                     </div>
@@ -177,7 +184,7 @@ export default function AuthPage() {
                                     <div className="pt-2">
                                         <Button
                                             type="submit"
-                                            className="w-full h-10 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg shadow-primary/20 transition-all"
+                                            className="w-full h-10 bg-[#3B82F6] hover:bg-[#3B82F6]/90 text-white font-medium shadow-lg shadow-[#3B82F6]/20 transition-all"
                                             disabled={loginMutation.isPending}
                                         >
                                             {loginMutation.isPending ? (
@@ -202,6 +209,12 @@ export default function AuthPage() {
                                     )}
                                     className="space-y-4"
                                 >
+                                    {registerMutation.error && (
+                                        <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md flex items-center gap-2" role="alert">
+                                            <span className="font-medium">Error:</span>
+                                            {registerMutation.error.message}
+                                        </div>
+                                    )}
                                     <FormField
                                         control={registerForm.control}
                                         name="username"
@@ -212,7 +225,7 @@ export default function AuthPage() {
                                                     <Input
                                                         placeholder="johndoe"
                                                         {...field}
-                                                        className="bg-[#0F172A] border-white/10 focus:border-primary/50 focus:ring-primary/20 h-10 transition-all text-white"
+                                                        className="bg-[#0F172A] border-[rgba(255,255,255,0.06)] focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20 h-10 transition-all text-white"
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -230,7 +243,7 @@ export default function AuthPage() {
                                                         <Input
                                                             type={showPassword ? "text" : "password"}
                                                             {...field}
-                                                            className="bg-[#0F172A] border-white/10 focus:border-primary/50 focus:ring-primary/20 h-10 pr-10 transition-all relative z-20 text-white"
+                                                            className="bg-[#0F172A] border-[rgba(255,255,255,0.06)] focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20 h-10 pr-10 transition-all relative z-20 text-white"
                                                         />
                                                         <Button
                                                             type="button"
@@ -255,7 +268,7 @@ export default function AuthPage() {
                                     <div className="pt-2">
                                         <Button
                                             type="submit"
-                                            className="w-full h-10 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg shadow-primary/20 transition-all"
+                                            className="w-full h-10 bg-[#3B82F6] hover:bg-[#3B82F6]/90 text-white font-medium shadow-lg shadow-[#3B82F6]/20 transition-all"
                                             disabled={registerMutation.isPending}
                                         >
                                             {registerMutation.isPending ? (
@@ -274,7 +287,7 @@ export default function AuthPage() {
                     </CardContent>
                     <CardFooter className="bg-muted/20 p-4 border-t border-white/5 flex justify-center">
                         <p className="text-[11px] text-[#93A4B2] text-center">
-                            By continuing you agree to our <span className="text-primary hover:underline cursor-pointer">Terms</span> & <span className="text-primary hover:underline cursor-pointer">Privacy Policy</span>
+                            By continuing you agree to our <span className="text-[#3B82F6] hover:underline cursor-pointer">Terms</span> & <span className="text-[#3B82F6] hover:underline cursor-pointer">Privacy Policy</span>
                         </p>
                     </CardFooter>
                 </Card>

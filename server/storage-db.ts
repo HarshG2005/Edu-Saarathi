@@ -2,8 +2,9 @@ import { IStorage } from "./storage";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 import {
-    users, documents, mcqSets, flashcardSets, summaries, mindmaps, notes, quizResults, chatSessions,
-    type User, type InsertUser, type Document, type MCQSet, type FlashcardSet, type Summary, type Mindmap, type Notes, type QuizResult, type ChatSession
+    users, documents, mcqSets, flashcardSets, summaries, mindmaps, notes, quizResults, chatSessions, highlights, userNotes, userFlashcards,
+    type User, type InsertUser, type Document, type MCQSet, type FlashcardSet, type Summary, type Mindmap, type Notes, type QuizResult, type ChatSession,
+    type Highlight, type UserNote, type UserFlashcard
 } from "@shared/schema";
 
 export class DbStorage implements IStorage {
@@ -156,5 +157,40 @@ export class DbStorage implements IStorage {
     async updateChatSession(id: string, updates: Partial<ChatSession>): Promise<ChatSession | undefined> {
         const [updated] = await db.update(chatSessions).set(updates).where(eq(chatSessions.id, id)).returning();
         return updated;
+    }
+
+    // Highlights
+    async getHighlights(documentId: string): Promise<Highlight[]> {
+        return db.select().from(highlights).where(eq(highlights.documentId, documentId)).orderBy(desc(highlights.createdAt));
+    }
+
+    async createHighlight(highlight: Omit<Highlight, "id">): Promise<Highlight> {
+        const [newHighlight] = await db.insert(highlights).values(highlight).returning();
+        return newHighlight;
+    }
+
+    async deleteHighlight(id: string): Promise<boolean> {
+        const [deleted] = await db.delete(highlights).where(eq(highlights.id, id)).returning();
+        return !!deleted;
+    }
+
+    // User Notes
+    async getUserNotes(documentId: string): Promise<UserNote[]> {
+        return db.select().from(userNotes).where(eq(userNotes.documentId, documentId)).orderBy(desc(userNotes.createdAt));
+    }
+
+    async createUserNote(note: Omit<UserNote, "id">): Promise<UserNote> {
+        const [newNote] = await db.insert(userNotes).values(note).returning();
+        return newNote;
+    }
+
+    // User Flashcards
+    async getUserFlashcards(documentId: string): Promise<UserFlashcard[]> {
+        return db.select().from(userFlashcards).where(eq(userFlashcards.documentId, documentId)).orderBy(desc(userFlashcards.createdAt));
+    }
+
+    async createUserFlashcard(flashcard: Omit<UserFlashcard, "id">): Promise<UserFlashcard> {
+        const [newFlashcard] = await db.insert(userFlashcards).values(flashcard).returning();
+        return newFlashcard;
     }
 }

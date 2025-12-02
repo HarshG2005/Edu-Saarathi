@@ -93,6 +93,7 @@ export const documents = pgTable("documents", {
   pageCount: integer("page_count").notNull(),
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
   content: text("content").notNull(),
+  pdfData: text("pdf_data"), // Base64 encoded PDF
   chunks: jsonb("chunks").notNull(),
 });
 
@@ -245,3 +246,51 @@ export type GenerateSummaryRequest = z.infer<typeof generateSummaryRequestSchema
 export type GenerateMindmapRequest = z.infer<typeof generateMindmapRequestSchema>;
 export type GenerateNotesRequest = z.infer<typeof generateNotesRequestSchema>;
 export type TutorChatRequest = z.infer<typeof tutorChatRequestSchema>;
+
+// --- User Generated Content ---
+
+// Highlights
+export const highlights = pgTable("highlights", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  documentId: uuid("document_id").notNull().references(() => documents.id),
+  page: integer("page").notNull(),
+  text: text("text").notNull(),
+  color: text("color").notNull().default("yellow"),
+  bbox: jsonb("bbox").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const highlightSchema = createInsertSchema(highlights);
+export type Highlight = typeof highlights.$inferSelect;
+export type InsertHighlight = z.infer<typeof highlightSchema>;
+
+// User Notes (attached to highlights)
+export const userNotes = pgTable("user_notes", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  documentId: uuid("document_id").notNull().references(() => documents.id),
+  highlightId: uuid("highlight_id").notNull().references(() => highlights.id),
+  text: text("text").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const userNoteSchema = createInsertSchema(userNotes);
+export type UserNote = typeof userNotes.$inferSelect;
+export type InsertUserNote = z.infer<typeof userNoteSchema>;
+
+// User Flashcards (individual cards from highlights)
+export const userFlashcards = pgTable("user_flashcards", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  documentId: uuid("document_id").notNull().references(() => documents.id),
+  highlightId: uuid("highlight_id").references(() => highlights.id),
+  question: text("question").notNull(),
+  answer: text("answer").notNull(),
+  tags: jsonb("tags").default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const userFlashcardSchema = createInsertSchema(userFlashcards);
+export type UserFlashcard = typeof userFlashcards.$inferSelect;
+export type InsertUserFlashcard = z.infer<typeof userFlashcardSchema>;

@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useLocation } from "wouter";
 import { Upload, FileText, Trash2, Eye, MoreVertical, Search, Loader2, BookOpen, Calendar, File, Layers } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import type { Document } from "@shared/schema";
 export function LibraryPage() {
   const { documents, addDocument, removeDocument, setCurrentDocumentId, setCurrentFeature } = useAppStore();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
@@ -216,6 +218,7 @@ export function LibraryPage() {
                   key={doc.id}
                   className="group flex flex-col hover-elevate cursor-pointer transition-all border-border/60 bg-card/50 hover:bg-card hover:border-border"
                   data-testid={`card-document-${doc.id}`}
+                  onClick={() => setLocation(`/documents/${doc.id}`)}
                 >
                   <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-5 pb-3">
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -228,13 +231,15 @@ export function LibraryPage() {
                           size="icon"
                           className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
                           data-testid={`button-document-menu-${doc.id}`}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setSelectedDocument(doc);
                             setShowPreview(true);
                           }}
@@ -243,7 +248,10 @@ export function LibraryPage() {
                           Preview content
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDeleteDocument(doc.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteDocument(doc.id);
+                          }}
                           className="text-destructive focus:text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
@@ -277,9 +285,23 @@ export function LibraryPage() {
                   <CardFooter className="p-5 pt-3 grid grid-cols-2 gap-3">
                     <Button
                       size="sm"
+                      className="w-full text-xs font-medium col-span-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLocation(`/documents/${doc.id}`);
+                      }}
+                    >
+                      <Eye className="mr-2 h-3.5 w-3.5" />
+                      Open PDF
+                    </Button>
+                    <Button
+                      size="sm"
                       variant="secondary"
                       className="w-full text-xs font-medium bg-secondary/50 hover:bg-secondary"
-                      onClick={() => handleUseDocument(doc.id, "mcq")}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleUseDocument(doc.id, "mcq");
+                      }}
                       data-testid={`button-generate-mcq-${doc.id}`}
                     >
                       Quiz
@@ -288,7 +310,10 @@ export function LibraryPage() {
                       size="sm"
                       variant="secondary"
                       className="w-full text-xs font-medium bg-secondary/50 hover:bg-secondary"
-                      onClick={() => handleUseDocument(doc.id, "flashcards")}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleUseDocument(doc.id, "flashcards");
+                      }}
                       data-testid={`button-generate-flashcards-${doc.id}`}
                     >
                       Flashcards

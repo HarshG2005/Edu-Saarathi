@@ -91,6 +91,9 @@ export async function registerRoutes(
         return res.status(400).json({ message: "No file uploaded" });
       }
 
+      console.log("DEBUG: Uploading file:", req.file.originalname, "Size:", req.file.size);
+      console.log("DEBUG: Buffer length:", req.file.buffer.length);
+
       const { text, pageCount } = await extractTextFromPDF(req.file.buffer);
       const chunks = chunkText(text);
 
@@ -99,6 +102,9 @@ export async function registerRoutes(
         console.error("User ID missing in request:", req.user);
         return res.status(401).json({ message: "User not authenticated correctly" });
       }
+
+      const pdfBase64 = req.file.buffer.toString("base64");
+      console.log("DEBUG: PDF Base64 length:", pdfBase64.length);
 
       console.log("DEBUG: Creating doc for", userId);
       const document = await storage.createDocument({
@@ -109,12 +115,17 @@ export async function registerRoutes(
         pageCount,
         uploadedAt: new Date(),
         content: text,
+        pdfData: pdfBase64,
         chunks,
       });
 
+      console.log("DEBUG: Document created with ID:", document.id);
       res.json(document);
     } catch (error: any) {
       console.error("Error uploading document:", error);
+      // Log to file for debugging
+      const fs = await import("fs");
+      fs.writeFileSync("upload_error.log", `Error: ${error.message}\nStack: ${error.stack}\n`);
       res.status(500).json({ message: error.message || "Failed to upload document" });
     }
   });
@@ -124,7 +135,9 @@ export async function registerRoutes(
     console.log("DEBUG: Getting docs for", (req.user as any)?.id);
     try {
       const documents = await storage.getDocuments((req.user as any).id);
-      res.json(documents);
+      // Don't send pdfData in list view to save bandwidth
+      const docsWithoutPdf = documents.map(({ pdfData, ...rest }) => rest);
+      res.json(docsWithoutPdf);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to get documents" });
     }
@@ -145,6 +158,37 @@ export async function registerRoutes(
       res.json(document);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to get document" });
+    }
+  });
+
+  // Serve PDF file
+  app.get("/api/documents/:id/pdf", async (req, res) => {
+    console.log("DEBUG: Fetching PDF for doc ID:", req.params.id);
+    try {
+      const document = await storage.getDocument(req.params.id);
+      if (!document) {
+        console.log("DEBUG: Document not found");
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      if (!document.pdfData) {
+        console.log("DEBUG: pdfData is missing/empty for doc ID:", req.params.id);
+        return res.status(404).json({ message: "Document or PDF data not found" });
+      }
+
+      console.log("DEBUG: Found PDF data, length:", document.pdfData.length);
+
+      if (document.userId !== (req.user as any).id) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      const pdfBuffer = Buffer.from(document.pdfData, "base64");
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `inline; filename="${document.fileName}"`);
+      res.send(pdfBuffer);
+    } catch (error: any) {
+      console.error("Error serving PDF:", error);
+      res.status(500).json({ message: error.message || "Failed to get PDF" });
     }
   });
 
@@ -614,6 +658,94 @@ export async function registerRoutes(
       res.status(500).json({ message: error.message || "Failed to fetch stats" });
     }
   });
+
+  // Highlights
+  app.post("/api/documents/:id/highlights", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).send("Unauthorized");
+      const highlight = await storage.createHighlight({
+        ...req.body,
+        userId: (req.user as any).id,
+        documentId: req.params.id,
+        createdAt: new Date(),
+      });
+      res.json(highlight);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to create highlight" });
+    }
+  });
+
+  app.get("/api/documents/:id/highlights", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).send("Unauthorized");
+      const highlights = await storage.getHighlights(req.params.id);
+      res.json(highlights);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to get highlights" });
+    }
+  });
+
+  app.delete("/api/highlights/:id", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).send("Unauthorized");
+      await storage.deleteHighlight(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to delete highlight" });
+    }
+  });
+
+  // User Notes
+  app.post("/api/user-notes", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).send("Unauthorized");
+      const note = await storage.createUserNote({
+        ...req.body,
+        userId: (req.user as any).id,
+        createdAt: new Date(),
+      });
+      res.json(note);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to create note" });
+    }
+  });
+
+  app.get("/api/documents/:id/user-notes", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).send("Unauthorized");
+      const notes = await storage.getUserNotes(req.params.id);
+      res.json(notes);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to get notes" });
+    }
+  });
+
+  // User Flashcards
+  app.post("/api/user-flashcards", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).send("Unauthorized");
+      const flashcard = await storage.createUserFlashcard({
+        ...req.body,
+        userId: (req.user as any).id,
+        createdAt: new Date(),
+      });
+      res.json(flashcard);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to create flashcard" });
+    }
+  });
+
+  app.get("/api/documents/:id/user-flashcards", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).send("Unauthorized");
+      const flashcards = await storage.getUserFlashcards(req.params.id);
+      res.json(flashcards);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to get flashcards" });
+    }
+  });
+
+
 
   return httpServer;
 }
