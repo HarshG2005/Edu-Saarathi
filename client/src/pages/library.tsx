@@ -210,7 +210,7 @@ export function LibraryPage() {
             {filteredDocuments
               .slice()
               .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
-              .slice(0, 5)
+              .slice(0, 8)
               .map((doc) => (
                 <Card
                   key={doc.id}
