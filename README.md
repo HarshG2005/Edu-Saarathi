@@ -4,7 +4,7 @@
 
 ### Prerequisites
 - Node.js (v20 or later)
-- PostgreSQL Database
+
 
 ### Installation
 
@@ -19,18 +19,13 @@
 1.  Create a `.env` file in the root directory (`EduQuestAI/`).
 2.  Add the following environment variables:
     ```env
-    DATABASE_URL=postgresql://user:password@host:port/dbname
+    ```env
     GEMINI_API_KEY=your_gemini_api_key
     SESSION_SECRET=your_session_secret
     PORT=5000
     ```
 
-### Database Setup
 
-Push the database schema to your PostgreSQL instance:
-```bash
-npm run db:push
-```
 
 ### Running the Application
 
@@ -113,7 +108,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage Solutions
 
-**Architecture**: Local-first storage pattern with in-memory fallback
+**Architecture**: Local-first storage pattern using JSON files.
 
 **Storage Interface** (`IStorage`):
 - Documents (PDFs with extracted text and metadata)
@@ -125,13 +120,16 @@ Preferred communication style: Simple, everyday language.
 - Quiz Results (performance tracking)
 - Chat Sessions (tutor conversation history)
 
-**Database**:
-- Configured for PostgreSQL via Drizzle ORM
-- Schema defined in `shared/schema.ts` using Zod for validation
-- Neon serverless PostgreSQL client for database connectivity
-- Migration system via drizzle-kit
+**Storage Implementation**:
+- **JSON Storage**: Data is saved as JSON files in the `data/` directory.
+- **Structure**:
+  - `data/documents/`: Uploaded document metadata
+  - `data/mcqs/`: Generated MCQ sets
+  - `data/flashcards/`: Flashcard sets
+  - `data/notes/`: Extracted notes
+  - ...and so on.
 
-**Rationale**: While the current implementation uses an in-memory storage interface, the database configuration allows for future persistence. This supports the local-first philosophy while enabling optional cloud sync if needed.
+**Rationale**: This approach ensures complete data ownership and offline accessibility. Users can directly view and backup their data files.
 
 ### AI Integration
 
@@ -156,9 +154,7 @@ Preferred communication style: Simple, everyday language.
 **AI/ML**:
 - Google Generative AI library - Primary AI provider option (requires GEMINI_API_KEY)
 
-**Database**:
-- Neon Serverless PostgreSQL - Cloud-hosted PostgreSQL database
-- Requires DATABASE_URL environment variable
+
 
 ### Key NPM Packages
 
@@ -175,20 +171,20 @@ Preferred communication style: Simple, everyday language.
 - express - Web framework
 - multer - File upload handling
 - pdfjs-dist - PDF text extraction
-- drizzle-orm - Database ORM
+
 - zod - Schema validation
 
 **Development**:
 - vite - Build tool and dev server
 - tsx - TypeScript execution
 - tailwindcss - CSS framework
-- @replit/* plugins - Replit-specific development tooling
+
 
 ### Configuration Requirements
 
 **Environment Variables**:
 - `GEMINI_API_KEY` - Required for AI features
-- `DATABASE_URL` - Required for PostgreSQL connection
+
 - `NODE_ENV` - Environment mode (development/production)
 
 **Build Configuration**:
