@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": false,
+        "module": "CommonJS",
+        "moduleResolution": "Node",
+        "allowImportingTsExtensions": false,
+        "outDir": "./dist-schema",
+        "strict": false,
+        "skipLibCheck": true
+    },
+    "include": [
+        "shared/schema.migration.ts"
+    ]
+}

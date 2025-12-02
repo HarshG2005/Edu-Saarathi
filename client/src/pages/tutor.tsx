@@ -76,7 +76,7 @@ export function TutorPage() {
         id: crypto.randomUUID(),
         role: "user",
         content: userMessage,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
       };
       setCurrentSession((prev) =>
         prev ? { ...prev, messages: [...prev.messages, newMessage] } : prev
@@ -276,7 +276,7 @@ export function TutorPage() {
             </CardHeader>
             <ScrollArea className="h-[calc(100%-3rem)]">
               <div className="space-y-1 p-2">
-                {chatSessions.slice().reverse().map((session) => (
+                {chatSessions.slice().reverse().slice(0, 5).map((session) => (
                   <button
                     key={session.id}
                     onClick={() => setCurrentSession(session)}

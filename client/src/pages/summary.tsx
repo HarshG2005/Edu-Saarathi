@@ -22,6 +22,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Summary } from "@shared/schema";
 import { getStoredProvider, AISettings } from "@/components/ai-settings";
+import { formatDate } from "@/lib/utils";
 
 export function SummaryPage() {
   const { documents, currentDocumentId, summaries, addSummary } = useAppStore();
@@ -245,7 +246,7 @@ export function SummaryPage() {
             <div className="mt-8">
               <h3 className="mb-4 text-lg font-semibold">Previous Summaries</h3>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {summaries.slice().reverse().map((summary) => (
+                {summaries.slice().reverse().slice(0, 5).map((summary) => (
                   <Card
                     key={summary.id}
                     className="cursor-pointer hover-elevate"
@@ -265,7 +266,12 @@ export function SummaryPage() {
                             {summary.content.slice(0, 100)}...
                           </p>
                         </div>
-                        <Badge variant="secondary">{summary.mode}</Badge>
+                        <div className="flex flex-col items-end gap-1">
+                          <Badge variant="secondary">{summary.mode}</Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {formatDate(summary.createdAt)}
+                          </span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

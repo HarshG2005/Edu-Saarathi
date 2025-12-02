@@ -22,6 +22,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { FlashcardSet } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
 import { getStoredProvider, AISettings } from "@/components/ai-settings";
+import { formatDate } from "@/lib/utils";
 
 export function FlashcardsPage() {
   const { documents, currentDocumentId, flashcardSets, addFlashcardSet, updateFlashcardMastery } = useAppStore();
@@ -240,7 +241,7 @@ export function FlashcardsPage() {
             <div className="mt-8">
               <h3 className="mb-4 text-lg font-semibold">Your Flashcard Sets</h3>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {flashcardSets.slice().reverse().map((set) => {
+                {flashcardSets.slice().reverse().slice(0, 5).map((set) => {
                   const mastered = set.flashcards.filter((c) => c.mastered).length;
                   const progress = Math.round((mastered / set.flashcards.length) * 100);
 
@@ -265,6 +266,9 @@ export function FlashcardsPage() {
                               {set.flashcards.length} cards • {mastered} mastered
                             </p>
                           </div>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            {formatDate(set.createdAt)}
+                          </span>
                         </div>
                         <div className="mt-3">
                           <Progress value={progress} className="h-2" />
@@ -336,18 +340,15 @@ export function FlashcardsPage() {
                     exit={{ rotateY: isFlipped ? 90 : -90, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Card className="min-h-64">
-                      <CardContent className="flex min-h-64 flex-col items-center justify-center p-8 text-center">
-                        <Badge
-                          variant="outline"
-                          className="absolute right-4 top-4"
-                        >
-                          {isFlipped ? "Back" : "Front"}
-                        </Badge>
-                        <p className="text-xl leading-relaxed" data-testid="text-flashcard-content">
+                    <Card className={`min-h-80 border-0 shadow-xl ${isFlipped
+                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+                      : "bg-gradient-to-br from-blue-500 to-violet-600 text-white"
+                      }`}>
+                      <CardContent className="flex min-h-80 flex-col items-center justify-center p-12 text-center">
+                        <p className="text-3xl font-bold leading-relaxed tracking-wide" data-testid="text-flashcard-content">
                           {isFlipped ? currentCard.back : currentCard.front}
                         </p>
-                        <p className="mt-6 text-sm text-muted-foreground">
+                        <p className="mt-8 text-sm font-medium text-white/70">
                           Click to {isFlipped ? "see question" : "reveal answer"}
                         </p>
                       </CardContent>

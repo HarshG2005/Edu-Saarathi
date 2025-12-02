@@ -250,6 +250,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-import { JsonStorage } from "./storage-json";
+import { DbStorage } from "./storage-db";
 
-export const storage = new JsonStorage();
+export const storage = new DbStorage();

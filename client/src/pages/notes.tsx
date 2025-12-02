@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -26,6 +25,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Notes } from "@shared/schema";
 import { getStoredProvider, AISettings } from "@/components/ai-settings";
+import { formatDate } from "@/lib/utils";
 
 export function NotesPage() {
   const { documents, currentDocumentId, notes, addNotes } = useAppStore();
@@ -254,7 +254,7 @@ export function NotesPage() {
             <div className="mt-8">
               <h3 className="mb-4 text-lg font-semibold">Previous Notes</h3>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {notes.slice().reverse().map((noteSet) => (
+                {notes.slice().reverse().slice(0, 5).map((noteSet) => (
                   <Card
                     key={noteSet.id}
                     className="cursor-pointer hover-elevate"
@@ -272,7 +272,12 @@ export function NotesPage() {
                             {noteSet.keyPoints.length} key points • {noteSet.definitions.length} definitions
                           </p>
                         </div>
-                        <StickyNote className="h-5 w-5 text-muted-foreground" />
+                        <div className="flex flex-col items-end gap-1">
+                          <StickyNote className="h-5 w-5 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">
+                            {formatDate(noteSet.createdAt)}
+                          </span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

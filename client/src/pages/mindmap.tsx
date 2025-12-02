@@ -32,6 +32,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Mindmap } from "@shared/schema";
 import { getStoredProvider, AISettings } from "@/components/ai-settings";
+import { formatDate } from "@/lib/utils";
 
 const nodeDefaults = {
   style: {
@@ -240,7 +241,7 @@ export function MindmapPage() {
             <div className="mt-8">
               <h3 className="mb-4 text-lg font-semibold">Previous Mindmaps</h3>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {mindmaps.slice().reverse().map((mindmap) => (
+                {mindmaps.slice().reverse().slice(0, 5).map((mindmap) => (
                   <Card
                     key={mindmap.id}
                     className="cursor-pointer hover-elevate"
@@ -255,7 +256,12 @@ export function MindmapPage() {
                             {mindmap.nodes.length} concepts • {mindmap.edges.length} connections
                           </p>
                         </div>
-                        <Network className="h-5 w-5 text-muted-foreground" />
+                        <div className="flex flex-col items-end gap-1">
+                          <Network className="h-5 w-5 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">
+                            {formatDate(mindmap.createdAt)}
+                          </span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

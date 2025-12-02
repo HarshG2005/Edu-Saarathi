@@ -35,17 +35,17 @@ export function LibraryPage() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append("file", file);
-      
+
       const response = await fetch("/api/documents/upload", {
         method: "POST",
         body: formData,
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to upload document");
       }
-      
+
       return response.json() as Promise<Document>;
     },
     onSuccess: (data) => {
@@ -140,11 +140,10 @@ export function LibraryPage() {
       </div>
 
       <div
-        className={`relative flex min-h-48 flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 transition-colors ${
-          isDragging
+        className={`relative flex min-h-48 flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 transition-colors ${isDragging
             ? "border-primary bg-primary/5"
             : "border-muted-foreground/25 hover:border-primary/50"
-        }`}
+          }`}
         onDragOver={(e) => {
           e.preventDefault();
           setIsDragging(true);
@@ -202,7 +201,7 @@ export function LibraryPage() {
 
       {filteredDocuments.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredDocuments.map((doc) => (
+          {filteredDocuments.slice(0, 5).map((doc) => (
             <Card
               key={doc.id}
               className="group hover-elevate cursor-pointer transition-all"

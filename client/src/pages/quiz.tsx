@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { HelpCircle, Play, Clock, Check, X, Trophy, RotateCcw, ChevronRight } from "lucide-react";
+import { HelpCircle, Play, Clock, Check, X, Trophy, RotateCcw, ChevronRight, BarChart2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getStoredProvider, AISettings } from "@/components/ai-settings";
+import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +18,7 @@ import {
 import { useAppStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
 import type { MCQSet, QuizResult, QuizAnswer } from "@shared/schema";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from "recharts";
 
 type QuizState = "setup" | "active" | "results";
 
@@ -41,7 +44,7 @@ export function QuizPage() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    
+
     if (quizState === "active" && timedMode && timeRemaining > 0) {
       interval = setInterval(() => {
         setTimeRemaining((t) => {
@@ -53,7 +56,7 @@ export function QuizPage() {
         });
       }, 1000);
     }
-    
+
     return () => clearInterval(interval);
   }, [quizState, timedMode, timeRemaining]);
 
@@ -66,7 +69,7 @@ export function QuizPage() {
         timeTaken: timePerQuestion,
       };
       setAnswers((prev) => [...prev, answer]);
-      
+
       if (currentMCQSet && currentIndex < currentMCQSet.mcqs.length - 1) {
         setCurrentIndex((i) => i + 1);
         setTimeRemaining(timePerQuestion);
@@ -127,6 +130,35 @@ export function QuizPage() {
     }
   };
 
+  const handleSkip = () => {
+    if (!currentMCQ || !currentMCQSet) return;
+
+    const timeTaken = Math.round((Date.now() - questionStartTime) / 1000);
+    const answer: QuizAnswer = {
+      mcqId: currentMCQ.id,
+      selectedOptionId: "",
+      isCorrect: false,
+      timeTaken,
+    };
+
+    const newAnswers = [...answers, answer];
+    setAnswers(newAnswers);
+
+    if (currentIndex < currentMCQSet.mcqs.length - 1) {
+      setCurrentIndex((i) => i + 1);
+      setQuestionStartTime(Date.now());
+      if (timedMode) {
+        setTimeRemaining(timePerQuestion);
+      }
+    } else {
+      finishQuiz(newAnswers);
+    }
+  };
+
+  const handleEarlySubmit = () => {
+    finishQuiz(answers);
+  };
+
   const finishQuiz = (finalAnswers: QuizAnswer[]) => {
     if (!currentMCQSet) return;
 
@@ -144,7 +176,7 @@ export function QuizPage() {
       totalQuestions: total,
       percentage,
       timeTaken: totalTime,
-      completedAt: new Date().toISOString(),
+      completedAt: new Date(),
     };
 
     addQuizResult(result);
@@ -163,7 +195,7 @@ export function QuizPage() {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
+    return `${mins}:${secs.toString().padStart(2, "0")} `;
   };
 
   const getScoreColor = (percentage: number) => {
@@ -171,6 +203,11 @@ export function QuizPage() {
     if (percentage >= 60) return "text-yellow-600 dark:text-yellow-400";
     return "text-red-600 dark:text-red-400";
   };
+
+  const getChartData = (result: QuizResult) => [
+    { name: "Correct", value: result.score, color: "#22c55e" },
+    { name: "Incorrect", value: result.totalQuestions - result.score, color: "#ef4444" },
+  ];
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -203,9 +240,9 @@ export function QuizPage() {
                         No MCQ sets available - generate some first!
                       </SelectItem>
                     ) : (
-                      mcqSets.map((set) => (
+                      mcqSets.slice().reverse().slice(0, 5).map((set) => (
                         <SelectItem key={set.id} value={set.id}>
-                          {set.topic || "MCQ Set"} ({set.mcqs.length} questions)
+                          {set.topic || "MCQ Set"} ({set.mcqs.length} questions) - {formatDate(set.createdAt)}
                         </SelectItem>
                       ))
                     )}
@@ -278,13 +315,13 @@ export function QuizPage() {
                     <div
                       key={result.id}
                       className="flex items-center justify-between rounded-lg border p-3"
-                      data-testid={`result-${result.id}`}
+                      data-testid={`result - ${result.id} `}
                     >
                       <div>
                         <p className="font-medium">{result.topic}</p>
                         <p className="text-sm text-muted-foreground">
                           {result.score}/{result.totalQuestions} correct
-                          {result.timeTaken && ` • ${formatTime(result.timeTaken)}`}
+                          {result.timeTaken && ` • ${formatTime(result.timeTaken)} `}
                         </p>
                       </div>
                       <Badge className={getScoreColor(result.percentage)}>
@@ -333,7 +370,7 @@ export function QuizPage() {
                     key={option.id}
                     onClick={() => handleAnswer(option.id)}
                     className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:border-primary hover:bg-muted/50"
-                    data-testid={`button-option-${option.id}`}
+                    data-testid={`button - option - ${option.id} `}
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-medium">
                       {String.fromCharCode(65 + idx)}
@@ -349,98 +386,133 @@ export function QuizPage() {
       )}
 
       {quizState === "results" && currentResult && currentMCQSet && (
-        <div className="mx-auto w-full max-w-2xl">
-          <Card className="mb-6 text-center">
-            <CardContent className="p-8">
-              <div className="mb-6 flex justify-center">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10">
-                  <Trophy className="h-12 w-12 text-primary" />
+        <div className="mx-auto w-full max-w-4xl">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-yellow-500" />
+                  Performance Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center justify-center p-6">
+                <div className="relative h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={getChartData(currentResult)}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {getChartData(currentResult).map((entry, index) => (
+                          <Cell key={`cell - ${index} `} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip />
+                      <Legend verticalAlign="bottom" height={36} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center">
+                    <p className="text-3xl font-bold">{currentResult.percentage}%</p>
+                    <p className="text-xs text-muted-foreground">Score</p>
+                  </div>
                 </div>
-              </div>
-              <h2 className="mb-2 text-2xl font-bold">Quiz Complete!</h2>
-              <p className="mb-6 text-muted-foreground">{currentResult.topic}</p>
 
-              <div className="mb-6 flex justify-center gap-8">
-                <div className="text-center">
-                  <p
-                    className={`text-5xl font-bold ${getScoreColor(currentResult.percentage)}`}
-                    data-testid="text-score"
-                  >
-                    {currentResult.percentage}%
-                  </p>
-                  <p className="text-sm text-muted-foreground">Score</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-5xl font-bold">
-                    {currentResult.score}/{currentResult.totalQuestions}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Correct</p>
-                </div>
-                {currentResult.timeTaken && (
-                  <div className="text-center">
-                    <p className="text-5xl font-bold">
-                      {formatTime(currentResult.timeTaken)}
+                <div className="mt-6 grid w-full grid-cols-3 gap-4 text-center">
+                  <div className="rounded-lg bg-muted p-3">
+                    <p className="text-2xl font-bold text-green-600">{currentResult.score}</p>
+                    <p className="text-xs text-muted-foreground">Correct</p>
+                  </div>
+                  <div className="rounded-lg bg-muted p-3">
+                    <p className="text-2xl font-bold text-red-600">
+                      {currentResult.totalQuestions - currentResult.score}
                     </p>
-                    <p className="text-sm text-muted-foreground">Time</p>
+                    <p className="text-xs text-muted-foreground">Incorrect</p>
                   </div>
-                )}
-              </div>
-
-              <Button onClick={resetQuiz} data-testid="button-try-again">
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Take Another Quiz
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Answer Review</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {currentMCQSet.mcqs.map((mcq, idx) => {
-                const answer = currentResult.answers[idx];
-                const correctOption = mcq.options.find((o) => o.isCorrect);
-                const selectedOption = mcq.options.find((o) => o.id === answer?.selectedOptionId);
-
-                return (
-                  <div
-                    key={mcq.id}
-                    className={`rounded-lg border p-4 ${
-                      answer?.isCorrect
-                        ? "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-900/20"
-                        : "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/20"
-                    }`}
-                    data-testid={`review-${mcq.id}`}
-                  >
-                    <div className="mb-2 flex items-start gap-2">
-                      {answer?.isCorrect ? (
-                        <Check className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
-                      ) : (
-                        <X className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-                      )}
-                      <p className="font-medium">
-                        Q{idx + 1}. {mcq.question}
-                      </p>
-                    </div>
-                    <div className="ml-7 space-y-1 text-sm">
-                      <p className="text-green-700 dark:text-green-400">
-                        Correct: {correctOption?.text}
-                      </p>
-                      {!answer?.isCorrect && selectedOption && (
-                        <p className="text-red-700 dark:text-red-400">
-                          Your answer: {selectedOption.text}
-                        </p>
-                      )}
-                      {!answer?.selectedOptionId && (
-                        <p className="text-muted-foreground">Not answered (time ran out)</p>
-                      )}
-                    </div>
+                  <div className="rounded-lg bg-muted p-3">
+                    <p className="text-2xl font-bold">
+                      {currentResult.timeTaken ? formatTime(currentResult.timeTaken) : "--:--"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Time Taken</p>
                   </div>
-                );
-              })}
-            </CardContent>
-          </Card>
+                </div>
+
+                <Button onClick={resetQuiz} className="mt-6 w-full" data-testid="button-try-again">
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Take Another Quiz
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="h-full overflow-hidden">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart2 className="h-5 w-5" />
+                  Detailed Review
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="max-h-[500px] overflow-y-auto pr-2">
+                <div className="space-y-4">
+                  {currentMCQSet.mcqs.map((mcq, idx) => {
+                    const answer = currentResult.answers[idx];
+                    const correctOption = mcq.options.find((o) => o.isCorrect);
+                    const selectedOption = mcq.options.find((o) => o.id === answer?.selectedOptionId);
+
+                    return (
+                      <div
+                        key={mcq.id}
+                        className={`rounded - lg border p - 4 transition - all ${answer?.isCorrect
+                          ? "border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-900/10"
+                          : "border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-900/10"
+                          } `}
+                        data-testid={`review - ${mcq.id} `}
+                      >
+                        <div className="mb-2 flex items-start gap-2">
+                          {answer?.isCorrect ? (
+                            <Check className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
+                          ) : (
+                            <X className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                          )}
+                          <p className="font-medium text-sm">
+                            <span className="mr-2 font-bold text-muted-foreground">Q{idx + 1}</span>
+                            {mcq.question}
+                          </p>
+                        </div>
+                        <div className="ml-7 space-y-2 text-sm">
+                          <div className="flex items-center gap-2 rounded bg-green-100/50 px-2 py-1 dark:bg-green-900/30">
+                            <Check className="h-3 w-3 text-green-600" />
+                            <span className="font-medium text-green-700 dark:text-green-400">
+                              Correct: {correctOption?.text}
+                            </span>
+                          </div>
+                          {!answer?.isCorrect && selectedOption && (
+                            <div className="flex items-center gap-2 rounded bg-red-100/50 px-2 py-1 dark:bg-red-900/30">
+                              <X className="h-3 w-3 text-red-600" />
+                              <span className="font-medium text-red-700 dark:text-red-400">
+                                Your Answer: {selectedOption.text}
+                              </span>
+                            </div>
+                          )}
+                          {!answer?.selectedOptionId && (
+                            <p className="text-muted-foreground italic">Skipped / Time ran out</p>
+                          )}
+                          {mcq.explanation && (
+                            <div className="mt-2 rounded bg-muted p-2 text-xs text-muted-foreground">
+                              <span className="font-bold">Explanation:</span> {mcq.explanation}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
     </div>

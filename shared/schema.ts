@@ -1,33 +1,9 @@
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uuid } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Document schema
-export const documentSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  name: z.string(),
-  fileName: z.string(),
-  fileSize: z.number(),
-  pageCount: z.number(),
-  uploadedAt: z.string(),
-  content: z.string(),
-  chunks: z.array(z.string()),
-});
+// --- Types for JSON columns (Defined first) ---
 
-export type Document = z.infer<typeof documentSchema>;
-export type InsertDocument = Omit<Document, "id">;
-
-// User schema
-export const userSchema = z.object({
-  id: z.string(),
-  username: z.string(),
-  password: z.string(),
-});
-
-export type User = z.infer<typeof userSchema>;
-export type InsertUser = Omit<User, "id">;
-export const insertUserSchema = userSchema.omit({ id: true });
-
-// MCQ schemas
 export const mcqOptionSchema = z.object({
   id: z.string(),
   text: z.string(),
@@ -42,20 +18,9 @@ export const mcqSchema = z.object({
   explanation: z.string().optional(),
 });
 
-export const mcqSetSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  documentId: z.string().optional(),
-  topic: z.string(),
-  mcqs: z.array(mcqSchema),
-  createdAt: z.string(),
-});
-
 export type MCQOption = z.infer<typeof mcqOptionSchema>;
 export type MCQ = z.infer<typeof mcqSchema>;
-export type MCQSet = z.infer<typeof mcqSetSchema>;
 
-// Flashcard schemas
 export const flashcardSchema = z.object({
   id: z.string(),
   front: z.string(),
@@ -63,34 +28,8 @@ export const flashcardSchema = z.object({
   mastered: z.boolean(),
 });
 
-export const flashcardSetSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  documentId: z.string().optional(),
-  topic: z.string(),
-  flashcards: z.array(flashcardSchema),
-  createdAt: z.string(),
-});
-
 export type Flashcard = z.infer<typeof flashcardSchema>;
-export type FlashcardSet = z.infer<typeof flashcardSetSchema>;
 
-// Summary schemas
-export const summarySchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  documentId: z.string().optional(),
-  topic: z.string(),
-  mode: z.enum(["short", "medium", "detailed"]),
-  content: z.string(),
-  bulletPoints: z.array(z.string()).optional(),
-  keyTerms: z.array(z.string()).optional(),
-  createdAt: z.string(),
-});
-
-export type Summary = z.infer<typeof summarySchema>;
-
-// Mindmap schemas
 export const mindmapNodeSchema = z.object({
   id: z.string(),
   type: z.string().optional(),
@@ -110,39 +49,9 @@ export const mindmapEdgeSchema = z.object({
   animated: z.boolean().optional(),
 });
 
-export const mindmapSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  documentId: z.string().optional(),
-  topic: z.string(),
-  nodes: z.array(mindmapNodeSchema),
-  edges: z.array(mindmapEdgeSchema),
-  createdAt: z.string(),
-});
-
 export type MindmapNode = z.infer<typeof mindmapNodeSchema>;
 export type MindmapEdge = z.infer<typeof mindmapEdgeSchema>;
-export type Mindmap = z.infer<typeof mindmapSchema>;
 
-// Notes schemas
-export const notesSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  documentId: z.string().optional(),
-  topic: z.string(),
-  keyPoints: z.array(z.string()),
-  definitions: z.array(z.object({
-    term: z.string(),
-    definition: z.string(),
-  })),
-  importantSentences: z.array(z.string()),
-  formulas: z.array(z.string()).optional(),
-  createdAt: z.string(),
-});
-
-export type Notes = z.infer<typeof notesSchema>;
-
-// Tutor chat schemas
 export const chatMessageSchema = z.object({
   id: z.string(),
   role: z.enum(["user", "assistant"]),
@@ -150,18 +59,8 @@ export const chatMessageSchema = z.object({
   timestamp: z.string(),
 });
 
-export const chatSessionSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  documentId: z.string().optional(),
-  messages: z.array(chatMessageSchema),
-  createdAt: z.string(),
-});
-
 export type ChatMessage = z.infer<typeof chatMessageSchema>;
-export type ChatSession = z.infer<typeof chatSessionSchema>;
 
-// Quiz schemas
 export const quizAnswerSchema = z.object({
   mcqId: z.string(),
   selectedOptionId: z.string(),
@@ -169,42 +68,139 @@ export const quizAnswerSchema = z.object({
   timeTaken: z.number().optional(),
 });
 
-export const quizResultSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  mcqSetId: z.string(),
-  topic: z.string(),
-  answers: z.array(quizAnswerSchema),
-  score: z.number(),
-  totalQuestions: z.number(),
-  percentage: z.number(),
-  timeTaken: z.number().optional(),
-  completedAt: z.string(),
-});
-
 export type QuizAnswer = z.infer<typeof quizAnswerSchema>;
-export type QuizResult = z.infer<typeof quizResultSchema>;
 
-// Progress schemas
-export const progressSchema = z.object({
-  totalDocuments: z.number(),
-  totalQuizzes: z.number(),
-  totalFlashcards: z.number(),
-  averageScore: z.number(),
-  masteredFlashcards: z.number(),
-  topicAccuracy: z.array(z.object({
-    topic: z.string(),
-    accuracy: z.number(),
-    attempts: z.number(),
-  })),
-  recentActivity: z.array(z.object({
-    type: z.string(),
-    description: z.string(),
-    timestamp: z.string(),
-  })),
+// --- Drizzle Tables ---
+
+// Users
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
 });
 
-export type Progress = z.infer<typeof progressSchema>;
+export const insertUserSchema = createInsertSchema(users).omit({ id: true });
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
+// Documents
+export const documents = pgTable("documents", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  name: text("name").notNull(),
+  fileName: text("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),
+  pageCount: integer("page_count").notNull(),
+  uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
+  content: text("content").notNull(),
+  chunks: jsonb("chunks").notNull(),
+});
+
+export const documentSchema = createInsertSchema(documents);
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = z.infer<typeof documentSchema>;
+
+// MCQ Sets
+export const mcqSets = pgTable("mcq_sets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  documentId: uuid("document_id").references(() => documents.id),
+  topic: text("topic").notNull(),
+  mcqs: jsonb("mcqs").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const mcqSetSchema = createInsertSchema(mcqSets);
+export type MCQSet = typeof mcqSets.$inferSelect;
+
+// Flashcard Sets
+export const flashcardSets = pgTable("flashcard_sets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  documentId: uuid("document_id").references(() => documents.id),
+  topic: text("topic").notNull(),
+  flashcards: jsonb("flashcards").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const flashcardSetSchema = createInsertSchema(flashcardSets);
+export type FlashcardSet = typeof flashcardSets.$inferSelect;
+
+// Summaries
+export const summaries = pgTable("summaries", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  documentId: uuid("document_id").references(() => documents.id),
+  topic: text("topic").notNull(),
+  mode: text("mode").notNull(), // "short", "medium", "detailed"
+  content: text("content").notNull(),
+  bulletPoints: jsonb("bullet_points").default([]),
+  keyTerms: jsonb("key_terms").default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const summarySchema = createInsertSchema(summaries);
+export type Summary = typeof summaries.$inferSelect;
+
+// Mindmaps
+export const mindmaps = pgTable("mindmaps", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  documentId: uuid("document_id").references(() => documents.id),
+  topic: text("topic").notNull(),
+  nodes: jsonb("nodes").notNull(),
+  edges: jsonb("edges").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const mindmapSchema = createInsertSchema(mindmaps);
+export type Mindmap = typeof mindmaps.$inferSelect;
+
+// Notes
+export const notes = pgTable("notes", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  documentId: uuid("document_id").references(() => documents.id),
+  topic: text("topic").notNull(),
+  keyPoints: jsonb("key_points").notNull(),
+  definitions: jsonb("definitions").notNull(),
+  importantSentences: jsonb("important_sentences").notNull(),
+  formulas: jsonb("formulas").default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const notesSchema = createInsertSchema(notes);
+export type Notes = typeof notes.$inferSelect;
+
+// Quiz Results
+export const quizResults = pgTable("quiz_results", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  mcqSetId: uuid("mcq_set_id").notNull(),
+  topic: text("topic").notNull(),
+  answers: jsonb("answers").notNull(),
+  score: integer("score").notNull(),
+  totalQuestions: integer("total_questions").notNull(),
+  percentage: integer("percentage").notNull(),
+  timeTaken: integer("time_taken"),
+  completedAt: timestamp("completed_at").defaultNow().notNull(),
+});
+
+export const quizResultSchema = createInsertSchema(quizResults);
+export type QuizResult = typeof quizResults.$inferSelect;
+
+// Chat Sessions
+export const chatSessions = pgTable("chat_sessions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  documentId: uuid("document_id").references(() => documents.id),
+  messages: jsonb("messages").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const chatSessionSchema = createInsertSchema(chatSessions);
+export type ChatSession = typeof chatSessions.$inferSelect;
+
 
 // API request schemas
 export const generateMCQRequestSchema = z.object({

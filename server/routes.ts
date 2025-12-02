@@ -20,6 +20,7 @@ import {
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { setupAuth } from "./auth";
+import { toSafeISO } from "./date-utils";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -106,7 +107,7 @@ export async function registerRoutes(
         fileName: req.file.originalname,
         fileSize: req.file.size,
         pageCount,
-        uploadedAt: new Date().toISOString(),
+        uploadedAt: new Date(),
         content: text,
         chunks,
       });
@@ -210,7 +211,7 @@ export async function registerRoutes(
           difficulty,
           explanation: mcq.explanation,
         })),
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       });
 
       res.json(mcqSet);
@@ -259,7 +260,7 @@ export async function registerRoutes(
           back: fc.back,
           mastered: false,
         })),
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       });
 
       res.json(flashcardSet);
@@ -306,7 +307,7 @@ export async function registerRoutes(
         content: result.content,
         bulletPoints: result.bulletPoints,
         keyTerms: result.keyTerms,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       });
 
       res.json(summary);
@@ -361,7 +362,7 @@ export async function registerRoutes(
           target: edge.target,
           animated: true,
         })),
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       });
 
       res.json(mindmap);
@@ -408,7 +409,7 @@ export async function registerRoutes(
         definitions: result.definitions,
         importantSentences: result.importantSentences,
         formulas: result.formulas,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       });
 
       res.json(notes);
@@ -447,14 +448,14 @@ export async function registerRoutes(
         id: randomUUID(),
         role: "user" as const,
         content: message,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
       };
 
       const assistantMessage = {
         id: randomUUID(),
         role: "assistant" as const,
         content: response,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
       };
 
       if (session) {
@@ -466,7 +467,7 @@ export async function registerRoutes(
           userId: (req.user as any).id,
           documentId,
           messages: [userMessage, assistantMessage],
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
         });
       }
 
@@ -496,6 +497,116 @@ export async function registerRoutes(
       res.json(results);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to get quiz results" });
+    }
+  });
+
+  // Stats Endpoint
+  app.get("/api/stats", async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const { documentId, range } = req.query;
+
+      const [quizResults, mcqSets, flashcardSets] = await Promise.all([
+        storage.getQuizResults(userId),
+        storage.getMCQSets(userId),
+        storage.getFlashcardSets(userId)
+      ]);
+
+      const mcqSetMap = new Map(mcqSets.map(s => [s.id, s]));
+
+      // Filter by Document
+      let filteredQuizResults = quizResults;
+      let filteredFlashcardSets = flashcardSets;
+
+      if (documentId && documentId !== "all") {
+        filteredQuizResults = quizResults.filter(r => {
+          const set = mcqSetMap.get(r.mcqSetId);
+          return set?.documentId === documentId;
+        });
+        filteredFlashcardSets = flashcardSets.filter(s => s.documentId === documentId);
+      }
+
+      // Filter by Time Range (for trends/activity)
+      const now = new Date();
+      let startDate = new Date(0); // Default to all time
+
+      if (range === "week") {
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else if (range === "month") {
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      }
+
+      const recentActivity = [
+        ...filteredQuizResults.map(r => ({
+          type: "quiz",
+          topic: r.topic,
+          date: toSafeISO(r.completedAt) || "",
+          score: r.percentage
+        })),
+        ...filteredFlashcardSets.map(s => ({
+          type: "flashcards",
+          topic: s.topic,
+          date: toSafeISO(s.createdAt) || "",
+          score: undefined
+        }))
+      ]
+        .filter(a => a.date && new Date(a.date) >= startDate)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 10);
+
+      // Calculate Stats
+      const totalQuizzes = filteredQuizResults.length;
+      const averageScore = totalQuizzes > 0
+        ? Math.round(filteredQuizResults.reduce((acc, r) => acc + r.percentage, 0) / totalQuizzes)
+        : 0;
+
+      const totalFlashcards = filteredFlashcardSets.reduce((acc, s) => acc + s.flashcards.length, 0);
+      const totalFlashcardsMastered = filteredFlashcardSets.reduce((acc, s) =>
+        acc + s.flashcards.filter(c => c.mastered).length, 0
+      );
+
+      const studyTime = filteredQuizResults.reduce((acc, r) => acc + (r.timeTaken || 0), 0) / 60; // Minutes
+
+      // Quiz Scores Trend
+      const quizScores = filteredQuizResults
+        .filter(r => new Date(r.completedAt) >= startDate)
+        .sort((a, b) => new Date(a.completedAt).getTime() - new Date(b.completedAt).getTime())
+        .map(r => ({
+          date: toSafeISO(r.completedAt) || "",
+          score: r.percentage,
+          topic: r.topic
+        }))
+        .filter(r => r.date); // Remove any with invalid dates
+
+      // Topic Mastery (Average score per topic)
+      const topicStats = new Map<string, { total: number; count: number }>();
+      filteredQuizResults.forEach(r => {
+        const current = topicStats.get(r.topic) || { total: 0, count: 0 };
+        topicStats.set(r.topic, {
+          total: current.total + r.percentage,
+          count: current.count + 1
+        });
+      });
+
+      const topicMastery = Array.from(topicStats.entries()).map(([name, stats]) => ({
+        name,
+        value: Math.round(stats.total / stats.count)
+      }));
+
+      res.json({
+        totalQuizzes,
+        averageScore,
+        totalFlashcardsMastered,
+        totalFlashcards,
+        studyTime,
+        quizScores,
+        topicMastery,
+        recentActivity
+      });
+
+    } catch (error: any) {
+      console.error("Error fetching stats:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch stats" });
     }
   });
 
