@@ -1,0 +1,474 @@
+EduQuest Local — AI Study Buddy (Local-First Edition)
+
+Version: 1.0
+Type: Local Desktop/Web App (Offline Capable)
+Audience: Developers using Cursor / Lovable / AI Coding Assistants
+
+1. Overview
+1.1 Product Summary
+
+EduQuest Local is a local-first AI-powered study tool that runs fully on the user’s device with no authentication, no cloud storage, and no external dependencies except optional AI APIs.
+
+Users can:
+
+Upload PDFs
+
+Generate MCQs
+
+Create flashcards
+
+Generate mindmaps
+
+Summarize chapters
+
+Extract notes
+
+Ask an AI tutor questions
+
+Create revision material
+
+Save everything locally
+
+All data is generated, stored, and used offline in JSON or local database.
+
+2. Goals & Non-Goals
+2.1 Goals
+
+Deliver a full AI “study buddy” experience offline
+
+Offer multiple knowledge outputs: MCQs, summaries, mindmaps, flashcards
+
+Enable users to analyze any PDF textbook locally
+
+Keep architecture simple, local, and fast
+
+Be easy to prototype and modify using AI coding assistants
+
+2.2 Non-Goals
+
+No authentication
+
+No multi-user support
+
+No online sync or cloud database
+
+No heavy backend scaling
+
+No enterprise features
+
+3. User Features (Local-Only)
+3.1 PDF Upload & Parsing
+
+Users can upload PDFs or DOCs.
+
+Requirements:
+
+Parse text locally
+
+Support OCR with Tesseract for scanned PDFs
+
+Detect headings, subheadings, and bullets
+
+Break content into chunks (200–600 words)
+
+Store parsed content locally in JSON files
+
+Output:
+
+/eduquest/docs/<doc_id>.json
+/eduquest/docs/<doc_id>_chunks.json
+
+3.2 MCQ Generator
+
+Generates MCQs from PDFs or user input.
+
+Features:
+
+5/10/20 MCQs per section
+
+Difficulty levels (easy/medium/hard)
+
+One correct + 3 distractors
+
+“Regenerate” option
+
+Save MCQ sets locally
+
+Export to TXT/PDF
+
+Output Example:
+
+/eduquest/mcqs/<doc_id>_mcqs.json
+
+3.3 Topic-Based MCQs (Without PDF)
+
+User enters any topic:
+
+“Generate MCQs for Photosynthesis.”
+
+Requirements:
+
+Use local LLM or external API
+
+Same MCQ format as above
+
+Save locally
+
+3.4 Flashcard Generator
+
+Generates flashcards from:
+
+Extracted key terms
+
+User content
+
+Uploaded PDFs
+
+Features:
+
+Front/back flashcards
+
+Shuffle mode
+
+Save locally
+
+Export as JSON/TXT
+
+Output:
+
+/eduquest/flashcards/<doc_id>_flashcards.json
+
+3.5 Summary Generator
+
+3 modes:
+
+Short (50–100 words)
+
+Medium (150–200 words)
+
+Detailed summary
+
+Additional:
+
+“Explain like I’m 5” mode
+
+Bullet point summaries
+
+Extract formulas / important terms
+
+Output:
+
+/eduquest/summaries/<doc_id>_summary.json
+
+3.6 Mindmap Generator
+
+Automatically generate mindmaps from parsed information.
+
+Features:
+
+Auto-create nodes from headings
+
+Editable nodes (rename, delete, add)
+
+Visual rendering using React Flow
+
+Export to PNG/SVG
+
+Save mindmap structure locally
+
+Output:
+
+/eduquest/mindmaps/<doc_id>_mindmap.json
+
+3.7 Local Notes Maker
+
+Automatically extract:
+
+Important sentences
+
+Named entities
+
+Definitions
+
+Formula list
+
+Key points sheet
+
+Output:
+
+/eduquest/notes/<doc_id>_notes.json
+
+3.8 Tutor Mode (Ask Any Question)
+
+User can ask:
+
+“Explain TCP handshake.”
+
+Features:
+
+Query local LLM or API
+
+Use optional retrieval (search chunks)
+
+Provide citation if using uploaded PDFs
+
+3.9 Local Quiz Mode
+
+Users can take quizzes offline.
+
+Features:
+
+Timed/untimed
+
+Random MCQs
+
+Score summary
+
+Accuracy tracking
+
+Weak topic detection
+
+Save quiz attempts locally
+
+Output:
+
+/eduquest/results/quiz_<timestamp>.json
+
+3.10 Local Progress Tracking
+
+Track:
+
+Flashcard mastery
+
+Topic accuracy
+
+Quiz performance
+
+Recent files
+
+Stored in SQLite or JSON.
+
+4. Technical Requirements
+4.1 Local Storage
+
+The entire app must store data locally.
+
+Options:
+
+Filesystem JSON folders (simplest)
+
+SQLite database (recommended)
+
+IndexedDB (if only frontend-based)
+
+Preferred Default:
+
+SQLite using a lightweight ORM (SQLModel / Prisma)
+
+4.2 Local Backend
+
+A lightweight local backend server must run:
+
+Option A: Python FastAPI (recommended)
+
+PDF parsing
+
+Embeddings
+
+LLM integration
+
+Notes generation
+
+Mindmap data generation
+
+Option B: Node + Express (secondary option)
+4.3 Local LLM Support
+
+Integrate with:
+
+Local Models:
+
+Ollama (Mistral, Llama, Qwen, Phi models)
+
+llama.cpp with GGUF models (CPU inference)
+
+GPT4All models
+
+API Models (optional):
+
+OpenAI
+
+Gemini
+
+Claude
+
+User should be able to select:
+
+Local LLM   |  Cloud LLM
+--------------------------
+Mistral      | GPT-4.1
+Llama 3      | GPT-3.5
+Qwen         | Gemini
+
+4.4 PDF Processing Pipeline (Local)
+
+Steps:
+
+Extract text → pdfplumber
+
+OCR if needed → Tesseract
+
+Clean text
+
+Segment by headings
+
+Chunk text for LLM
+
+Save content locally
+
+4.5 Mindmap Workflow
+
+Detect concepts with spaCy / keyphrase extraction
+
+Build node+edge JSON graph
+
+Render with React Flow
+
+Allow editing
+
+Export final map
+
+4.6 Frontend Architecture
+
+Frontend must be local-friendly:
+
+Stack:
+
+React
+
+Zustand/localStorage/IndexedDB
+
+TailwindCSS
+
+shadcn/ui
+
+React Flow (mindmaps)
+
+Axios/fetch to local backend
+
+App types supported:
+
+Localhost web app (in browser)
+
+Electron desktop app (optional)
+
+5. Non-Functional Requirements
+Performance
+
+Parse 20–50 page PDF in < 10 sec
+
+Generate 20 MCQs in < 10 sec using local LLM
+
+Display 100 flashcards instantly
+
+Reliability
+
+No login → No session data lost
+
+Auto-save outputs
+
+Security
+
+All processing offline
+
+No external API call unless user enables
+
+No analytics or logging
+
+Portability
+
+Should run on:
+
+Windows 10+
+
+macOS
+
+Linux
+
+Local Python environment or Node environment
+
+6. Folder Structure (Local App)
+root/
+ ├─ backend/
+ │   ├─ main.py (FastAPI)
+ │   ├─ routes/
+ │   ├─ services/
+ │   ├─ models/
+ │   ├─ utils/
+ │   └─ local_storage/
+ │       ├─ docs/
+ │       ├─ mcqs/
+ │       ├─ summaries/
+ │       ├─ mindmaps/
+ │       ├─ flashcards/
+ │       ├─ notes/
+ │       └─ results/
+ ├─ frontend/
+ │   ├─ src/
+ │   │   ├─ components/
+ │   │   ├─ pages/
+ │   │   ├─ context/
+ │   │   ├─ utils/
+ │   │   └─ hooks/
+ └─ README.md
+
+7. MVP Scope (for Coding Assistants)
+MVP Must Include:
+
+PDF upload
+
+Local parsing
+
+Generate MCQs
+
+Generate summaries
+
+Generate flashcards
+
+Generate mindmap JSON
+
+Simple mindmap UI
+
+Quiz mode
+
+Local storage
+
+Not Required for MVP:
+
+Auth
+
+Cloud database
+
+Payments
+
+Multi-user support
+
+Classroom features
+
+8. Future Extensions (Post-MVP)
+
+(Only listed so your architecture keeps room for growth)
+
+User accounts
+
+Sync across devices
+
+Cloud LLM fallbacks
+
+Fine-tuning pipelines
+
+Multi-document knowledge graph
+
+Teacher dashboards
+
+API access for institutions
