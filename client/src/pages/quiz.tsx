@@ -451,24 +451,28 @@ export function QuizPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {quizResults.slice(-5).reverse().map((result) => (
-                    <div
-                      key={result.id}
-                      className="flex items-center justify-between rounded-lg border p-3"
-                      data-testid={`result - ${result.id} `}
-                    >
-                      <div>
-                        <p className="font-medium">{result.topic}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {result.score}/{result.totalQuestions} correct
-                          {result.timeTaken && ` • ${formatTime(result.timeTaken)} `}
-                        </p>
+                  {quizResults
+                    .slice()
+                    .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+                    .slice(0, 5)
+                    .map((result) => (
+                      <div
+                        key={result.id}
+                        className="flex items-center justify-between rounded-lg border p-3"
+                        data-testid={`result - ${result.id} `}
+                      >
+                        <div>
+                          <p className="font-medium">{result.topic}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {result.score}/{result.totalQuestions} correct
+                            {result.timeTaken && ` • ${formatTime(result.timeTaken)} `}
+                          </p>
+                        </div>
+                        <Badge className={getScoreColor(result.percentage)}>
+                          {result.percentage}%
+                        </Badge>
                       </div>
-                      <Badge className={getScoreColor(result.percentage)}>
-                        {result.percentage}%
-                      </Badge>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </CardContent>
             </Card>

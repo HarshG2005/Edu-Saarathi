@@ -141,8 +141,8 @@ export function LibraryPage() {
 
       <div
         className={`relative flex min-h-48 flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 transition-colors ${isDragging
-            ? "border-primary bg-primary/5"
-            : "border-muted-foreground/25 hover:border-primary/50"
+          ? "border-primary bg-primary/5"
+          : "border-muted-foreground/25 hover:border-primary/50"
           }`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -201,84 +201,88 @@ export function LibraryPage() {
 
       {filteredDocuments.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredDocuments.slice(0, 5).map((doc) => (
-            <Card
-              key={doc.id}
-              className="group hover-elevate cursor-pointer transition-all"
-              data-testid={`card-document-${doc.id}`}
-            >
-              <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <FileText className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <CardTitle className="line-clamp-1 text-base font-semibold">
-                      {doc.name}
-                    </CardTitle>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span>{formatFileSize(doc.fileSize)}</span>
-                      <span>•</span>
-                      <span>{doc.pageCount} pages</span>
+          {filteredDocuments
+            .slice()
+            .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
+            .slice(0, 5)
+            .map((doc) => (
+              <Card
+                key={doc.id}
+                className="group hover-elevate cursor-pointer transition-all"
+                data-testid={`card-document-${doc.id}`}
+              >
+                <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <FileText className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <CardTitle className="line-clamp-1 text-base font-semibold">
+                        {doc.name}
+                      </CardTitle>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span>{formatFileSize(doc.fileSize)}</span>
+                        <span>•</span>
+                        <span>{doc.pageCount} pages</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="opacity-0 group-hover:opacity-100"
+                        data-testid={`button-document-menu-${doc.id}`}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedDocument(doc);
+                          setShowPreview(true);
+                        }}
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        Preview content
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleDeleteDocument(doc.id)}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Remove
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </CardHeader>
+                <CardContent className="pt-2">
+                  <p className="mb-4 text-xs text-muted-foreground">
+                    Uploaded {formatDate(doc.uploadedAt)}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 group-hover:opacity-100"
-                      data-testid={`button-document-menu-${doc.id}`}
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleUseDocument(doc.id, "mcq")}
+                      data-testid={`button-generate-mcq-${doc.id}`}
                     >
-                      <MoreVertical className="h-4 w-4" />
+                      Generate MCQs
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setSelectedDocument(doc);
-                        setShowPreview(true);
-                      }}
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleUseDocument(doc.id, "flashcards")}
+                      data-testid={`button-generate-flashcards-${doc.id}`}
                     >
-                      <Eye className="mr-2 h-4 w-4" />
-                      Preview content
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleDeleteDocument(doc.id)}
-                      className="text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Remove
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <p className="mb-4 text-xs text-muted-foreground">
-                  Uploaded {formatDate(doc.uploadedAt)}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => handleUseDocument(doc.id, "mcq")}
-                    data-testid={`button-generate-mcq-${doc.id}`}
-                  >
-                    Generate MCQs
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => handleUseDocument(doc.id, "flashcards")}
-                    data-testid={`button-generate-flashcards-${doc.id}`}
-                  >
-                    Flashcards
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                      Flashcards
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
         </div>
       ) : documents.length > 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
