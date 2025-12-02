@@ -11,6 +11,8 @@ import type {
     Notes,
     QuizResult,
     ChatSession,
+    User,
+    InsertUser,
 } from "@shared/schema";
 
 export class JsonStorage implements IStorage {
@@ -23,6 +25,7 @@ export class JsonStorage implements IStorage {
 
     private async init() {
         const dirs = [
+            "users",
             "documents",
             "mcqs",
             "flashcards",
@@ -76,13 +79,31 @@ export class JsonStorage implements IStorage {
         }
     }
 
+    // Users
+    async getUser(id: string): Promise<User | undefined> {
+        return this.readJson<User>("users", id);
+    }
+
+    async getUserByUsername(username: string): Promise<User | undefined> {
+        const users = await this.listJson<User>("users");
+        return users.find((u) => u.username === username);
+    }
+
+    async createUser(insertUser: InsertUser): Promise<User> {
+        const id = randomUUID();
+        const user: User = { ...insertUser, id };
+        return this.writeJson("users", id, user);
+    }
+
     // Documents
     async getDocument(id: string): Promise<Document | undefined> {
         return this.readJson<Document>("documents", id);
     }
 
-    async getDocuments(): Promise<Document[]> {
-        return this.listJson<Document>("documents");
+    async getDocuments(userId: string): Promise<Document[]> {
+        if (!userId) return [];
+        const docs = await this.listJson<Document>("documents");
+        return docs.filter(doc => doc.userId === userId);
     }
 
     async createDocument(doc: Omit<Document, "id">): Promise<Document> {
@@ -105,8 +126,9 @@ export class JsonStorage implements IStorage {
         return this.readJson<MCQSet>("mcqs", id);
     }
 
-    async getMCQSets(): Promise<MCQSet[]> {
-        return this.listJson<MCQSet>("mcqs");
+    async getMCQSets(userId: string): Promise<MCQSet[]> {
+        const sets = await this.listJson<MCQSet>("mcqs");
+        return sets.filter(set => set.userId === userId);
     }
 
     async createMCQSet(set: Omit<MCQSet, "id">): Promise<MCQSet> {
@@ -120,8 +142,9 @@ export class JsonStorage implements IStorage {
         return this.readJson<FlashcardSet>("flashcards", id);
     }
 
-    async getFlashcardSets(): Promise<FlashcardSet[]> {
-        return this.listJson<FlashcardSet>("flashcards");
+    async getFlashcardSets(userId: string): Promise<FlashcardSet[]> {
+        const sets = await this.listJson<FlashcardSet>("flashcards");
+        return sets.filter(set => set.userId === userId);
     }
 
     async createFlashcardSet(set: Omit<FlashcardSet, "id">): Promise<FlashcardSet> {
@@ -142,8 +165,9 @@ export class JsonStorage implements IStorage {
         return this.readJson<Summary>("summaries", id);
     }
 
-    async getSummaries(): Promise<Summary[]> {
-        return this.listJson<Summary>("summaries");
+    async getSummaries(userId: string): Promise<Summary[]> {
+        const summaries = await this.listJson<Summary>("summaries");
+        return summaries.filter(s => s.userId === userId);
     }
 
     async createSummary(summary: Omit<Summary, "id">): Promise<Summary> {
@@ -157,8 +181,9 @@ export class JsonStorage implements IStorage {
         return this.readJson<Mindmap>("mindmaps", id);
     }
 
-    async getMindmaps(): Promise<Mindmap[]> {
-        return this.listJson<Mindmap>("mindmaps");
+    async getMindmaps(userId: string): Promise<Mindmap[]> {
+        const mindmaps = await this.listJson<Mindmap>("mindmaps");
+        return mindmaps.filter(m => m.userId === userId);
     }
 
     async createMindmap(mindmap: Omit<Mindmap, "id">): Promise<Mindmap> {
@@ -172,8 +197,9 @@ export class JsonStorage implements IStorage {
         return this.readJson<Notes>("notes", id);
     }
 
-    async getAllNotes(): Promise<Notes[]> {
-        return this.listJson<Notes>("notes");
+    async getAllNotes(userId: string): Promise<Notes[]> {
+        const notes = await this.listJson<Notes>("notes");
+        return notes.filter(n => n.userId === userId);
     }
 
     async createNotes(notes: Omit<Notes, "id">): Promise<Notes> {
@@ -187,8 +213,9 @@ export class JsonStorage implements IStorage {
         return this.readJson<QuizResult>("results", id);
     }
 
-    async getQuizResults(): Promise<QuizResult[]> {
-        return this.listJson<QuizResult>("results");
+    async getQuizResults(userId: string): Promise<QuizResult[]> {
+        const results = await this.listJson<QuizResult>("results");
+        return results.filter(r => r.userId === userId);
     }
 
     async createQuizResult(result: Omit<QuizResult, "id">): Promise<QuizResult> {
@@ -202,8 +229,9 @@ export class JsonStorage implements IStorage {
         return this.readJson<ChatSession>("chats", id);
     }
 
-    async getChatSessions(): Promise<ChatSession[]> {
-        return this.listJson<ChatSession>("chats");
+    async getChatSessions(userId: string): Promise<ChatSession[]> {
+        const sessions = await this.listJson<ChatSession>("chats");
+        return sessions.filter(s => s.userId === userId);
     }
 
     async createChatSession(session: Omit<ChatSession, "id">): Promise<ChatSession> {

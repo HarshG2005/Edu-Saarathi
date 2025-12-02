@@ -1,14 +1,15 @@
-import { 
-  BookOpen, 
-  FileText, 
-  HelpCircle, 
-  LayoutDashboard, 
-  Lightbulb, 
-  ListChecks, 
-  MessageSquare, 
-  Network, 
+import {
+  BookOpen,
+  FileText,
+  HelpCircle,
+  LayoutDashboard,
+  Lightbulb,
+  ListChecks,
+  MessageSquare,
+  Network,
   GraduationCap,
-  StickyNote
+  StickyNote,
+  LogOut
 } from "lucide-react";
 import {
   Sidebar,
@@ -85,8 +86,11 @@ const studyTools = [
   },
 ];
 
+import { useAuth } from "@/hooks/use-auth";
+
 export function AppSidebar() {
   const { currentFeature, setCurrentFeature, documents, quizResults } = useAppStore();
+  const { logoutMutation } = useAuth();
 
   return (
     <Sidebar>
@@ -101,7 +105,7 @@ export function AppSidebar() {
           </div>
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent className="px-2">
         <SidebarGroup>
           <SidebarGroupLabel className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -163,9 +167,23 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <div className="h-2 w-2 rounded-full bg-status-online" />
-          <span>Local-first • Offline capable</span>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="h-2 w-2 rounded-full bg-status-online" />
+            <span>Local-first • Offline capable</span>
+          </div>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => logoutMutation.mutate()}
+                className="text-muted-foreground hover:text-foreground"
+                disabled={logoutMutation.isPending}
+              >
+                <LogOut className="h-4 w-4" />
+                <span>{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
         </div>
       </SidebarFooter>
     </Sidebar>

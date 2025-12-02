@@ -3,6 +3,7 @@ import { z } from "zod";
 // Document schema
 export const documentSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   name: z.string(),
   fileName: z.string(),
   fileSize: z.number(),
@@ -14,6 +15,17 @@ export const documentSchema = z.object({
 
 export type Document = z.infer<typeof documentSchema>;
 export type InsertDocument = Omit<Document, "id">;
+
+// User schema
+export const userSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  password: z.string(),
+});
+
+export type User = z.infer<typeof userSchema>;
+export type InsertUser = Omit<User, "id">;
+export const insertUserSchema = userSchema.omit({ id: true });
 
 // MCQ schemas
 export const mcqOptionSchema = z.object({
@@ -32,6 +44,7 @@ export const mcqSchema = z.object({
 
 export const mcqSetSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   documentId: z.string().optional(),
   topic: z.string(),
   mcqs: z.array(mcqSchema),
@@ -52,6 +65,7 @@ export const flashcardSchema = z.object({
 
 export const flashcardSetSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   documentId: z.string().optional(),
   topic: z.string(),
   flashcards: z.array(flashcardSchema),
@@ -64,6 +78,7 @@ export type FlashcardSet = z.infer<typeof flashcardSetSchema>;
 // Summary schemas
 export const summarySchema = z.object({
   id: z.string(),
+  userId: z.string(),
   documentId: z.string().optional(),
   topic: z.string(),
   mode: z.enum(["short", "medium", "detailed"]),
@@ -97,6 +112,7 @@ export const mindmapEdgeSchema = z.object({
 
 export const mindmapSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   documentId: z.string().optional(),
   topic: z.string(),
   nodes: z.array(mindmapNodeSchema),
@@ -111,6 +127,7 @@ export type Mindmap = z.infer<typeof mindmapSchema>;
 // Notes schemas
 export const notesSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   documentId: z.string().optional(),
   topic: z.string(),
   keyPoints: z.array(z.string()),
@@ -135,6 +152,7 @@ export const chatMessageSchema = z.object({
 
 export const chatSessionSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   documentId: z.string().optional(),
   messages: z.array(chatMessageSchema),
   createdAt: z.string(),
@@ -153,6 +171,7 @@ export const quizAnswerSchema = z.object({
 
 export const quizResultSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   mcqSetId: z.string(),
   topic: z.string(),
   answers: z.array(quizAnswerSchema),

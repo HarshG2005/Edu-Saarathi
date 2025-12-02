@@ -19,6 +19,7 @@ import {
   tutorChatRequestSchema,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { setupAuth } from "./auth";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -72,9 +73,18 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  setupAuth(app);
+
+  // Middleware to check if user is authenticated
+  const isAuthenticated = (req: any, res: any, next: any) => {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.status(401).send("Unauthorized");
+  };
 
   // Document Upload
-  app.post("/api/documents/upload", upload.single("file"), async (req, res) => {
+  app.post("/api/documents/upload", isAuthenticated, upload.single("file"), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -83,7 +93,15 @@ export async function registerRoutes(
       const { text, pageCount } = await extractTextFromPDF(req.file.buffer);
       const chunks = chunkText(text);
 
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        console.error("User ID missing in request:", req.user);
+        return res.status(401).json({ message: "User not authenticated correctly" });
+      }
+
+      console.log("DEBUG: Creating doc for", userId);
       const document = await storage.createDocument({
+        userId,
         name: req.file.originalname.replace(".pdf", ""),
         fileName: req.file.originalname,
         fileSize: req.file.size,
@@ -102,8 +120,9 @@ export async function registerRoutes(
 
   // Get all documents
   app.get("/api/documents", async (req, res) => {
+    console.log("DEBUG: Getting docs for", (req.user as any)?.id);
     try {
-      const documents = await storage.getDocuments();
+      const documents = await storage.getDocuments((req.user as any).id);
       res.json(documents);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to get documents" });
@@ -117,6 +136,11 @@ export async function registerRoutes(
       if (!document) {
         return res.status(404).json({ message: "Document not found" });
       }
+
+      if (document.userId !== (req.user as any).id) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
       res.json(document);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to get document" });
@@ -126,10 +150,16 @@ export async function registerRoutes(
   // Delete document
   app.delete("/api/documents/:id", async (req, res) => {
     try {
-      const deleted = await storage.deleteDocument(req.params.id);
-      if (!deleted) {
+      const document = await storage.getDocument(req.params.id);
+      if (!document) {
         return res.status(404).json({ message: "Document not found" });
       }
+
+      if (document.userId !== (req.user as any).id) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      await storage.deleteDocument(req.params.id);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to delete document" });
@@ -166,6 +196,7 @@ export async function registerRoutes(
       const result = await generateMCQs(content, finalTopic, parseInt(count), difficulty, provider);
 
       const mcqSet = await storage.createMCQSet({
+        userId: (req.user as any).id,
         documentId,
         topic: finalTopic,
         mcqs: result.mcqs.map((mcq) => ({
@@ -219,6 +250,7 @@ export async function registerRoutes(
       const result = await generateFlashcards(content, finalTopic, count, provider);
 
       const flashcardSet = await storage.createFlashcardSet({
+        userId: (req.user as any).id,
         documentId,
         topic: finalTopic,
         flashcards: result.flashcards.map((fc) => ({
@@ -267,6 +299,7 @@ export async function registerRoutes(
       const result = await generateSummary(content, finalTopic, mode, bulletPoints || false, provider);
 
       const summary = await storage.createSummary({
+        userId: (req.user as any).id,
         documentId,
         topic: finalTopic,
         mode,
@@ -313,6 +346,7 @@ export async function registerRoutes(
       const result = await generateMindmap(content, finalTopic, provider);
 
       const mindmap = await storage.createMindmap({
+        userId: (req.user as any).id,
         documentId,
         topic: finalTopic,
         nodes: result.nodes.map((node) => ({
@@ -367,6 +401,7 @@ export async function registerRoutes(
       const result = await generateNotes(content, finalTopic, provider);
 
       const notes = await storage.createNotes({
+        userId: (req.user as any).id,
         documentId,
         topic: finalTopic,
         keyPoints: result.keyPoints,
@@ -428,6 +463,7 @@ export async function registerRoutes(
         });
       } else {
         session = await storage.createChatSession({
+          userId: (req.user as any).id,
           documentId,
           messages: [userMessage, assistantMessage],
           createdAt: new Date().toISOString(),
@@ -444,7 +480,10 @@ export async function registerRoutes(
   // Quiz Results
   app.post("/api/quiz/results", async (req, res) => {
     try {
-      const result = await storage.createQuizResult(req.body);
+      const result = await storage.createQuizResult({
+        ...req.body,
+        userId: (req.user as any).id,
+      });
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to save quiz result" });
@@ -453,7 +492,7 @@ export async function registerRoutes(
 
   app.get("/api/quiz/results", async (req, res) => {
     try {
-      const results = await storage.getQuizResults();
+      const results = await storage.getQuizResults((req.user as any).id);
       res.json(results);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to get quiz results" });

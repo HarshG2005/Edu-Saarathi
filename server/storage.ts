@@ -7,50 +7,57 @@ import type {
   Mindmap,
   Notes,
   QuizResult,
-  ChatSession
+  ChatSession,
+  User,
+  InsertUser
 } from "@shared/schema";
 
 export interface IStorage {
+  // Users
+  getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+
   // Documents
   getDocument(id: string): Promise<Document | undefined>;
-  getDocuments(): Promise<Document[]>;
+  getDocuments(userId: string): Promise<Document[]>;
   createDocument(doc: Omit<Document, "id">): Promise<Document>;
   deleteDocument(id: string): Promise<boolean>;
 
   // MCQ Sets
   getMCQSet(id: string): Promise<MCQSet | undefined>;
-  getMCQSets(): Promise<MCQSet[]>;
+  getMCQSets(userId: string): Promise<MCQSet[]>;
   createMCQSet(set: Omit<MCQSet, "id">): Promise<MCQSet>;
 
   // Flashcard Sets
   getFlashcardSet(id: string): Promise<FlashcardSet | undefined>;
-  getFlashcardSets(): Promise<FlashcardSet[]>;
+  getFlashcardSets(userId: string): Promise<FlashcardSet[]>;
   createFlashcardSet(set: Omit<FlashcardSet, "id">): Promise<FlashcardSet>;
   updateFlashcardSet(id: string, set: Partial<FlashcardSet>): Promise<FlashcardSet | undefined>;
 
   // Summaries
   getSummary(id: string): Promise<Summary | undefined>;
-  getSummaries(): Promise<Summary[]>;
+  getSummaries(userId: string): Promise<Summary[]>;
   createSummary(summary: Omit<Summary, "id">): Promise<Summary>;
 
   // Mindmaps
   getMindmap(id: string): Promise<Mindmap | undefined>;
-  getMindmaps(): Promise<Mindmap[]>;
+  getMindmaps(userId: string): Promise<Mindmap[]>;
   createMindmap(mindmap: Omit<Mindmap, "id">): Promise<Mindmap>;
 
   // Notes
   getNotes(id: string): Promise<Notes | undefined>;
-  getAllNotes(): Promise<Notes[]>;
+  getAllNotes(userId: string): Promise<Notes[]>;
   createNotes(notes: Omit<Notes, "id">): Promise<Notes>;
 
   // Quiz Results
   getQuizResult(id: string): Promise<QuizResult | undefined>;
-  getQuizResults(): Promise<QuizResult[]>;
+  getQuizResults(userId: string): Promise<QuizResult[]>;
   createQuizResult(result: Omit<QuizResult, "id">): Promise<QuizResult>;
 
   // Chat Sessions
   getChatSession(id: string): Promise<ChatSession | undefined>;
-  getChatSessions(): Promise<ChatSession[]>;
+  getChatSessions(userId: string): Promise<ChatSession[]>;
   createChatSession(session: Omit<ChatSession, "id">): Promise<ChatSession>;
   updateChatSession(id: string, session: Partial<ChatSession>): Promise<ChatSession | undefined>;
 }
@@ -64,6 +71,7 @@ export class MemStorage implements IStorage {
   private notes: Map<string, Notes>;
   private quizResults: Map<string, QuizResult>;
   private chatSessions: Map<string, ChatSession>;
+  private users: Map<string, User>;
 
   constructor() {
     this.documents = new Map();
@@ -74,6 +82,23 @@ export class MemStorage implements IStorage {
     this.notes = new Map();
     this.quizResults = new Map();
     this.chatSessions = new Map();
+    this.users = new Map();
+  }
+
+  // Users
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find((user) => user.username === username);
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = randomUUID();
+    const user: User = { ...insertUser, id };
+    this.users.set(id, user);
+    return user;
   }
 
   // Documents
@@ -81,8 +106,8 @@ export class MemStorage implements IStorage {
     return this.documents.get(id);
   }
 
-  async getDocuments(): Promise<Document[]> {
-    return Array.from(this.documents.values());
+  async getDocuments(userId: string): Promise<Document[]> {
+    return Array.from(this.documents.values()).filter(doc => doc.userId === userId);
   }
 
   async createDocument(doc: Omit<Document, "id">): Promise<Document> {
@@ -101,8 +126,8 @@ export class MemStorage implements IStorage {
     return this.mcqSets.get(id);
   }
 
-  async getMCQSets(): Promise<MCQSet[]> {
-    return Array.from(this.mcqSets.values());
+  async getMCQSets(userId: string): Promise<MCQSet[]> {
+    return Array.from(this.mcqSets.values()).filter(set => set.userId === userId);
   }
 
   async createMCQSet(set: Omit<MCQSet, "id">): Promise<MCQSet> {
@@ -117,8 +142,8 @@ export class MemStorage implements IStorage {
     return this.flashcardSets.get(id);
   }
 
-  async getFlashcardSets(): Promise<FlashcardSet[]> {
-    return Array.from(this.flashcardSets.values());
+  async getFlashcardSets(userId: string): Promise<FlashcardSet[]> {
+    return Array.from(this.flashcardSets.values()).filter(set => set.userId === userId);
   }
 
   async createFlashcardSet(set: Omit<FlashcardSet, "id">): Promise<FlashcardSet> {
@@ -141,8 +166,8 @@ export class MemStorage implements IStorage {
     return this.summaries.get(id);
   }
 
-  async getSummaries(): Promise<Summary[]> {
-    return Array.from(this.summaries.values());
+  async getSummaries(userId: string): Promise<Summary[]> {
+    return Array.from(this.summaries.values()).filter(s => s.userId === userId);
   }
 
   async createSummary(summary: Omit<Summary, "id">): Promise<Summary> {
@@ -157,8 +182,8 @@ export class MemStorage implements IStorage {
     return this.mindmaps.get(id);
   }
 
-  async getMindmaps(): Promise<Mindmap[]> {
-    return Array.from(this.mindmaps.values());
+  async getMindmaps(userId: string): Promise<Mindmap[]> {
+    return Array.from(this.mindmaps.values()).filter(m => m.userId === userId);
   }
 
   async createMindmap(mindmap: Omit<Mindmap, "id">): Promise<Mindmap> {
@@ -173,8 +198,8 @@ export class MemStorage implements IStorage {
     return this.notes.get(id);
   }
 
-  async getAllNotes(): Promise<Notes[]> {
-    return Array.from(this.notes.values());
+  async getAllNotes(userId: string): Promise<Notes[]> {
+    return Array.from(this.notes.values()).filter(n => n.userId === userId);
   }
 
   async createNotes(notes: Omit<Notes, "id">): Promise<Notes> {
@@ -189,8 +214,8 @@ export class MemStorage implements IStorage {
     return this.quizResults.get(id);
   }
 
-  async getQuizResults(): Promise<QuizResult[]> {
-    return Array.from(this.quizResults.values());
+  async getQuizResults(userId: string): Promise<QuizResult[]> {
+    return Array.from(this.quizResults.values()).filter(r => r.userId === userId);
   }
 
   async createQuizResult(result: Omit<QuizResult, "id">): Promise<QuizResult> {
@@ -205,8 +230,8 @@ export class MemStorage implements IStorage {
     return this.chatSessions.get(id);
   }
 
-  async getChatSessions(): Promise<ChatSession[]> {
-    return Array.from(this.chatSessions.values());
+  async getChatSessions(userId: string): Promise<ChatSession[]> {
+    return Array.from(this.chatSessions.values()).filter(s => s.userId === userId);
   }
 
   async createChatSession(session: Omit<ChatSession, "id">): Promise<ChatSession> {

@@ -17,6 +17,8 @@ import { TutorPage } from "@/pages/tutor";
 import { QuizPage } from "@/pages/quiz";
 import { ProgressPage } from "@/pages/progress";
 
+import { LandingPage } from "@/pages/landing";
+
 function MainContent() {
   const { currentFeature } = useAppStore();
 
@@ -58,6 +60,11 @@ function MainContent() {
   );
 }
 
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
+import AuthPage from "@/pages/auth-page";
+import { Switch, Route } from "wouter";
+
 function App() {
   const style = {
     "--sidebar-width": "16rem",
@@ -66,16 +73,48 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <SidebarProvider style={style as React.CSSProperties}>
-          <div className="flex h-screen w-full">
-            <AppSidebar />
-            <MainContent />
-          </div>
-        </SidebarProvider>
-        <Toaster />
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <AppContent />
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
+  );
+}
+
+function AppContent() {
+  const { user } = useAuth();
+
+  const style = {
+    "--sidebar-width": "16rem",
+    "--sidebar-width-icon": "3rem",
+  };
+
+  return (
+    <Switch>
+      <Route path="/auth" component={AuthPage} />
+      <Route path="/">
+        {user ? (
+          <ProtectedRoute
+            path="/"
+            component={() => (
+              <SidebarProvider style={style as React.CSSProperties}>
+                <div className="flex h-screen w-full">
+                  <AppSidebar />
+                  <MainContent />
+                </div>
+                <Toaster />
+              </SidebarProvider>
+            )}
+          />
+        ) : (
+          <LandingPage />
+        )}
+      </Route>
+      <Route>
+        <LandingPage />
+      </Route>
+    </Switch>
   );
 }
 

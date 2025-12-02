@@ -14,15 +14,15 @@ interface AppState {
   notes: Notes[];
   quizResults: QuizResult[];
   chatSessions: ChatSession[];
-  
+
   setCurrentDocumentId: (id: string | null) => void;
   setCurrentFeature: (feature: string) => void;
   setTheme: (theme: "light" | "dark") => void;
   toggleTheme: () => void;
-  
+
   addDocument: (doc: Document) => void;
   removeDocument: (id: string) => void;
-  
+
   addMCQSet: (set: MCQSet) => void;
   addFlashcardSet: (set: FlashcardSet) => void;
   addSummary: (summary: Summary) => void;
@@ -31,7 +31,10 @@ interface AppState {
   addQuizResult: (result: QuizResult) => void;
   addChatSession: (session: ChatSession) => void;
   updateChatSession: (id: string, session: Partial<ChatSession>) => void;
-  
+
+  hasStarted: boolean;
+  setHasStarted: (started: boolean) => void;
+
   updateFlashcardMastery: (setId: string, cardId: string, mastered: boolean) => void;
 }
 
@@ -41,6 +44,7 @@ export const useAppStore = create<AppState>()(
       currentDocumentId: null,
       currentFeature: "library",
       theme: "light",
+      hasStarted: false,
       documents: [],
       mcqSets: [],
       flashcardSets: [],
@@ -49,9 +53,10 @@ export const useAppStore = create<AppState>()(
       notes: [],
       quizResults: [],
       chatSessions: [],
-      
+
       setCurrentDocumentId: (id) => set({ currentDocumentId: id }),
       setCurrentFeature: (feature) => set({ currentFeature: feature }),
+      setHasStarted: (started) => set({ hasStarted: started }),
       setTheme: (theme) => {
         if (theme === "dark") {
           document.documentElement.classList.add("dark");
@@ -69,50 +74,50 @@ export const useAppStore = create<AppState>()(
         }
         return { theme: newTheme };
       }),
-      
-      addDocument: (doc) => set((state) => ({ 
-        documents: [...state.documents, doc] 
+
+      addDocument: (doc) => set((state) => ({
+        documents: [...state.documents, doc]
       })),
-      removeDocument: (id) => set((state) => ({ 
-        documents: state.documents.filter((d) => d.id !== id) 
+      removeDocument: (id) => set((state) => ({
+        documents: state.documents.filter((d) => d.id !== id)
       })),
-      
-      addMCQSet: (mcqSet) => set((state) => ({ 
-        mcqSets: [...state.mcqSets, mcqSet] 
+
+      addMCQSet: (mcqSet) => set((state) => ({
+        mcqSets: [...state.mcqSets, mcqSet]
       })),
-      addFlashcardSet: (flashcardSet) => set((state) => ({ 
-        flashcardSets: [...state.flashcardSets, flashcardSet] 
+      addFlashcardSet: (flashcardSet) => set((state) => ({
+        flashcardSets: [...state.flashcardSets, flashcardSet]
       })),
-      addSummary: (summary) => set((state) => ({ 
-        summaries: [...state.summaries, summary] 
+      addSummary: (summary) => set((state) => ({
+        summaries: [...state.summaries, summary]
       })),
-      addMindmap: (mindmap) => set((state) => ({ 
-        mindmaps: [...state.mindmaps, mindmap] 
+      addMindmap: (mindmap) => set((state) => ({
+        mindmaps: [...state.mindmaps, mindmap]
       })),
-      addNotes: (notes) => set((state) => ({ 
-        notes: [...state.notes, notes] 
+      addNotes: (notes) => set((state) => ({
+        notes: [...state.notes, notes]
       })),
-      addQuizResult: (result) => set((state) => ({ 
-        quizResults: [...state.quizResults, result] 
+      addQuizResult: (result) => set((state) => ({
+        quizResults: [...state.quizResults, result]
       })),
-      addChatSession: (session) => set((state) => ({ 
-        chatSessions: [...state.chatSessions, session] 
+      addChatSession: (session) => set((state) => ({
+        chatSessions: [...state.chatSessions, session]
       })),
       updateChatSession: (id, updates) => set((state) => ({
-        chatSessions: state.chatSessions.map((s) => 
+        chatSessions: state.chatSessions.map((s) =>
           s.id === id ? { ...s, ...updates } : s
         ),
       })),
-      
+
       updateFlashcardMastery: (setId, cardId, mastered) => set((state) => ({
         flashcardSets: state.flashcardSets.map((set) =>
           set.id === setId
             ? {
-                ...set,
-                flashcards: set.flashcards.map((card) =>
-                  card.id === cardId ? { ...card, mastered } : card
-                ),
-              }
+              ...set,
+              flashcards: set.flashcards.map((card) =>
+                card.id === cardId ? { ...card, mastered } : card
+              ),
+            }
             : set
         ),
       })),
@@ -121,6 +126,7 @@ export const useAppStore = create<AppState>()(
       name: "eduquest-storage",
       partialize: (state) => ({
         theme: state.theme,
+        hasStarted: state.hasStarted,
         documents: state.documents,
         mcqSets: state.mcqSets,
         flashcardSets: state.flashcardSets,
