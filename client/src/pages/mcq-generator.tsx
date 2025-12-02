@@ -19,17 +19,18 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { MCQSet, MCQ } from "@shared/schema";
+import { getStoredProvider, AISettings } from "@/components/ai-settings";
 
 export function MCQGeneratorPage() {
   const { documents, currentDocumentId, mcqSets, addMCQSet } = useAppStore();
   const { toast } = useToast();
-  
+
   const [topic, setTopic] = useState("");
   const [count, setCount] = useState<"5" | "10" | "20">("10");
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
   const [selectedDocId, setSelectedDocId] = useState(currentDocumentId || "");
   const [activeTab, setActiveTab] = useState<"generate" | "view">("generate");
-  
+
   const [currentMCQSet, setCurrentMCQSet] = useState<MCQSet | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
@@ -44,6 +45,7 @@ export function MCQGeneratorPage() {
         topic: topic || undefined,
         count,
         difficulty,
+        provider: getStoredProvider(),
       };
       const response = await apiRequest("POST", "/api/mcq/generate", payload);
       return response.json();
@@ -84,14 +86,14 @@ export function MCQGeneratorPage() {
 
   const getScore = () => {
     if (!currentMCQSet) return { correct: 0, total: 0, percentage: 0 };
-    
+
     let correct = 0;
     currentMCQSet.mcqs.forEach((mcq) => {
       const selected = selectedAnswers[mcq.id];
       const correctOption = mcq.options.find((o) => o.isCorrect);
       if (selected === correctOption?.id) correct++;
     });
-    
+
     return {
       correct,
       total: currentMCQSet.mcqs.length,
@@ -101,7 +103,7 @@ export function MCQGeneratorPage() {
 
   const handleExport = () => {
     if (!currentMCQSet) return;
-    
+
     const content = currentMCQSet.mcqs
       .map((mcq, i) => {
         const options = mcq.options
@@ -110,7 +112,7 @@ export function MCQGeneratorPage() {
         return `Q${i + 1}. ${mcq.question}\n${options}\n`;
       })
       .join("\n");
-    
+
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -118,7 +120,7 @@ export function MCQGeneratorPage() {
     a.download = `mcqs-${currentMCQSet.topic || "generated"}.txt`;
     a.click();
     URL.revokeObjectURL(url);
-    
+
     toast({
       title: "Exported",
       description: "MCQs have been exported as a text file.",
@@ -140,11 +142,14 @@ export function MCQGeneratorPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold" data-testid="text-page-title">MCQ Generator</h1>
-        <p className="text-muted-foreground">
-          Generate multiple choice questions from your documents or any topic
-        </p>
+      <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold" data-testid="text-page-title">MCQ Generator</h1>
+          <p className="text-muted-foreground">
+            Generate multiple choice questions from your documents or any topic
+          </p>
+        </div>
+        <AISettings />
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "view")}>
@@ -351,27 +356,25 @@ export function MCQGeneratorPage() {
                           key={option.id}
                           onClick={() => handleAnswerSelect(currentMCQ.id, option.id)}
                           disabled={showResults}
-                          className={`flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
-                            showCorrect
-                              ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                              : showIncorrect
+                          className={`flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors ${showCorrect
+                            ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                            : showIncorrect
                               ? "border-red-500 bg-red-50 dark:bg-red-900/20"
                               : isSelected
-                              ? "border-primary bg-primary/5"
-                              : "hover:border-primary/50 hover:bg-muted/50"
-                          }`}
+                                ? "border-primary bg-primary/5"
+                                : "hover:border-primary/50 hover:bg-muted/50"
+                            }`}
                           data-testid={`button-option-${option.id}`}
                         >
                           <div
-                            className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-medium ${
-                              showCorrect
-                                ? "border-green-500 bg-green-500 text-white"
-                                : showIncorrect
+                            className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-medium ${showCorrect
+                              ? "border-green-500 bg-green-500 text-white"
+                              : showIncorrect
                                 ? "border-red-500 bg-red-500 text-white"
                                 : isSelected
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : "border-muted-foreground/30"
-                            }`}
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-muted-foreground/30"
+                              }`}
                           >
                             {showCorrect ? (
                               <Check className="h-4 w-4" />
@@ -449,17 +452,16 @@ export function MCQGeneratorPage() {
                     <button
                       key={mcq.id}
                       onClick={() => setCurrentIndex(idx)}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${
-                        idx === currentIndex
-                          ? "bg-primary text-primary-foreground"
-                          : isCorrect
+                      className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${idx === currentIndex
+                        ? "bg-primary text-primary-foreground"
+                        : isCorrect
                           ? "bg-green-500 text-white"
                           : isIncorrect
-                          ? "bg-red-500 text-white"
-                          : answered
-                          ? "bg-muted"
-                          : "border hover:bg-muted"
-                      }`}
+                            ? "bg-red-500 text-white"
+                            : answered
+                              ? "bg-muted"
+                              : "border hover:bg-muted"
+                        }`}
                       data-testid={`button-question-nav-${idx}`}
                     >
                       {idx + 1}

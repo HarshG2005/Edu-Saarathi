@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Summary } from "@shared/schema";
+import { getStoredProvider, AISettings } from "@/components/ai-settings";
 
 export function SummaryPage() {
   const { documents, currentDocumentId, summaries, addSummary } = useAppStore();
@@ -43,6 +44,7 @@ export function SummaryPage() {
         topic: topic || undefined,
         mode,
         bulletPoints: includeBulletPoints,
+        provider: getStoredProvider(),
       };
       const response = await apiRequest("POST", "/api/summary/generate", payload);
       return response.json();
@@ -67,12 +69,12 @@ export function SummaryPage() {
 
   const handleCopy = () => {
     if (!currentSummary) return;
-    
+
     let content = currentSummary.content;
     if (currentSummary.bulletPoints?.length) {
       content += "\n\nKey Points:\n" + currentSummary.bulletPoints.map((p) => `• ${p}`).join("\n");
     }
-    
+
     navigator.clipboard.writeText(content);
     toast({
       title: "Copied",
@@ -86,11 +88,11 @@ export function SummaryPage() {
     let content = `Summary: ${currentSummary.topic || "Generated Summary"}\n`;
     content += `Mode: ${currentSummary.mode}\n\n`;
     content += currentSummary.content;
-    
+
     if (currentSummary.bulletPoints?.length) {
       content += "\n\nKey Points:\n" + currentSummary.bulletPoints.map((p) => `• ${p}`).join("\n");
     }
-    
+
     if (currentSummary.keyTerms?.length) {
       content += "\n\nKey Terms: " + currentSummary.keyTerms.join(", ");
     }
@@ -124,11 +126,14 @@ export function SummaryPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold" data-testid="text-page-title">Summary Generator</h1>
-        <p className="text-muted-foreground">
-          Generate concise summaries from your documents or any topic
-        </p>
+      <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold" data-testid="text-page-title">Summary Generator</h1>
+          <p className="text-muted-foreground">
+            Generate concise summaries from your documents or any topic
+          </p>
+        </div>
+        <AISettings />
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "view")}>

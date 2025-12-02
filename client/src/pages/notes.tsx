@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Notes } from "@shared/schema";
+import { getStoredProvider, AISettings } from "@/components/ai-settings";
 
 export function NotesPage() {
   const { documents, currentDocumentId, notes, addNotes } = useAppStore();
@@ -43,6 +44,7 @@ export function NotesPage() {
       const payload = {
         documentId: hasDocumentSelected ? selectedDocId : undefined,
         topic: topic || undefined,
+        provider: getStoredProvider(),
       };
       const response = await apiRequest("POST", "/api/notes/generate", payload);
       return response.json();
@@ -69,22 +71,22 @@ export function NotesPage() {
     if (!currentNotes) return;
 
     let content = `Notes: ${currentNotes.topic || "Extracted Notes"}\n\n`;
-    
+
     content += "KEY POINTS:\n";
     currentNotes.keyPoints.forEach((point, i) => {
       content += `${i + 1}. ${point}\n`;
     });
-    
+
     content += "\nDEFINITIONS:\n";
     currentNotes.definitions.forEach((def) => {
       content += `• ${def.term}: ${def.definition}\n`;
     });
-    
+
     content += "\nIMPORTANT SENTENCES:\n";
     currentNotes.importantSentences.forEach((sentence) => {
       content += `"${sentence}"\n`;
     });
-    
+
     if (currentNotes.formulas?.length) {
       content += "\nFORMULAS:\n";
       currentNotes.formulas.forEach((formula) => {
@@ -104,25 +106,25 @@ export function NotesPage() {
 
     let content = `Notes: ${currentNotes.topic || "Extracted Notes"}\n`;
     content += "=".repeat(50) + "\n\n";
-    
+
     content += "KEY POINTS\n";
     content += "-".repeat(30) + "\n";
     currentNotes.keyPoints.forEach((point, i) => {
       content += `${i + 1}. ${point}\n`;
     });
-    
+
     content += "\nDEFINITIONS\n";
     content += "-".repeat(30) + "\n";
     currentNotes.definitions.forEach((def) => {
       content += `• ${def.term}\n  ${def.definition}\n\n`;
     });
-    
+
     content += "IMPORTANT SENTENCES\n";
     content += "-".repeat(30) + "\n";
     currentNotes.importantSentences.forEach((sentence) => {
       content += `"${sentence}"\n\n`;
     });
-    
+
     if (currentNotes.formulas?.length) {
       content += "FORMULAS\n";
       content += "-".repeat(30) + "\n";
@@ -147,11 +149,14 @@ export function NotesPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold" data-testid="text-page-title">Notes Extractor</h1>
-        <p className="text-muted-foreground">
-          Extract key points, definitions, and important information from your documents
-        </p>
+      <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold" data-testid="text-page-title">Notes Extractor</h1>
+          <p className="text-muted-foreground">
+            Extract key points, definitions, and important information from your documents
+          </p>
+        </div>
+        <AISettings />
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "view")}>

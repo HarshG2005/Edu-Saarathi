@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { ChatSession, ChatMessage } from "@shared/schema";
+import { getStoredProvider, AISettings } from "@/components/ai-settings";
 
 export function TutorPage() {
   const { documents, chatSessions, addChatSession, updateChatSession } = useAppStore();
@@ -36,6 +37,7 @@ export function TutorPage() {
         sessionId: currentSession?.id,
         documentId: hasDocumentSelected ? selectedDocId : undefined,
         message: userMessage,
+        provider: getStoredProvider(),
       };
       const response = await apiRequest("POST", "/api/tutor/chat", payload);
       return response.json();
@@ -65,10 +67,10 @@ export function TutorPage() {
 
   const handleSend = () => {
     if (!message.trim() || chatMutation.isPending) return;
-    
+
     const userMessage = message.trim();
     setMessage("");
-    
+
     if (currentSession) {
       const newMessage: ChatMessage = {
         id: crypto.randomUUID(),
@@ -80,7 +82,7 @@ export function TutorPage() {
         prev ? { ...prev, messages: [...prev.messages, newMessage] } : prev
       );
     }
-    
+
     chatMutation.mutate(userMessage);
   };
 
@@ -106,12 +108,17 @@ export function TutorPage() {
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col gap-6 p-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
+        <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold" data-testid="text-page-title">AI Tutor</h1>
           <p className="text-muted-foreground">
             Ask questions about any topic or your uploaded documents
           </p>
         </div>
+        <div className="flex items-center gap-4">
+          <AISettings />
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center justify-end gap-4">
         <div className="flex gap-2">
           <Select value={selectedDocId} onValueChange={setSelectedDocId}>
             <SelectTrigger className="w-48" data-testid="select-document">
@@ -154,9 +161,8 @@ export function TutorPage() {
                 {currentSession.messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex gap-4 ${
-                      msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                    className={`flex gap-4 ${msg.role === "user" ? "justify-end" : "justify-start"
+                      }`}
                     data-testid={`message-${msg.id}`}
                   >
                     {msg.role === "assistant" && (
@@ -167,11 +173,10 @@ export function TutorPage() {
                       </Avatar>
                     )}
                     <div
-                      className={`max-w-[70%] rounded-lg p-4 ${
-                        msg.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
-                      }`}
+                      className={`max-w-[70%] rounded-lg p-4 ${msg.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted"
+                        }`}
                     >
                       <p className="whitespace-pre-wrap text-sm leading-relaxed">
                         {msg.content}
@@ -275,9 +280,8 @@ export function TutorPage() {
                   <button
                     key={session.id}
                     onClick={() => setCurrentSession(session)}
-                    className={`flex w-full items-start gap-2 rounded-lg p-3 text-left transition-colors hover:bg-muted ${
-                      currentSession?.id === session.id ? "bg-muted" : ""
-                    }`}
+                    className={`flex w-full items-start gap-2 rounded-lg p-3 text-left transition-colors hover:bg-muted ${currentSession?.id === session.id ? "bg-muted" : ""
+                      }`}
                     data-testid={`button-session-${session.id}`}
                   >
                     <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />

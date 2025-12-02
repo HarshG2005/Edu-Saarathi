@@ -2,15 +2,15 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import { storage } from "./storage";
-import { 
-  generateMCQs, 
-  generateFlashcards, 
-  generateSummary, 
-  generateMindmap, 
+import {
+  generateMCQs,
+  generateFlashcards,
+  generateSummary,
+  generateMindmap,
   generateNotes,
-  tutorChat 
+  tutorChat
 } from "./openai";
-import { 
+import {
   generateMCQRequestSchema,
   generateFlashcardsRequestSchema,
   generateSummaryRequestSchema,
@@ -36,14 +36,14 @@ const upload = multer({
 async function extractTextFromPDF(buffer: Buffer): Promise<{ text: string; pageCount: number }> {
   // Using pdf.js via dynamic import for text extraction
   const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  
+
   const data = new Uint8Array(buffer);
   const loadingTask = pdfjsLib.getDocument({ data });
   const pdf = await loadingTask.promise;
-  
+
   let fullText = "";
   const pageCount = pdf.numPages;
-  
+
   for (let i = 1; i <= pageCount; i++) {
     const page = await pdf.getPage(i);
     const textContent = await page.getTextContent();
@@ -52,7 +52,7 @@ async function extractTextFromPDF(buffer: Buffer): Promise<{ text: string; pageC
       .join(" ");
     fullText += pageText + "\n\n";
   }
-  
+
   return { text: fullText.trim(), pageCount };
 }
 
@@ -60,11 +60,11 @@ async function extractTextFromPDF(buffer: Buffer): Promise<{ text: string; pageC
 function chunkText(text: string, chunkSize: number = 500): string[] {
   const words = text.split(/\s+/);
   const chunks: string[] = [];
-  
+
   for (let i = 0; i < words.length; i += chunkSize) {
     chunks.push(words.slice(i, i + chunkSize).join(" "));
   }
-  
+
   return chunks;
 }
 
@@ -72,7 +72,7 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  
+
   // Document Upload
   app.post("/api/documents/upload", upload.single("file"), async (req, res) => {
     try {
@@ -82,7 +82,7 @@ export async function registerRoutes(
 
       const { text, pageCount } = await extractTextFromPDF(req.file.buffer);
       const chunks = chunkText(text);
-      
+
       const document = await storage.createDocument({
         name: req.file.originalname.replace(".pdf", ""),
         fileName: req.file.originalname,
@@ -145,10 +145,10 @@ export async function registerRoutes(
       }
 
       const { documentId, topic, count, difficulty } = parsed.data;
-      
+
       let content = "";
       let finalTopic = topic || "";
-      
+
       if (documentId) {
         const doc = await storage.getDocument(documentId);
         if (!doc) {
@@ -162,8 +162,9 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Either a document or topic is required" });
       }
 
-      const result = await generateMCQs(content, finalTopic, parseInt(count), difficulty);
-      
+      const provider = req.body.provider || "gemini";
+      const result = await generateMCQs(content, finalTopic, parseInt(count), difficulty, provider);
+
       const mcqSet = await storage.createMCQSet({
         documentId,
         topic: finalTopic,
@@ -197,10 +198,10 @@ export async function registerRoutes(
       }
 
       const { documentId, topic, count } = parsed.data;
-      
+
       let content = "";
       let finalTopic = topic || "";
-      
+
       if (documentId) {
         const doc = await storage.getDocument(documentId);
         if (!doc) {
@@ -214,8 +215,9 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Either a document or topic is required" });
       }
 
-      const result = await generateFlashcards(content, finalTopic, count);
-      
+      const provider = req.body.provider || "gemini";
+      const result = await generateFlashcards(content, finalTopic, count, provider);
+
       const flashcardSet = await storage.createFlashcardSet({
         documentId,
         topic: finalTopic,
@@ -244,10 +246,10 @@ export async function registerRoutes(
       }
 
       const { documentId, topic, mode, bulletPoints } = parsed.data;
-      
+
       let content = "";
       let finalTopic = topic || "";
-      
+
       if (documentId) {
         const doc = await storage.getDocument(documentId);
         if (!doc) {
@@ -261,8 +263,9 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Either a document or topic is required" });
       }
 
-      const result = await generateSummary(content, finalTopic, mode, bulletPoints || false);
-      
+      const provider = req.body.provider || "gemini";
+      const result = await generateSummary(content, finalTopic, mode, bulletPoints || false, provider);
+
       const summary = await storage.createSummary({
         documentId,
         topic: finalTopic,
@@ -289,10 +292,10 @@ export async function registerRoutes(
       }
 
       const { documentId, topic } = parsed.data;
-      
+
       let content = "";
       let finalTopic = topic || "";
-      
+
       if (documentId) {
         const doc = await storage.getDocument(documentId);
         if (!doc) {
@@ -306,8 +309,9 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Either a document or topic is required" });
       }
 
-      const result = await generateMindmap(content, finalTopic);
-      
+      const provider = req.body.provider || "gemini";
+      const result = await generateMindmap(content, finalTopic, provider);
+
       const mindmap = await storage.createMindmap({
         documentId,
         topic: finalTopic,
@@ -342,10 +346,10 @@ export async function registerRoutes(
       }
 
       const { documentId, topic } = parsed.data;
-      
+
       let content = "";
       let finalTopic = topic || "";
-      
+
       if (documentId) {
         const doc = await storage.getDocument(documentId);
         if (!doc) {
@@ -359,8 +363,9 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Either a document or topic is required" });
       }
 
-      const result = await generateNotes(content, finalTopic);
-      
+      const provider = req.body.provider || "gemini";
+      const result = await generateNotes(content, finalTopic, provider);
+
       const notes = await storage.createNotes({
         documentId,
         topic: finalTopic,
@@ -387,10 +392,10 @@ export async function registerRoutes(
       }
 
       const { sessionId, documentId, message } = parsed.data;
-      
+
       let session = sessionId ? await storage.getChatSession(sessionId) : null;
       let documentContext = "";
-      
+
       if (documentId) {
         const doc = await storage.getDocument(documentId);
         if (doc) {
@@ -399,16 +404,17 @@ export async function registerRoutes(
       }
 
       const conversationHistory = session?.messages || [];
-      
-      const response = await tutorChat(message, conversationHistory, documentContext);
-      
+
+      const provider = req.body.provider || "gemini";
+      const response = await tutorChat(message, conversationHistory, documentContext, provider);
+
       const userMessage = {
         id: randomUUID(),
         role: "user" as const,
         content: message,
         timestamp: new Date().toISOString(),
       };
-      
+
       const assistantMessage = {
         id: randomUUID(),
         role: "assistant" as const,

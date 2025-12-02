@@ -21,6 +21,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { FlashcardSet } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
+import { getStoredProvider, AISettings } from "@/components/ai-settings";
 
 export function FlashcardsPage() {
   const { documents, currentDocumentId, flashcardSets, addFlashcardSet, updateFlashcardMastery } = useAppStore();
@@ -45,6 +46,7 @@ export function FlashcardsPage() {
         documentId: hasDocumentSelected ? selectedDocId : undefined,
         topic: topic || undefined,
         count: count[0],
+        provider: getStoredProvider(),
       };
       const response = await apiRequest("POST", "/api/flashcards/generate", payload);
       return response.json();
@@ -81,7 +83,7 @@ export function FlashcardsPage() {
 
   const handleShuffle = () => {
     if (!currentSet) return;
-    
+
     if (isShuffled) {
       setShuffledIndices(currentSet.flashcards.map((_, i) => i));
       setIsShuffled(false);
@@ -143,11 +145,14 @@ export function FlashcardsPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold" data-testid="text-page-title">Flashcards</h1>
-        <p className="text-muted-foreground">
-          Create and study flashcards from your documents or any topic
-        </p>
+      <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold" data-testid="text-page-title">Flashcards</h1>
+          <p className="text-muted-foreground">
+            Create and study flashcards from your documents or any topic
+          </p>
+        </div>
+        <AISettings />
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "study")}>
@@ -404,13 +409,12 @@ export function FlashcardsPage() {
                         setCurrentIndex(idx);
                         setIsFlipped(false);
                       }}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${
-                        idx === currentIndex
-                          ? "bg-primary text-primary-foreground"
-                          : cardAtIdx?.mastered
+                      className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${idx === currentIndex
+                        ? "bg-primary text-primary-foreground"
+                        : cardAtIdx?.mastered
                           ? "bg-green-500 text-white"
                           : "border hover:bg-muted"
-                      }`}
+                        }`}
                       data-testid={`button-card-nav-${idx}`}
                     >
                       {idx + 1}

@@ -31,6 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Mindmap } from "@shared/schema";
+import { getStoredProvider, AISettings } from "@/components/ai-settings";
 
 const nodeDefaults = {
   style: {
@@ -71,6 +72,7 @@ export function MindmapPage() {
       const payload = {
         documentId: hasDocumentSelected ? selectedDocId : undefined,
         topic: topic || undefined,
+        provider: getStoredProvider(),
       };
       const response = await apiRequest("POST", "/api/mindmap/generate", payload);
       return response.json();
@@ -78,7 +80,7 @@ export function MindmapPage() {
     onSuccess: (data) => {
       addMindmap(data);
       setCurrentMindmap(data);
-      
+
       const flowNodes: Node[] = data.nodes.map((node) => ({
         id: node.id,
         type: node.type || "default",
@@ -86,18 +88,18 @@ export function MindmapPage() {
         data: node.data,
         ...nodeDefaults,
       }));
-      
+
       const flowEdges: Edge[] = data.edges.map((edge) => ({
         id: edge.id,
         source: edge.source,
         target: edge.target,
         ...edgeDefaults,
       }));
-      
+
       setNodes(flowNodes);
       setEdges(flowEdges);
       setActiveTab("view");
-      
+
       toast({
         title: "Mindmap generated",
         description: "Your concept map is ready to explore.",
@@ -114,7 +116,7 @@ export function MindmapPage() {
 
   const loadMindmap = useCallback((mindmap: Mindmap) => {
     setCurrentMindmap(mindmap);
-    
+
     const flowNodes: Node[] = mindmap.nodes.map((node) => ({
       id: node.id,
       type: node.type || "default",
@@ -122,14 +124,14 @@ export function MindmapPage() {
       data: node.data,
       ...nodeDefaults,
     }));
-    
+
     const flowEdges: Edge[] = mindmap.edges.map((edge) => ({
       id: edge.id,
       source: edge.source,
       target: edge.target,
       ...edgeDefaults,
     }));
-    
+
     setNodes(flowNodes);
     setEdges(flowEdges);
     setActiveTab("view");
@@ -155,11 +157,14 @@ export function MindmapPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold" data-testid="text-page-title">Mindmap Generator</h1>
-        <p className="text-muted-foreground">
-          Create visual concept maps from your documents or any topic
-        </p>
+      <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold" data-testid="text-page-title">Mindmap Generator</h1>
+          <p className="text-muted-foreground">
+            Create visual concept maps from your documents or any topic
+          </p>
+        </div>
+        <AISettings />
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "view")}>
@@ -305,7 +310,7 @@ export function MindmapPage() {
                     <Button
                       size="icon"
                       variant="secondary"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       data-testid="button-zoom-in"
                     >
                       <ZoomIn className="h-4 w-4" />
@@ -313,7 +318,7 @@ export function MindmapPage() {
                     <Button
                       size="icon"
                       variant="secondary"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       data-testid="button-zoom-out"
                     >
                       <ZoomOut className="h-4 w-4" />
@@ -321,7 +326,7 @@ export function MindmapPage() {
                     <Button
                       size="icon"
                       variant="secondary"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       data-testid="button-fit"
                     >
                       <Maximize2 className="h-4 w-4" />
