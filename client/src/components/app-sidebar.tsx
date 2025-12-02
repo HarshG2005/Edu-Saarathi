@@ -81,6 +81,12 @@ const studyTools = [
     icon: LayoutDashboard,
     description: "Track your learning",
   },
+  {
+    title: "Study Guide",
+    id: "study-guide",
+    icon: BookOpen,
+    description: "Review all materials",
+  },
 ];
 
 export function AppSidebar() {

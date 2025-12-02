@@ -15,7 +15,7 @@ import { NotesPage } from "@/pages/notes";
 import { TutorPage } from "@/pages/tutor";
 import { QuizPage } from "@/pages/quiz";
 import { ProgressPage } from "@/pages/progress";
-
+import { StudyGuidePage } from "@/pages/study-guide";
 import { LandingPage } from "@/pages/landing";
 
 function MainContent() {
@@ -39,6 +39,8 @@ function MainContent() {
         return <QuizPage />;
       case "progress":
         return <ProgressPage />;
+      case "study-guide":
+        return <StudyGuidePage />;
       default:
         return <LibraryPage />;
     }
