@@ -625,6 +625,51 @@ export async function registerRoutes(
 
       const studyTime = filteredQuizResults.reduce((acc, r) => acc + (r.timeTaken || 0), 0) / 60; // Minutes
 
+      // Calculate Streak
+      const activityDates = new Set<string>();
+
+      filteredQuizResults.forEach(r => {
+        if (r.completedAt) {
+          activityDates.add(new Date(r.completedAt).toDateString());
+        }
+      });
+
+      filteredFlashcardSets.forEach(s => {
+        if (s.createdAt) {
+          activityDates.add(new Date(s.createdAt).toDateString());
+        }
+      });
+
+      const sortedDates = Array.from(activityDates)
+        .map(d => new Date(d))
+        .sort((a, b) => b.getTime() - a.getTime());
+
+      let streak = 0;
+      const today = new Date().toDateString();
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+      if (sortedDates.length > 0) {
+        const lastActivity = sortedDates[0].toDateString();
+        // If last activity was today or yesterday, streak is active
+        if (lastActivity === today || lastActivity === yesterday) {
+          streak = 1;
+          let currentDate = sortedDates[0];
+
+          for (let i = 1; i < sortedDates.length; i++) {
+            const prevDate = sortedDates[i];
+            const diffTime = Math.abs(currentDate.getTime() - prevDate.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 1) {
+              streak++;
+              currentDate = prevDate;
+            } else {
+              break;
+            }
+          }
+        }
+      }
+
       // Study Guide Stats
       const totalHighlights = filteredHighlights.length;
       const totalUserNotes = filteredUserNotes.length;
@@ -662,6 +707,7 @@ export async function registerRoutes(
         totalFlashcardsMastered,
         totalFlashcards,
         studyTime,
+        streak,
         quizScores,
         topicMastery,
         recentActivity,

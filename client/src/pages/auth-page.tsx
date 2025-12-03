@@ -22,10 +22,9 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, Eye, EyeOff, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function AuthPage() {
     const { user, loginMutation, registerMutation } = useAuth();
@@ -61,31 +60,34 @@ export default function AuthPage() {
     });
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0F172A] p-4 font-sans">
+        <div className="min-h-screen flex items-center justify-center bg-gfg-bg dark:bg-gfg-dark-bg p-4 font-sans transition-colors duration-300">
+            <div className="absolute top-4 right-4">
+                <ThemeToggle />
+            </div>
             <div className="w-full max-w-[420px]">
-                <Card className="w-full bg-[#0D1B2A] border-[rgba(255,255,255,0.06)] shadow-2xl rounded-xl overflow-hidden">
+                <Card className="w-full shadow-gfg-light dark:shadow-gfg-dark border-gfg-border dark:border-gfg-dark-border bg-gfg-card dark:bg-gfg-dark-card">
                     <CardHeader className="space-y-3 pb-6 text-center">
                         <div className="flex justify-center mb-2">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#3B82F6]/10 text-[#3B82F6] ring-1 ring-[#3B82F6]/20">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gfg-green/10 text-gfg-green ring-1 ring-gfg-green/20 dark:bg-gfg-green/20 dark:text-gfg-green-light dark:ring-gfg-green-light/30">
                                 <Brain className="h-6 w-6" />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <CardTitle className="text-2xl font-semibold tracking-tight text-[#E6EEF3]">
+                            <CardTitle className="text-2xl font-bold tracking-tight text-gfg-text dark:text-gfg-dark-text">
                                 Welcome back
                             </CardTitle>
-                            <CardDescription className="text-[#93A4B2]">
-                                Sign in to EduQuest AI to continue learning
+                            <CardDescription className="text-gfg-text-light dark:text-gfg-dark-muted">
+                                Sign in to EduQuest to continue learning
                             </CardDescription>
                         </div>
                     </CardHeader>
                     <CardContent className="px-8 pb-8">
-                        <div className="grid w-full grid-cols-2 mb-6 bg-muted/50 p-1 rounded-lg">
+                        <div className="grid w-full grid-cols-2 mb-6 bg-gfg-bg dark:bg-gfg-dark-panel p-1 rounded-lg border border-gfg-border dark:border-gfg-dark-border">
                             <button
                                 onClick={() => setActiveTab("login")}
                                 className={`text-sm font-medium py-1.5 rounded-md transition-all ${activeTab === "login"
-                                    ? "bg-[#3B82F6] text-white shadow-sm"
-                                    : "text-muted-foreground hover:text-foreground"
+                                    ? "bg-white dark:bg-gfg-dark-card text-gfg-green dark:text-gfg-green-light shadow-sm border border-gfg-border dark:border-gfg-dark-border"
+                                    : "text-gfg-text-light dark:text-gfg-dark-muted hover:text-gfg-text dark:hover:text-gfg-dark-text"
                                     }`}
                             >
                                 Login
@@ -93,8 +95,8 @@ export default function AuthPage() {
                             <button
                                 onClick={() => setActiveTab("register")}
                                 className={`text-sm font-medium py-1.5 rounded-md transition-all ${activeTab === "register"
-                                    ? "bg-[#3B82F6] text-white shadow-sm"
-                                    : "text-muted-foreground hover:text-foreground"
+                                    ? "bg-white dark:bg-gfg-dark-card text-gfg-green dark:text-gfg-green-light shadow-sm border border-gfg-border dark:border-gfg-dark-border"
+                                    : "text-gfg-text-light dark:text-gfg-dark-muted hover:text-gfg-text dark:hover:text-gfg-dark-text"
                                     }`}
                             >
                                 Register
@@ -110,7 +112,7 @@ export default function AuthPage() {
                                     className="space-y-4"
                                 >
                                     {loginMutation.error && (
-                                        <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md flex items-center gap-2" role="alert">
+                                        <div className="bg-destructive/10 text-destructive dark:bg-red-900/20 dark:text-red-400 text-sm p-3 rounded-md flex items-center gap-2" role="alert">
                                             <span className="font-medium">Error:</span>
                                             {loginMutation.error.message}
                                         </div>
@@ -120,13 +122,13 @@ export default function AuthPage() {
                                         name="username"
                                         render={({ field }) => (
                                             <FormItem className="space-y-1.5">
-                                                <FormLabel className="text-xs font-medium text-[#93A4B2]">Username</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-gfg-text dark:text-gfg-dark-text">Username</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         placeholder="johndoe"
                                                         {...field}
                                                         autoFocus
-                                                        className="bg-[#0F172A] border-[rgba(255,255,255,0.06)] focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20 h-10 transition-all text-white"
+                                                        className="h-10"
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -138,19 +140,19 @@ export default function AuthPage() {
                                         name="password"
                                         render={({ field }) => (
                                             <FormItem className="space-y-1.5">
-                                                <FormLabel className="text-xs font-medium text-[#93A4B2]">Password</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-gfg-text dark:text-gfg-dark-text">Password</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
                                                         <Input
                                                             type={showPassword ? "text" : "password"}
                                                             {...field}
-                                                            className="bg-[#0F172A] border-[rgba(255,255,255,0.06)] focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20 h-10 pr-10 transition-all relative z-20 text-white"
+                                                            className="h-10 pr-10"
                                                         />
                                                         <Button
                                                             type="button"
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground z-30"
+                                                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gfg-text-light dark:text-gfg-dark-muted hover:text-gfg-green dark:hover:text-gfg-green-light z-30"
                                                             onClick={() => setShowPassword(!showPassword)}
                                                         >
                                                             {showPassword ? (
@@ -168,15 +170,15 @@ export default function AuthPage() {
 
                                     <div className="flex items-center justify-between text-sm">
                                         <div className="flex items-center space-x-2">
-                                            <Checkbox id="remember" className="border-white/20 data-[state=checked]:bg-[#3B82F6] data-[state=checked]:border-[#3B82F6]" />
+                                            <Checkbox id="remember" className="border-gfg-border dark:border-gfg-dark-border data-[state=checked]:bg-gfg-green dark:data-[state=checked]:bg-gfg-green-light data-[state=checked]:border-gfg-green dark:data-[state=checked]:border-gfg-green-light" />
                                             <label
                                                 htmlFor="remember"
-                                                className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#93A4B2]"
+                                                className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gfg-text-light dark:text-gfg-dark-muted"
                                             >
                                                 Remember me
                                             </label>
                                         </div>
-                                        <Button variant="link" className="px-0 font-normal text-xs text-[#3B82F6] h-auto" type="button">
+                                        <Button variant="link" className="px-0 font-normal text-xs text-gfg-green dark:text-gfg-green-light h-auto" type="button">
                                             Forgot password?
                                         </Button>
                                     </div>
@@ -184,7 +186,8 @@ export default function AuthPage() {
                                     <div className="pt-2">
                                         <Button
                                             type="submit"
-                                            className="w-full h-10 bg-[#3B82F6] hover:bg-[#3B82F6]/90 text-white font-medium shadow-lg shadow-[#3B82F6]/20 transition-all"
+                                            className="w-full h-10 font-bold shadow-md"
+                                            variant="cta"
                                             disabled={loginMutation.isPending}
                                         >
                                             {loginMutation.isPending ? (
@@ -210,7 +213,7 @@ export default function AuthPage() {
                                     className="space-y-4"
                                 >
                                     {registerMutation.error && (
-                                        <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md flex items-center gap-2" role="alert">
+                                        <div className="bg-destructive/10 text-destructive dark:bg-red-900/20 dark:text-red-400 text-sm p-3 rounded-md flex items-center gap-2" role="alert">
                                             <span className="font-medium">Error:</span>
                                             {registerMutation.error.message}
                                         </div>
@@ -220,12 +223,12 @@ export default function AuthPage() {
                                         name="username"
                                         render={({ field }) => (
                                             <FormItem className="space-y-1.5">
-                                                <FormLabel className="text-xs font-medium text-[#93A4B2]">Username</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-gfg-text dark:text-gfg-dark-text">Username</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         placeholder="johndoe"
                                                         {...field}
-                                                        className="bg-[#0F172A] border-[rgba(255,255,255,0.06)] focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20 h-10 transition-all text-white"
+                                                        className="h-10"
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -237,19 +240,19 @@ export default function AuthPage() {
                                         name="password"
                                         render={({ field }) => (
                                             <FormItem className="space-y-1.5">
-                                                <FormLabel className="text-xs font-medium text-[#93A4B2]">Password</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-gfg-text dark:text-gfg-dark-text">Password</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
                                                         <Input
                                                             type={showPassword ? "text" : "password"}
                                                             {...field}
-                                                            className="bg-[#0F172A] border-[rgba(255,255,255,0.06)] focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20 h-10 pr-10 transition-all relative z-20 text-white"
+                                                            className="h-10 pr-10"
                                                         />
                                                         <Button
                                                             type="button"
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground z-30"
+                                                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gfg-text-light dark:text-gfg-dark-muted hover:text-gfg-green dark:hover:text-gfg-green-light z-30"
                                                             onClick={() => setShowPassword(!showPassword)}
                                                         >
                                                             {showPassword ? (
@@ -268,7 +271,8 @@ export default function AuthPage() {
                                     <div className="pt-2">
                                         <Button
                                             type="submit"
-                                            className="w-full h-10 bg-[#3B82F6] hover:bg-[#3B82F6]/90 text-white font-medium shadow-lg shadow-[#3B82F6]/20 transition-all"
+                                            className="w-full h-10 font-bold shadow-md"
+                                            variant="cta"
                                             disabled={registerMutation.isPending}
                                         >
                                             {registerMutation.isPending ? (
@@ -285,9 +289,9 @@ export default function AuthPage() {
                             </Form>
                         )}
                     </CardContent>
-                    <CardFooter className="bg-muted/20 p-4 border-t border-white/5 flex justify-center">
-                        <p className="text-[11px] text-[#93A4B2] text-center">
-                            By continuing you agree to our <span className="text-[#3B82F6] hover:underline cursor-pointer">Terms</span> & <span className="text-[#3B82F6] hover:underline cursor-pointer">Privacy Policy</span>
+                    <CardFooter className="bg-gfg-bg dark:bg-gfg-dark-panel p-4 border-t border-gfg-border dark:border-gfg-dark-border flex justify-center rounded-b-lg">
+                        <p className="text-[11px] text-gfg-text-light dark:text-gfg-dark-muted text-center">
+                            By continuing you agree to our <span className="text-gfg-green dark:text-gfg-green-light hover:underline cursor-pointer">Terms</span> & <span className="text-gfg-green dark:text-gfg-green-light hover:underline cursor-pointer">Privacy Policy</span>
                         </p>
                     </CardFooter>
                 </Card>

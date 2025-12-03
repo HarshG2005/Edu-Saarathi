@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Section } from "@/components/ui/section";
+import { SearchBar } from "@/components/ui/search-bar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -132,18 +134,18 @@ export function LibraryPage() {
   };
 
   return (
-    <div className="flex flex-col gap-8 p-8 max-w-[1600px] mx-auto">
+    <Section className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight" data-testid="text-page-title">Document Library</h1>
-        <p className="text-muted-foreground text-lg">
+        <h1 className="text-3xl font-bold tracking-tight text-gfg-text dark:text-gfg-dark-text" data-testid="text-page-title">Document Library</h1>
+        <p className="text-gfg-text-light dark:text-gfg-dark-muted text-lg">
           Upload and manage your PDF textbooks and study materials
         </p>
       </div>
 
       <div
-        className={`relative flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed p-8 transition-all duration-200 ${isDragging
-          ? "border-primary bg-primary/5 scale-[1.01]"
-          : "border-border hover:border-primary/50 hover:bg-muted/50"
+        className={`relative flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-8 transition-all duration-200 ${isDragging
+          ? "border-gfg-green bg-gfg-green-50 dark:bg-gfg-green/10 scale-[1.01]"
+          : "border-gfg-border dark:border-gfg-dark-border hover:border-gfg-green dark:hover:border-gfg-green-light hover:bg-gfg-bg-card dark:hover:bg-gfg-dark-panel"
           }`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -155,24 +157,24 @@ export function LibraryPage() {
       >
         {uploadMutation.isPending ? (
           <>
-            <div className="rounded-full bg-primary/10 p-4">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="rounded-full bg-gfg-green/10 dark:bg-gfg-green/20 p-4">
+              <Loader2 className="h-8 w-8 animate-spin text-gfg-green dark:text-gfg-green-light" />
             </div>
             <div className="text-center space-y-1">
-              <p className="text-lg font-medium">Processing document...</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-lg font-medium text-gfg-text dark:text-gfg-dark-text">Processing document...</p>
+              <p className="text-sm text-gfg-text-light dark:text-gfg-dark-muted">
                 Extracting text and preparing content
               </p>
             </div>
           </>
         ) : (
           <>
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 shadow-sm">
-              <Upload className="h-8 w-8 text-primary" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gfg-green/10 dark:bg-gfg-green/20 shadow-sm">
+              <Upload className="h-8 w-8 text-gfg-green dark:text-gfg-green-light" />
             </div>
             <div className="text-center space-y-1">
-              <p className="text-lg font-medium">Drop your PDF here</p>
-              <p className="text-sm text-muted-foreground">or click to browse</p>
+              <p className="text-lg font-medium text-gfg-text dark:text-gfg-dark-text">Drop your PDF here</p>
+              <p className="text-sm text-gfg-text-light dark:text-gfg-dark-muted">or click to browse</p>
             </div>
             <input
               type="file"
@@ -181,7 +183,7 @@ export function LibraryPage() {
               className="absolute inset-0 cursor-pointer opacity-0"
               data-testid="input-file-upload"
             />
-            <Badge variant="secondary" className="mt-2 font-normal text-muted-foreground bg-muted">
+            <Badge variant="secondary" className="mt-2 font-normal text-gfg-text-light dark:text-gfg-dark-muted bg-gray-100 dark:bg-gfg-dark-card border border-gfg-border dark:border-gfg-dark-border">
               PDF files only • Max 50MB
             </Badge>
           </>
@@ -191,17 +193,15 @@ export function LibraryPage() {
       <div className="space-y-4">
         {documents.length > 0 && (
           <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
+            <div className="flex-1 max-w-md">
+              <SearchBar
                 placeholder="Search documents..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background"
                 data-testid="input-search-documents"
               />
             </div>
-            <div className="ml-auto text-sm text-muted-foreground font-medium">
+            <div className="ml-auto text-sm text-gfg-text-light dark:text-gfg-dark-muted font-medium">
               {documents.length} documents
             </div>
           </div>
@@ -216,12 +216,12 @@ export function LibraryPage() {
               .map((doc) => (
                 <Card
                   key={doc.id}
-                  className="group flex flex-col hover-elevate cursor-pointer transition-all border-border/60 bg-card/50 hover:bg-card hover:border-border"
+                  className="group flex flex-col cursor-pointer hover:shadow-md transition-shadow border-gfg-border dark:border-gfg-dark-border hover:border-gfg-green dark:hover:border-gfg-green-light"
                   data-testid={`card-document-${doc.id}`}
                   onClick={() => setLocation(`/documents/${doc.id}`)}
                 >
                   <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-5 pb-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gfg-green/10 dark:bg-gfg-green/20 text-gfg-green dark:text-gfg-green-light">
                       <FileText className="h-6 w-6" />
                     </div>
                     <DropdownMenu>
@@ -229,20 +229,21 @@ export function LibraryPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
+                          className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gfg-green-50 dark:hover:bg-gfg-green/10 hover:text-gfg-green dark:hover:text-gfg-green-light"
                           data-testid={`button-document-menu-${doc.id}`}
                           onClick={(e) => e.stopPropagation()}
                         >
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className="bg-gfg-bg-card dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedDocument(doc);
                             setShowPreview(true);
                           }}
+                          className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel cursor-pointer"
                         >
                           <Eye className="mr-2 h-4 w-4" />
                           Preview content
@@ -252,7 +253,7 @@ export function LibraryPage() {
                             e.stopPropagation();
                             handleDeleteDocument(doc.id);
                           }}
-                          className="text-destructive focus:text-destructive"
+                          className="text-destructive focus:text-destructive dark:text-red-400 dark:focus:text-red-300 hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel cursor-pointer"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Remove
@@ -262,11 +263,11 @@ export function LibraryPage() {
                   </CardHeader>
 
                   <CardContent className="flex-1 px-5 py-2">
-                    <h3 className="font-semibold leading-tight line-clamp-2 mb-3 min-h-[2.5rem]" title={doc.name}>
+                    <h3 className="font-semibold leading-tight line-clamp-2 mb-3 min-h-[2.5rem] text-gfg-text dark:text-gfg-dark-text" title={doc.name}>
                       {doc.name}
                     </h3>
 
-                    <div className="grid grid-cols-2 gap-y-2 text-xs text-muted-foreground">
+                    <div className="grid grid-cols-2 gap-y-2 text-xs text-gfg-text-light dark:text-gfg-dark-muted">
                       <div className="flex items-center gap-1.5">
                         <File className="h-3.5 w-3.5" />
                         <span>{formatFileSize(doc.fileSize)}</span>
@@ -285,6 +286,7 @@ export function LibraryPage() {
                   <CardFooter className="p-5 pt-3 grid grid-cols-2 gap-3">
                     <Button
                       size="sm"
+                      variant="cta"
                       className="w-full text-xs font-medium col-span-2"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -296,8 +298,8 @@ export function LibraryPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="secondary"
-                      className="w-full text-xs font-medium bg-secondary/50 hover:bg-secondary"
+                      variant="outline"
+                      className="w-full text-xs font-medium border-gfg-green text-gfg-green hover:bg-gfg-green-50 dark:border-gfg-green-light dark:text-gfg-green-light dark:hover:bg-gfg-green/10"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleUseDocument(doc.id, "mcq");
@@ -308,8 +310,8 @@ export function LibraryPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="secondary"
-                      className="w-full text-xs font-medium bg-secondary/50 hover:bg-secondary"
+                      variant="outline"
+                      className="w-full text-xs font-medium border-gfg-green text-gfg-green hover:bg-gfg-green-50 dark:border-gfg-green-light dark:text-gfg-green-light dark:hover:bg-gfg-green/10"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleUseDocument(doc.id, "flashcards");
@@ -323,13 +325,13 @@ export function LibraryPage() {
               ))}
           </div>
         ) : documents.length > 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-20 text-center border rounded-xl border-dashed bg-muted/10">
-            <div className="rounded-full bg-muted p-4">
-              <Search className="h-8 w-8 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center gap-4 py-20 text-center border rounded-xl border-dashed border-gfg-border dark:border-gfg-dark-border bg-gfg-bg-card dark:bg-gfg-dark-card">
+            <div className="rounded-full bg-gray-100 dark:bg-gfg-dark-panel p-4">
+              <Search className="h-8 w-8 text-gfg-text-light dark:text-gfg-dark-muted" />
             </div>
             <div>
-              <p className="text-lg font-medium">No documents found</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-lg font-medium text-gfg-text dark:text-gfg-dark-text">No documents found</p>
+              <p className="text-sm text-gfg-text-light dark:text-gfg-dark-muted">
                 Try a different search term
               </p>
             </div>
@@ -338,13 +340,13 @@ export function LibraryPage() {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center gap-4 py-20 text-center border rounded-xl border-dashed bg-muted/10">
-            <div className="rounded-full bg-muted p-4">
-              <BookOpen className="h-10 w-10 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center gap-4 py-20 text-center border rounded-xl border-dashed border-gfg-border dark:border-gfg-dark-border bg-gfg-bg-card dark:bg-gfg-dark-card">
+            <div className="rounded-full bg-gray-100 dark:bg-gfg-dark-panel p-4">
+              <BookOpen className="h-10 w-10 text-gfg-text-light dark:text-gfg-dark-muted" />
             </div>
             <div className="max-w-xs">
-              <p className="text-lg font-medium">Your library is empty</p>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-lg font-medium text-gfg-text dark:text-gfg-dark-text">Your library is empty</p>
+              <p className="text-sm text-gfg-text-light dark:text-gfg-dark-muted mt-1">
                 Upload a PDF above to get started with AI-powered study tools
               </p>
             </div>
@@ -353,16 +355,16 @@ export function LibraryPage() {
       </div>
 
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-3xl h-[80vh] flex flex-col">
+        <DialogContent className="max-w-3xl h-[80vh] flex flex-col bg-gfg-bg-card dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <FileText className="h-5 w-5 text-primary" />
+            <DialogTitle className="flex items-center gap-2 text-xl text-gfg-text dark:text-gfg-dark-text">
+              <FileText className="h-5 w-5 text-gfg-green dark:text-gfg-green-light" />
               <span className="truncate">{selectedDocument?.name}</span>
             </DialogTitle>
           </DialogHeader>
-          <div className="flex-1 overflow-hidden rounded-lg border bg-muted/30 p-1">
+          <div className="flex-1 overflow-hidden rounded-lg border border-gfg-border dark:border-gfg-dark-border bg-gray-50 dark:bg-gfg-dark-panel p-1">
             <ScrollArea className="h-full p-4">
-              <pre className="whitespace-pre-wrap font-mono text-sm text-muted-foreground leading-relaxed">
+              <pre className="whitespace-pre-wrap font-mono text-sm text-gfg-text dark:text-gfg-dark-text leading-relaxed">
                 {selectedDocument?.content?.slice(0, 5000)}
                 {selectedDocument?.content && selectedDocument.content.length > 5000 && "..."}
               </pre>
@@ -370,6 +372,6 @@ export function LibraryPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </Section>
   );
 }

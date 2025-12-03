@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Section } from "@/components/ui/section";
 import {
   Select,
   SelectContent,
@@ -72,8 +73,9 @@ export function SummaryPage() {
     if (!currentSummary) return;
 
     let content = currentSummary.content;
-    if (currentSummary.bulletPoints?.length) {
-      content += "\n\nKey Points:\n" + currentSummary.bulletPoints.map((p) => `• ${p}`).join("\n");
+    const bulletPoints = currentSummary.bulletPoints as string[];
+    if (bulletPoints?.length) {
+      content += "\n\nKey Points:\n" + bulletPoints.map((p) => `• ${p}`).join("\n");
     }
 
     navigator.clipboard.writeText(content);
@@ -90,12 +92,14 @@ export function SummaryPage() {
     content += `Mode: ${currentSummary.mode}\n\n`;
     content += currentSummary.content;
 
-    if (currentSummary.bulletPoints?.length) {
-      content += "\n\nKey Points:\n" + currentSummary.bulletPoints.map((p) => `• ${p}`).join("\n");
+    const bulletPoints = currentSummary.bulletPoints as string[];
+    if (bulletPoints?.length) {
+      content += "\n\nKey Points:\n" + bulletPoints.map((p) => `• ${p}`).join("\n");
     }
 
-    if (currentSummary.keyTerms?.length) {
-      content += "\n\nKey Terms: " + currentSummary.keyTerms.join(", ");
+    const keyTerms = currentSummary.keyTerms as string[];
+    if (keyTerms?.length) {
+      content += "\n\nKey Terms: " + keyTerms.join(", ");
     }
 
     const blob = new Blob([content], { type: "text/plain" });
@@ -126,11 +130,11 @@ export function SummaryPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <Section className="flex flex-col gap-6">
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold" data-testid="text-page-title">Summary Generator</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold text-gfg-text" data-testid="text-page-title">Summary Generator</h1>
+          <p className="text-gfg-text-light">
             Generate concise summaries from your documents or any topic
           </p>
         </div>
@@ -138,26 +142,26 @@ export function SummaryPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "view")}>
-        <TabsList>
-          <TabsTrigger value="generate" data-testid="tab-generate">Generate</TabsTrigger>
-          <TabsTrigger value="view" data-testid="tab-view" disabled={!currentSummary}>
+        <TabsList className="grid w-full grid-cols-2 bg-gfg-bg-card border border-gfg-border-light max-w-md">
+          <TabsTrigger value="generate" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white" data-testid="tab-generate">Generate</TabsTrigger>
+          <TabsTrigger value="view" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white" data-testid="tab-view" disabled={!currentSummary}>
             View Summary
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="generate" className="mt-6">
-          <Card className="max-w-xl">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-gfg-text">
+                <FileText className="h-5 w-5 text-gfg-green" />
                 Generate Summary
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="document">Source Document (Optional)</Label>
+                <Label htmlFor="document" className="text-gfg-text">Source Document (Optional)</Label>
                 <Select value={selectedDocId} onValueChange={setSelectedDocId}>
-                  <SelectTrigger id="document" data-testid="select-document">
+                  <SelectTrigger id="document" className="bg-white border-gfg-border-medium" data-testid="select-document">
                     <SelectValue placeholder="Select a document or enter a topic" />
                   </SelectTrigger>
                   <SelectContent>
@@ -174,43 +178,44 @@ export function SummaryPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="topic">Topic {!hasDocumentSelected && "(Required)"}</Label>
+                <Label htmlFor="topic" className="text-gfg-text">Topic {!hasDocumentSelected && "(Required)"}</Label>
                 <Input
                   id="topic"
                   placeholder="e.g., Photosynthesis, Machine Learning basics"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
+                  className="bg-white border-gfg-border-medium"
                   data-testid="input-topic"
                 />
               </div>
 
               <div className="space-y-3">
-                <Label>Summary Length</Label>
+                <Label className="text-gfg-text">Summary Length</Label>
                 <ToggleGroup
                   type="single"
                   value={mode}
                   onValueChange={(v) => v && setMode(v as "short" | "medium" | "detailed")}
                   className="justify-start"
                 >
-                  <ToggleGroupItem value="short" data-testid="toggle-short">
+                  <ToggleGroupItem value="short" className="data-[state=on]:bg-gfg-green data-[state=on]:text-white border border-gfg-border-medium" data-testid="toggle-short">
                     Short
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="medium" data-testid="toggle-medium">
+                  <ToggleGroupItem value="medium" className="data-[state=on]:bg-gfg-green data-[state=on]:text-white border border-gfg-border-medium" data-testid="toggle-medium">
                     Medium
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="detailed" data-testid="toggle-detailed">
+                  <ToggleGroupItem value="detailed" className="data-[state=on]:bg-gfg-green data-[state=on]:text-white border border-gfg-border-medium" data-testid="toggle-detailed">
                     Detailed
                   </ToggleGroupItem>
                 </ToggleGroup>
-                <p className="text-xs text-muted-foreground">{getModeDescription(mode)}</p>
+                <p className="text-xs text-gfg-text-light">{getModeDescription(mode)}</p>
               </div>
 
-              <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="flex items-center justify-between rounded-lg border border-gfg-border-light bg-gray-50 p-4">
                 <div className="flex items-center gap-3">
-                  <List className="h-5 w-5 text-muted-foreground" />
+                  <List className="h-5 w-5 text-gfg-text-light" />
                   <div>
-                    <Label htmlFor="bullet-points">Include Bullet Points</Label>
-                    <p className="text-xs text-muted-foreground">
+                    <Label htmlFor="bullet-points" className="text-gfg-text">Include Bullet Points</Label>
+                    <p className="text-xs text-gfg-text-light">
                       Add key takeaways as bullet points
                     </p>
                   </div>
@@ -219,6 +224,7 @@ export function SummaryPage() {
                   id="bullet-points"
                   checked={includeBulletPoints}
                   onCheckedChange={setIncludeBulletPoints}
+                  className="data-[state=checked]:bg-gfg-green"
                   data-testid="switch-bullet-points"
                 />
               </div>
@@ -227,6 +233,7 @@ export function SummaryPage() {
                 onClick={() => generateMutation.mutate()}
                 disabled={generateMutation.isPending || (!hasDocumentSelected && !topic.trim())}
                 className="w-full"
+                variant="cta"
                 data-testid="button-generate-summary"
               >
                 {generateMutation.isPending ? (
@@ -246,12 +253,12 @@ export function SummaryPage() {
 
           {summaries.length > 0 && (
             <div className="mt-8">
-              <h3 className="mb-4 text-lg font-semibold">Previous Summaries</h3>
+              <h3 className="mb-4 text-lg font-semibold text-gfg-text">Previous Summaries</h3>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {summaries.slice().reverse().slice(0, 5).map((summary) => (
                   <Card
                     key={summary.id}
-                    className="cursor-pointer hover-elevate"
+                    className="cursor-pointer hover:shadow-md transition-shadow border-gfg-border-light hover:border-gfg-green"
                     onClick={() => {
                       setCurrentSummary(summary);
                       setActiveTab("view");
@@ -261,16 +268,16 @@ export function SummaryPage() {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium line-clamp-1 break-words" title={summary.topic || "Summary"}>
+                          <p className="font-medium line-clamp-1 break-words text-gfg-text" title={summary.topic || "Summary"}>
                             {summary.topic || "Summary"}
                           </p>
-                          <p className="mt-1 text-sm text-muted-foreground line-clamp-2 break-words">
+                          <p className="mt-1 text-sm text-gfg-text-light line-clamp-2 break-words">
                             {summary.content.slice(0, 100)}...
                           </p>
                         </div>
                         <div className="flex flex-col items-end gap-1">
-                          <Badge variant="secondary">{summary.mode}</Badge>
-                          <span className="text-xs text-muted-foreground">
+                          <Badge variant="outline" className="text-gfg-text border-gfg-border-medium">{summary.mode}</Badge>
+                          <span className="text-xs text-gfg-text-light">
                             {formatDate(summary.createdAt)}
                           </span>
                         </div>
@@ -288,16 +295,17 @@ export function SummaryPage() {
             <div className="mx-auto max-w-3xl">
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-xl font-semibold text-gfg-text">
                     {currentSummary.topic || "Generated Summary"}
                   </h2>
-                  <Badge variant="secondary">{currentSummary.mode}</Badge>
+                  <Badge variant="outline" className="text-gfg-text border-gfg-border-medium">{currentSummary.mode}</Badge>
                 </div>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleCopy}
+                    className="border-gfg-green text-gfg-green hover:bg-gfg-green-50"
                     data-testid="button-copy"
                   >
                     <Copy className="mr-2 h-4 w-4" />
@@ -307,6 +315,7 @@ export function SummaryPage() {
                     variant="outline"
                     size="sm"
                     onClick={handleExport}
+                    className="border-gfg-green text-gfg-green hover:bg-gfg-green-50"
                     data-testid="button-export"
                   >
                     <Download className="mr-2 h-4 w-4" />
@@ -315,11 +324,11 @@ export function SummaryPage() {
                 </div>
               </div>
 
-              <Card className="mb-6">
+              <Card className="mb-6 border-gfg-border-light">
                 <CardContent className="p-6">
                   <ScrollArea className="max-h-96">
                     <p
-                      className="whitespace-pre-wrap text-base leading-relaxed"
+                      className="whitespace-pre-wrap text-base leading-relaxed text-gfg-text"
                       data-testid="text-summary-content"
                     >
                       {currentSummary.content}
@@ -328,20 +337,20 @@ export function SummaryPage() {
                 </CardContent>
               </Card>
 
-              {currentSummary.bulletPoints && currentSummary.bulletPoints.length > 0 && (
-                <Card className="mb-6">
+              {(currentSummary.bulletPoints as string[])?.length > 0 && (
+                <Card className="mb-6 border-gfg-border-light">
                   <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <List className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-lg text-gfg-text">
+                      <List className="h-5 w-5 text-gfg-green" />
                       Key Takeaways
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3">
-                      {currentSummary.bulletPoints.map((point, idx) => (
+                      {(currentSummary.bulletPoints as string[]).map((point, idx) => (
                         <li key={idx} className="flex items-start gap-3">
-                          <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-                          <span>{point}</span>
+                          <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-gfg-green" />
+                          <span className="text-gfg-text">{point}</span>
                         </li>
                       ))}
                     </ul>
@@ -349,18 +358,18 @@ export function SummaryPage() {
                 </Card>
               )}
 
-              {currentSummary.keyTerms && currentSummary.keyTerms.length > 0 && (
-                <Card>
+              {(currentSummary.keyTerms as string[])?.length > 0 && (
+                <Card className="border-gfg-border-light">
                   <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <BookOpen className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-lg text-gfg-text">
+                      <BookOpen className="h-5 w-5 text-gfg-green" />
                       Key Terms
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
-                      {currentSummary.keyTerms.map((term, idx) => (
-                        <Badge key={idx} variant="secondary">
+                      {(currentSummary.keyTerms as string[]).map((term, idx) => (
+                        <Badge key={idx} variant="secondary" className="bg-gfg-bg-secondary text-gfg-text border border-gfg-border-medium">
                           {term}
                         </Badge>
                       ))}
@@ -372,6 +381,6 @@ export function SummaryPage() {
           )}
         </TabsContent>
       </Tabs>
-    </div>
+    </Section>
   );
 }

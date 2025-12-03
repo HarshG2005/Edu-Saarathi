@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Section } from "@/components/ui/section";
 import {
   Select,
   SelectContent,
@@ -121,7 +122,7 @@ export function QuizPage() {
       };
       setAnswers((prev) => [...prev, answer]);
 
-      if (currentMCQSet && currentIndex < currentMCQSet.mcqs.length - 1) {
+      if (currentMCQSet && currentIndex < (currentMCQSet.mcqs as any[]).length - 1) {
         setCurrentIndex((i) => i + 1);
         setTimeRemaining(timePerQuestion);
         setQuestionStartTime(Date.now());
@@ -157,7 +158,7 @@ export function QuizPage() {
     if (!currentMCQ || !currentMCQSet) return;
 
     const timeTaken = Math.round((Date.now() - questionStartTime) / 1000);
-    const correctOption = currentMCQ.options.find((o) => o.isCorrect);
+    const correctOption = currentMCQ.options.find((o: any) => o.isCorrect);
     const isCorrect = optionId === correctOption?.id;
 
     const answer: QuizAnswer = {
@@ -170,7 +171,7 @@ export function QuizPage() {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
 
-    if (currentIndex < currentMCQSet.mcqs.length - 1) {
+    if (currentIndex < (currentMCQSet.mcqs as any[]).length - 1) {
       setCurrentIndex((i) => i + 1);
       setQuestionStartTime(Date.now());
       if (timedMode) {
@@ -195,7 +196,7 @@ export function QuizPage() {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
 
-    if (currentIndex < currentMCQSet.mcqs.length - 1) {
+    if (currentIndex < (currentMCQSet.mcqs as any[]).length - 1) {
       setCurrentIndex((i) => i + 1);
       setQuestionStartTime(Date.now());
       if (timedMode) {
@@ -215,7 +216,7 @@ export function QuizPage() {
 
     const totalTime = Math.round((Date.now() - startTime) / 1000);
     const correct = finalAnswers.filter((a) => a.isCorrect).length;
-    const total = currentMCQSet.mcqs.length;
+    const total = (currentMCQSet.mcqs as any[]).length;
     const percentage = Math.round((correct / total) * 100);
 
     const resultData = {
@@ -277,21 +278,21 @@ export function QuizPage() {
   };
 
   const getScoreColor = (percentage: number) => {
-    if (percentage >= 80) return "text-green-600 dark:text-green-400";
-    if (percentage >= 60) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
+    if (percentage >= 80) return "text-gfg-green bg-gfg-green-50 border-gfg-green";
+    if (percentage >= 60) return "text-yellow-600 bg-yellow-50 border-yellow-200";
+    return "text-red-600 bg-red-50 border-red-200";
   };
 
   const getChartData = (result: QuizResult) => [
-    { name: "Correct", value: result.score, color: "#22c55e" },
+    { name: "Correct", value: result.score, color: "#2F8D46" }, // GFG Green
     { name: "Incorrect", value: result.totalQuestions - result.score, color: "#ef4444" },
   ];
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <Section className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold" data-testid="text-page-title">Quiz Mode</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-bold text-gfg-text" data-testid="text-page-title">Quiz Mode</h1>
+        <p className="text-gfg-text-light">
           Test your knowledge with timed or untimed quizzes
         </p>
       </div>
@@ -300,16 +301,16 @@ export function QuizPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <HelpCircle className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-gfg-text">
+                <HelpCircle className="h-5 w-5 text-gfg-green" />
                 Start a Quiz
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <Tabs value={setupTab} onValueChange={(v) => setSetupTab(v as "existing" | "generate")}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="existing">Select Existing</TabsTrigger>
-                  <TabsTrigger value="generate">
+                <TabsList className="grid w-full grid-cols-2 bg-gfg-bg-card border border-gfg-border-light">
+                  <TabsTrigger value="existing" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white">Select Existing</TabsTrigger>
+                  <TabsTrigger value="generate" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white">
                     <Sparkles className="mr-2 h-4 w-4" />
                     Generate New
                   </TabsTrigger>
@@ -317,9 +318,9 @@ export function QuizPage() {
 
                 <TabsContent value="existing" className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="mcq-set">Select MCQ Set</Label>
+                    <Label htmlFor="mcq-set" className="text-gfg-text">Select MCQ Set</Label>
                     <Select value={selectedSetId} onValueChange={setSelectedSetId}>
-                      <SelectTrigger id="mcq-set" data-testid="select-mcq-set">
+                      <SelectTrigger id="mcq-set" className="bg-white border-gfg-border-medium" data-testid="select-mcq-set">
                         <SelectValue placeholder="Choose an MCQ set to quiz on" />
                       </SelectTrigger>
                       <SelectContent>
@@ -330,7 +331,7 @@ export function QuizPage() {
                         ) : (
                           mcqSets.slice().reverse().slice(0, 5).map((set) => (
                             <SelectItem key={set.id} value={set.id}>
-                              {set.topic || "MCQ Set"} ({set.mcqs.length} questions) - {formatDate(set.createdAt)}
+                              {set.topic || "MCQ Set"} ({(set.mcqs as any[]).length} questions) - {formatDate(set.createdAt)}
                             </SelectItem>
                           ))
                         )}
@@ -342,6 +343,7 @@ export function QuizPage() {
                     onClick={startQuiz}
                     disabled={!selectedSetId || mcqSets.length === 0}
                     className="w-full"
+                    variant="cta"
                     data-testid="button-start-quiz"
                   >
                     <Play className="mr-2 h-4 w-4" />
@@ -351,9 +353,9 @@ export function QuizPage() {
 
                 <TabsContent value="generate" className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="gen-doc">Source Document (Optional)</Label>
+                    <Label htmlFor="gen-doc" className="text-gfg-text">Source Document (Optional)</Label>
                     <Select value={genDocId} onValueChange={setGenDocId}>
-                      <SelectTrigger id="gen-doc">
+                      <SelectTrigger id="gen-doc" className="bg-white border-gfg-border-medium">
                         <SelectValue placeholder="Or enter a topic below" />
                       </SelectTrigger>
                       <SelectContent>
@@ -370,20 +372,21 @@ export function QuizPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="gen-topic">Topic</Label>
+                    <Label htmlFor="gen-topic" className="text-gfg-text">Topic</Label>
                     <Input
                       id="gen-topic"
                       placeholder="e.g., Machine Learning, Solar System, Web Development"
                       value={genTopic}
                       onChange={(e) => setGenTopic(e.target.value)}
+                      className="bg-white border-gfg-border-medium"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Question Count</Label>
+                      <Label className="text-gfg-text">Question Count</Label>
                       <Select value={genCount} onValueChange={(v) => setGenCount(v as "5" | "10" | "20")}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-white border-gfg-border-medium">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -395,9 +398,9 @@ export function QuizPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Difficulty</Label>
+                      <Label className="text-gfg-text">Difficulty</Label>
                       <Select value={genDifficulty} onValueChange={(v) => setGenDifficulty(v as "easy" | "medium" | "hard")}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-white border-gfg-border-medium">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -413,6 +416,7 @@ export function QuizPage() {
                     onClick={() => generateMCQsMutation.mutate()}
                     disabled={generateMCQsMutation.isPending || (!hasDocumentSelected && !genTopic)}
                     className="w-full"
+                    variant="cta"
                   >
                     {generateMCQsMutation.isPending ? (
                       <>
@@ -429,12 +433,12 @@ export function QuizPage() {
                 </TabsContent>
               </Tabs>
 
-              <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="flex items-center justify-between rounded-lg border border-gfg-border-light bg-gray-50 p-4">
                 <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-muted-foreground" />
+                  <Clock className="h-5 w-5 text-gfg-text-light" />
                   <div>
-                    <Label htmlFor="timed-mode">Timed Mode</Label>
-                    <p className="text-xs text-muted-foreground">
+                    <Label htmlFor="timed-mode" className="text-gfg-text">Timed Mode</Label>
+                    <p className="text-xs text-gfg-text-light">
                       Set a time limit per question
                     </p>
                   </div>
@@ -444,17 +448,18 @@ export function QuizPage() {
                   checked={timedMode}
                   onCheckedChange={setTimedMode}
                   data-testid="switch-timed-mode"
+                  className="data-[state=checked]:bg-gfg-green"
                 />
               </div>
 
               {timedMode && (
                 <div className="space-y-2">
-                  <Label>Seconds per Question</Label>
+                  <Label className="text-gfg-text">Seconds per Question</Label>
                   <Select
                     value={timePerQuestion.toString()}
                     onValueChange={(v) => setTimePerQuestion(parseInt(v))}
                   >
-                    <SelectTrigger data-testid="select-time">
+                    <SelectTrigger data-testid="select-time" className="bg-white border-gfg-border-medium">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -473,8 +478,8 @@ export function QuizPage() {
           {quizResults.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trophy className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-gfg-text">
+                  <Trophy className="h-5 w-5 text-gfg-green" />
                   Recent Results
                 </CardTitle>
               </CardHeader>
@@ -487,17 +492,17 @@ export function QuizPage() {
                     .map((result) => (
                       <div
                         key={result.id}
-                        className="flex items-center justify-between rounded-lg border p-3"
+                        className="flex items-center justify-between rounded-lg border border-gfg-border-light p-3 bg-white hover:shadow-sm transition-shadow"
                         data-testid={`result - ${result.id} `}
                       >
                         <div>
-                          <p className="font-medium">{result.topic}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="font-medium text-gfg-text">{result.topic}</p>
+                          <p className="text-sm text-gfg-text-light">
                             {result.score}/{result.totalQuestions} correct
                             {result.timeTaken && ` • ${formatTime(result.timeTaken)} `}
                           </p>
                         </div>
-                        <Badge className={getScoreColor(result.percentage)}>
+                        <Badge variant="outline" className={getScoreColor(result.percentage)}>
                           {result.percentage}%
                         </Badge>
                       </div>
@@ -512,8 +517,8 @@ export function QuizPage() {
       {quizState === "active" && currentMCQ && currentMCQSet && (
         <div className="mx-auto w-full max-w-2xl">
           <div className="mb-6 flex items-center justify-between">
-            <Badge variant="outline">
-              Question {currentIndex + 1} of {currentMCQSet.mcqs.length}
+            <Badge variant="outline" className="text-gfg-text border-gfg-border-medium bg-white">
+              Question {currentIndex + 1} of {(currentMCQSet.mcqs as any[]).length}
             </Badge>
             {timedMode && (
               <Badge
@@ -527,29 +532,29 @@ export function QuizPage() {
           </div>
 
           <Progress
-            value={(currentIndex / currentMCQSet.mcqs.length) * 100}
-            className="mb-6 h-2"
+            value={(currentIndex / (currentMCQSet.mcqs as any[]).length) * 100}
+            className="mb-6 h-2 bg-gray-200"
           />
 
-          <Card className="mb-6">
+          <Card className="mb-6 border-gfg-border-light shadow-md">
             <CardContent className="p-6">
-              <p className="mb-6 text-lg leading-relaxed" data-testid="text-question">
+              <p className="mb-6 text-lg leading-relaxed text-gfg-text font-medium" data-testid="text-question">
                 {currentMCQ.question}
               </p>
 
               <div className="space-y-3">
-                {currentMCQ.options.map((option, idx) => (
+                {currentMCQ.options.map((option: any, idx: number) => (
                   <button
                     key={option.id}
                     onClick={() => handleAnswer(option.id)}
-                    className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:border-primary hover:bg-muted/50"
+                    className="flex w-full items-center gap-3 rounded-lg border border-gfg-border-medium p-4 text-left transition-all hover:border-gfg-green hover:bg-gfg-green-50 group"
                     data-testid={`button - option - ${option.id} `}
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-medium">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-gfg-border-medium text-sm font-medium text-gfg-text-light group-hover:border-gfg-green group-hover:text-gfg-green">
                       {String.fromCharCode(65 + idx)}
                     </div>
-                    <span className="flex-1">{option.text}</span>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    <span className="flex-1 text-gfg-text">{option.text}</span>
+                    <ChevronRight className="h-5 w-5 text-gfg-text-light group-hover:text-gfg-green" />
                   </button>
                 ))}
               </div>
@@ -563,7 +568,7 @@ export function QuizPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="h-full">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-gfg-text">
                   <Trophy className="h-5 w-5 text-yellow-500" />
                   Performance Summary
                 </CardTitle>
@@ -590,31 +595,31 @@ export function QuizPage() {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center">
-                    <p className="text-3xl font-bold">{currentResult.percentage}%</p>
-                    <p className="text-xs text-muted-foreground">Score</p>
+                    <p className="text-3xl font-bold text-gfg-text">{currentResult.percentage}%</p>
+                    <p className="text-xs text-gfg-text-light">Score</p>
                   </div>
                 </div>
 
                 <div className="mt-6 grid w-full grid-cols-3 gap-4 text-center">
-                  <div className="rounded-lg bg-muted p-3">
-                    <p className="text-2xl font-bold text-green-600">{currentResult.score}</p>
-                    <p className="text-xs text-muted-foreground">Correct</p>
+                  <div className="rounded-lg bg-gfg-green-50 p-3 border border-gfg-green/20">
+                    <p className="text-2xl font-bold text-gfg-green">{currentResult.score}</p>
+                    <p className="text-xs text-gfg-text-light">Correct</p>
                   </div>
-                  <div className="rounded-lg bg-muted p-3">
+                  <div className="rounded-lg bg-red-50 p-3 border border-red-200">
                     <p className="text-2xl font-bold text-red-600">
                       {currentResult.totalQuestions - currentResult.score}
                     </p>
                     <p className="text-xs text-muted-foreground">Incorrect</p>
                   </div>
-                  <div className="rounded-lg bg-muted p-3">
-                    <p className="text-2xl font-bold">
+                  <div className="rounded-lg bg-gray-50 p-3 border border-gray-200">
+                    <p className="text-2xl font-bold text-gfg-text">
                       {currentResult.timeTaken ? formatTime(currentResult.timeTaken) : "--:--"}
                     </p>
-                    <p className="text-xs text-muted-foreground">Time Taken</p>
+                    <p className="text-xs text-gfg-text-light">Time Taken</p>
                   </div>
                 </div>
 
-                <Button onClick={resetQuiz} className="mt-6 w-full" data-testid="button-try-again">
+                <Button onClick={resetQuiz} className="mt-6 w-full" variant="outline" data-testid="button-try-again">
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Take Another Quiz
                 </Button>
@@ -623,59 +628,59 @@ export function QuizPage() {
 
             <Card className="h-full overflow-hidden">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart2 className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-gfg-text">
+                  <BarChart2 className="h-5 w-5 text-gfg-green" />
                   Detailed Review
                 </CardTitle>
               </CardHeader>
               <CardContent className="max-h-[500px] overflow-y-auto pr-2">
                 <div className="space-y-4">
-                  {currentMCQSet.mcqs.map((mcq, idx) => {
-                    const answer = currentResult.answers[idx];
-                    const correctOption = mcq.options.find((o) => o.isCorrect);
-                    const selectedOption = mcq.options.find((o) => o.id === answer?.selectedOptionId);
+                  {(currentMCQSet.mcqs as any[]).map((mcq: any, idx: number) => {
+                    const answer = (currentResult.answers as any[])[idx];
+                    const correctOption = mcq.options.find((o: any) => o.isCorrect);
+                    const selectedOption = mcq.options.find((o: any) => o.id === answer?.selectedOptionId);
 
                     return (
                       <div
                         key={mcq.id}
                         className={`rounded - lg border p - 4 transition - all ${answer?.isCorrect
-                          ? "border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-900/10"
-                          : "border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-900/10"
+                          ? "border-gfg-green bg-gfg-green-50"
+                          : "border-red-200 bg-red-50"
                           } `}
                         data-testid={`review - ${mcq.id} `}
                       >
                         <div className="mb-2 flex items-start gap-2">
                           {answer?.isCorrect ? (
-                            <Check className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
+                            <Check className="mt-0.5 h-5 w-5 shrink-0 text-gfg-green" />
                           ) : (
                             <X className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
                           )}
-                          <p className="font-medium text-sm">
-                            <span className="mr-2 font-bold text-muted-foreground">Q{idx + 1}</span>
+                          <p className="font-medium text-sm text-gfg-text">
+                            <span className="mr-2 font-bold text-gfg-text-light">Q{idx + 1}</span>
                             {mcq.question}
                           </p>
                         </div>
                         <div className="ml-7 space-y-2 text-sm">
-                          <div className="flex items-center gap-2 rounded bg-green-100/50 px-2 py-1 dark:bg-green-900/30">
-                            <Check className="h-3 w-3 text-green-600" />
-                            <span className="font-medium text-green-700 dark:text-green-400">
+                          <div className="flex items-center gap-2 rounded bg-white border border-gfg-green/20 px-2 py-1">
+                            <Check className="h-3 w-3 text-gfg-green" />
+                            <span className="font-medium text-gfg-green">
                               Correct: {correctOption?.text}
                             </span>
                           </div>
                           {!answer?.isCorrect && selectedOption && (
-                            <div className="flex items-center gap-2 rounded bg-red-100/50 px-2 py-1 dark:bg-red-900/30">
+                            <div className="flex items-center gap-2 rounded bg-white border border-red-200 px-2 py-1">
                               <X className="h-3 w-3 text-red-600" />
-                              <span className="font-medium text-red-700 dark:text-red-400">
+                              <span className="font-medium text-red-600">
                                 Your Answer: {selectedOption.text}
                               </span>
                             </div>
                           )}
                           {!answer?.selectedOptionId && (
-                            <p className="text-muted-foreground italic">Skipped / Time ran out</p>
+                            <p className="text-gfg-text-light italic">Skipped / Time ran out</p>
                           )}
                           {mcq.explanation && (
-                            <div className="mt-2 rounded bg-muted p-2 text-xs text-muted-foreground">
-                              <span className="font-bold">Explanation:</span> {mcq.explanation}
+                            <div className="mt-2 rounded bg-white p-2 text-xs text-gfg-text-light border border-gfg-border-light">
+                              <span className="font-bold text-gfg-text">Explanation:</span> {mcq.explanation}
                             </div>
                           )}
                         </div>
@@ -688,6 +693,6 @@ export function QuizPage() {
           </div>
         </div>
       )}
-    </div>
+    </Section>
   );
 }

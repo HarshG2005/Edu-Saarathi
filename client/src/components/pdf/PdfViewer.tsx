@@ -122,7 +122,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
     return (
         <div
             ref={containerRef}
-            className="relative w-full bg-slate-900/50 min-h-screen flex flex-col items-center p-8"
+            className="relative w-full bg-gfg-bg dark:bg-gfg-dark-bg min-h-screen flex flex-col items-center p-8 transition-colors duration-300"
             onMouseUp={handleSelection}
         >
             <Document
@@ -132,16 +132,16 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
                     console.error("Error loading PDF:", error);
                 }}
                 error={
-                    <div className="flex flex-col items-center gap-2 text-red-400 p-4 bg-red-950/20 rounded-lg border border-red-900/50">
+                    <div className="flex flex-col items-center gap-2 text-gfg-dark-danger p-4 bg-red-50 dark:bg-gfg-dark-danger/10 rounded-lg border border-red-200 dark:border-gfg-dark-danger/20">
                         <Loader2 className="h-6 w-6 animate-spin" />
                         <span className="font-medium">Failed to load PDF</span>
-                        <span className="text-sm text-red-400/80 text-center max-w-md">
+                        <span className="text-sm text-gfg-text-light dark:text-gfg-dark-muted text-center max-w-md">
                             Please ensure this is a valid PDF uploaded recently. Older documents may not have PDF data stored.
                         </span>
                     </div>
                 }
                 loading={
-                    <div className="flex items-center gap-2 text-slate-400">
+                    <div className="flex items-center gap-2 text-gfg-text-light dark:text-gfg-dark-muted">
                         <Loader2 className="h-6 w-6 animate-spin" />
                         <span>Loading PDF...</span>
                     </div>
@@ -149,7 +149,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
                 className="flex flex-col gap-8"
             >
                 {Array.from(new Array(numPages), (el, index) => (
-                    <div key={`page_${index + 1}`} className="relative shadow-2xl">
+                    <div key={`page_${index + 1}`} className="relative shadow-gfg-light dark:shadow-gfg-dark">
                         <Page
                             pageNumber={index + 1}
                             width={800}

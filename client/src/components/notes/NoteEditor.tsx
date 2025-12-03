@@ -42,14 +42,14 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[500px] bg-slate-900 border-slate-800 text-slate-100">
+            <DialogContent className="sm:max-w-[500px] bg-gfg-dark-panel border-gfg-dark-border text-gfg-dark-text">
                 <DialogHeader>
                     <DialogTitle>Add Note</DialogTitle>
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
                     {highlightText && (
-                        <div className="p-3 text-sm italic text-slate-400 bg-slate-800/50 rounded-md border border-slate-700/50">
+                        <div className="p-3 text-sm italic text-gfg-dark-muted bg-gfg-dark-card/50 rounded-md border border-gfg-dark-border/50">
                             "{highlightText.length > 150 ? highlightText.slice(0, 150) + "..." : highlightText}"
                         </div>
                     )}
@@ -61,17 +61,17 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
                             value={text}
                             onChange={(e) => setText(e.target.value)}
                             placeholder="Type your thoughts here..."
-                            className="h-32 bg-slate-950 border-slate-800 focus:ring-blue-500/50"
+                            className="h-32 bg-gfg-dark-bg border-gfg-dark-border focus:ring-gfg-green/50 text-gfg-dark-text placeholder:text-gfg-dark-muted"
                             autoFocus
                         />
                     </div>
                 </div>
 
                 <DialogFooter>
-                    <Button variant="ghost" onClick={onClose} disabled={isSaving}>
+                    <Button variant="ghost" onClick={onClose} disabled={isSaving} className="text-gfg-dark-text hover:bg-gfg-dark-card">
                         Cancel
                     </Button>
-                    <Button onClick={handleSave} disabled={isSaving || !text.trim()} className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={handleSave} disabled={isSaving || !text.trim()} className="bg-gfg-green-cta hover:bg-gfg-green text-white">
                         {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Save Note
                     </Button>

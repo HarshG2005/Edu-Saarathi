@@ -48,10 +48,10 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[600px] bg-slate-900 border-slate-800 text-slate-100">
+            <DialogContent className="sm:max-w-[600px] bg-gfg-dark-panel border-gfg-dark-border text-gfg-dark-text">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <Sparkles className="h-5 w-5 text-blue-400" />
+                        <Sparkles className="h-5 w-5 text-gfg-green" />
                         Create Flashcard
                     </DialogTitle>
                 </DialogHeader>
@@ -64,7 +64,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
                             value={question}
                             onChange={(e) => setQuestion(e.target.value)}
                             placeholder="Enter the question..."
-                            className="h-24 bg-slate-950 border-slate-800 focus:ring-blue-500/50"
+                            className="h-24 bg-gfg-dark-bg border-gfg-dark-border focus:ring-gfg-green/50 text-gfg-dark-text placeholder:text-gfg-dark-muted"
                         />
                     </div>
 
@@ -75,16 +75,16 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
                             value={answer}
                             onChange={(e) => setAnswer(e.target.value)}
                             placeholder="Enter the answer..."
-                            className="h-24 bg-slate-950 border-slate-800 focus:ring-blue-500/50"
+                            className="h-24 bg-gfg-dark-bg border-gfg-dark-border focus:ring-gfg-green/50 text-gfg-dark-text placeholder:text-gfg-dark-muted"
                         />
                     </div>
                 </div>
 
                 <DialogFooter>
-                    <Button variant="ghost" onClick={onClose} disabled={isSaving}>
+                    <Button variant="ghost" onClick={onClose} disabled={isSaving} className="text-gfg-dark-text hover:bg-gfg-dark-card">
                         Cancel
                     </Button>
-                    <Button onClick={handleSave} disabled={isSaving || !question.trim() || !answer.trim()} className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={handleSave} disabled={isSaving || !question.trim() || !answer.trim()} className="bg-gfg-green-cta hover:bg-gfg-green text-white">
                         {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Create Flashcard
                     </Button>

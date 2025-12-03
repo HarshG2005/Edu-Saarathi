@@ -25,18 +25,18 @@ export const HighlightMenu: React.FC<HighlightMenuProps> = ({
 
     return (
         <div
-            className="fixed z-50 flex items-center gap-1 p-1 bg-slate-900 border border-slate-700 rounded-lg shadow-xl animate-in fade-in zoom-in-95 duration-200"
+            className="fixed z-50 flex items-center gap-1 p-1 bg-gfg-dark-panel border border-gfg-dark-border rounded-lg shadow-xl animate-in fade-in zoom-in-95 duration-200"
             style={{
                 top: position.top,
                 left: position.left,
                 transform: "translate(-50%, -100%) translateY(-10px)",
             }}
         >
-            <div className="flex items-center gap-1 pr-2 border-r border-slate-700">
+            <div className="flex items-center gap-1 pr-2 border-r border-gfg-dark-border">
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-yellow-400 hover:text-yellow-300 hover:bg-slate-800"
+                    className="h-8 w-8 text-yellow-400 hover:text-yellow-300 hover:bg-gfg-dark-card"
                     onClick={() => onAction("highlight-yellow")}
                     title="Highlight"
                 >
@@ -45,7 +45,7 @@ export const HighlightMenu: React.FC<HighlightMenuProps> = ({
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-orange-400 hover:text-orange-300 hover:bg-slate-800"
+                    className="h-8 w-8 text-orange-400 hover:text-orange-300 hover:bg-gfg-dark-card"
                     onClick={() => onAction("highlight-orange")}
                     title="Important"
                 >
@@ -54,7 +54,7 @@ export const HighlightMenu: React.FC<HighlightMenuProps> = ({
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-purple-400 hover:text-purple-300 hover:bg-slate-800"
+                    className="h-8 w-8 text-purple-400 hover:text-purple-300 hover:bg-gfg-dark-card"
                     onClick={() => onAction("highlight-purple")}
                     title="Question"
                 >
@@ -66,7 +66,7 @@ export const HighlightMenu: React.FC<HighlightMenuProps> = ({
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-slate-200 hover:text-white hover:bg-slate-800"
+                    className="h-8 w-8 text-gfg-dark-muted hover:text-gfg-dark-text hover:bg-gfg-dark-card"
                     onClick={() => onAction("note")}
                     title="Add Note"
                 >
@@ -75,7 +75,7 @@ export const HighlightMenu: React.FC<HighlightMenuProps> = ({
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-blue-400 hover:text-blue-300 hover:bg-slate-800"
+                    className="h-8 w-8 text-gfg-green hover:text-gfg-green-light hover:bg-gfg-dark-card"
                     onClick={() => onAction("flashcard")}
                     title="Create Flashcard"
                 >

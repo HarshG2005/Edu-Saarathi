@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Section } from "@/components/ui/section";
 import {
   Select,
   SelectContent,
@@ -30,7 +31,7 @@ import { useAppStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import type { Mindmap } from "@shared/schema";
+import type { Mindmap, MindmapNode, MindmapEdge } from "@shared/schema";
 import { getStoredProvider, AISettings } from "@/components/ai-settings";
 import { formatDate } from "@/lib/utils";
 
@@ -38,9 +39,9 @@ const nodeDefaults = {
   style: {
     padding: "12px 20px",
     borderRadius: "12px",
-    border: "1px solid hsl(var(--border))",
-    background: "hsl(var(--card))",
-    color: "hsl(var(--card-foreground))",
+    border: "1px solid #d1d5db", // gfg-border-light
+    background: "#ffffff", // white
+    color: "#1f2937", // gfg-text
     fontSize: 14,
     fontWeight: 500,
     boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
@@ -51,7 +52,7 @@ const nodeDefaults = {
 
 const edgeDefaults = {
   style: {
-    stroke: "hsl(var(--primary))",
+    stroke: "#2F8D46", // gfg-green
     strokeWidth: 2,
     opacity: 0.6,
   },
@@ -86,7 +87,7 @@ export function MindmapPage() {
       addMindmap(data);
       setCurrentMindmap(data);
 
-      const flowNodes: Node[] = data.nodes.map((node) => ({
+      const flowNodes: Node[] = (data.nodes as unknown as MindmapNode[]).map((node) => ({
         id: node.id,
         type: node.type || "default",
         position: node.position,
@@ -94,7 +95,7 @@ export function MindmapPage() {
         ...nodeDefaults,
       }));
 
-      const flowEdges: Edge[] = data.edges.map((edge) => ({
+      const flowEdges: Edge[] = (data.edges as unknown as MindmapEdge[]).map((edge) => ({
         id: edge.id,
         source: edge.source,
         target: edge.target,
@@ -122,7 +123,7 @@ export function MindmapPage() {
   const loadMindmap = useCallback((mindmap: Mindmap) => {
     setCurrentMindmap(mindmap);
 
-    const flowNodes: Node[] = mindmap.nodes.map((node) => ({
+    const flowNodes: Node[] = (mindmap.nodes as unknown as MindmapNode[]).map((node) => ({
       id: node.id,
       type: node.type || "default",
       position: node.position,
@@ -130,7 +131,7 @@ export function MindmapPage() {
       ...nodeDefaults,
     }));
 
-    const flowEdges: Edge[] = mindmap.edges.map((edge) => ({
+    const flowEdges: Edge[] = (mindmap.edges as unknown as MindmapEdge[]).map((edge) => ({
       id: edge.id,
       source: edge.source,
       target: edge.target,
@@ -161,11 +162,11 @@ export function MindmapPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-[1600px] mx-auto">
+    <Section className="flex flex-col gap-6 max-w-[1600px] mx-auto h-screen">
       <div className="flex items-start justify-between shrink-0">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight" data-testid="text-page-title">Mindmap Generator</h1>
-          <p className="text-muted-foreground text-lg">
+          <h1 className="text-3xl font-bold tracking-tight text-gfg-text" data-testid="text-page-title">Mindmap Generator</h1>
+          <p className="text-gfg-text-light text-lg">
             Create visual concept maps from your documents or any topic
           </p>
         </div>
@@ -173,25 +174,25 @@ export function MindmapPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "view")} className="flex-1 flex flex-col min-h-0">
-        <div className="flex items-center justify-between border-b pb-4 shrink-0">
-          <TabsList className="bg-muted/50 p-1">
-            <TabsTrigger value="generate" className="px-6" data-testid="tab-generate">Generate</TabsTrigger>
-            <TabsTrigger value="view" className="px-6" data-testid="tab-view" disabled={!currentMindmap}>
+        <div className="flex items-center justify-between border-b border-gfg-border-light pb-4 shrink-0">
+          <TabsList className="bg-gfg-bg-card border border-gfg-border-light p-1">
+            <TabsTrigger value="generate" className="px-6 data-[state=active]:bg-gfg-green data-[state=active]:text-white" data-testid="tab-generate">Generate</TabsTrigger>
+            <TabsTrigger value="view" className="px-6 data-[state=active]:bg-gfg-green data-[state=active]:text-white" data-testid="tab-view" disabled={!currentMindmap}>
               View Mindmap
             </TabsTrigger>
           </TabsList>
 
           {activeTab === "view" && currentMindmap && (
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="h-8 px-3 text-sm font-normal">
-                {currentMindmap.nodes.length} concepts
+              <Badge variant="outline" className="h-8 px-3 text-sm font-normal text-gfg-text border-gfg-border-medium">
+                {(currentMindmap.nodes as unknown as MindmapNode[]).length} concepts
               </Badge>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleExportJSON}
                 data-testid="button-export"
-                className="h-8"
+                className="h-8 border-gfg-green text-gfg-green hover:bg-gfg-green-50"
               >
                 <Download className="mr-2 h-3.5 w-3.5" />
                 Export JSON
@@ -203,20 +204,20 @@ export function MindmapPage() {
         <TabsContent value="generate" className="mt-6">
           <Card className="max-w-xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
+              <CardTitle className="flex items-center gap-2 text-gfg-text">
+                <Sparkles className="h-5 w-5 text-gfg-green" />
                 Create New Mindmap
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gfg-text-light">
                 Configure the AI to generate a structured concept map
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="document">Source Document (Optional)</Label>
+                  <Label htmlFor="document" className="text-gfg-text">Source Document (Optional)</Label>
                   <Select value={selectedDocId} onValueChange={setSelectedDocId}>
-                    <SelectTrigger id="document" data-testid="select-document">
+                    <SelectTrigger id="document" className="bg-white border-gfg-border-medium" data-testid="select-document">
                       <SelectValue placeholder="Select a document..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -233,12 +234,13 @@ export function MindmapPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="topic">Topic {!hasDocumentSelected && "(Required)"}</Label>
+                  <Label htmlFor="topic" className="text-gfg-text">Topic {!hasDocumentSelected && "(Required)"}</Label>
                   <Input
                     id="topic"
                     placeholder="e.g., Quantum Physics, The French Revolution"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
+                    className="bg-white border-gfg-border-medium"
                     data-testid="input-topic"
                   />
                 </div>
@@ -248,6 +250,7 @@ export function MindmapPage() {
                 onClick={() => generateMutation.mutate()}
                 disabled={generateMutation.isPending || (!hasDocumentSelected && !topic.trim())}
                 className="w-full"
+                variant="cta"
                 data-testid="button-generate-mindmap"
               >
                 {generateMutation.isPending ? (
@@ -267,26 +270,26 @@ export function MindmapPage() {
 
           {mindmaps.length > 0 && (
             <div className="mt-8">
-              <h3 className="mb-4 text-lg font-semibold">Recent Mindmaps</h3>
+              <h3 className="mb-4 text-lg font-semibold text-gfg-text">Recent Mindmaps</h3>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {mindmaps.slice().reverse().slice(0, 5).map((mindmap) => (
                   <Card
                     key={mindmap.id}
-                    className="cursor-pointer hover-elevate"
+                    className="cursor-pointer hover:shadow-md transition-shadow border-gfg-border-light hover:border-gfg-green"
                     onClick={() => loadMindmap(mindmap)}
                     data-testid={`card-mindmap-${mindmap.id}`}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-2">
                         <div className="space-y-1">
-                          <p className="font-medium leading-none line-clamp-1">{mindmap.topic || "Untitled Mindmap"}</p>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <p className="font-medium leading-none line-clamp-1 text-gfg-text">{mindmap.topic || "Untitled Mindmap"}</p>
+                          <div className="flex items-center gap-2 text-xs text-gfg-text-light">
                             <span>{formatDate(mindmap.createdAt)}</span>
                             <span>•</span>
-                            <span>{mindmap.nodes.length} nodes</span>
+                            <span>{(mindmap.nodes as unknown as MindmapNode[]).length} nodes</span>
                           </div>
                         </div>
-                        <Network className="h-4 w-4 text-muted-foreground/50" />
+                        <Network className="h-4 w-4 text-gfg-text-light/50" />
                       </div>
                     </CardContent>
                   </Card>
@@ -296,7 +299,7 @@ export function MindmapPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="view" className="mt-4 flex-1 min-h-0 border rounded-xl overflow-hidden shadow-sm bg-background relative">
+        <TabsContent value="view" className="mt-4 flex-1 min-h-0 border border-gfg-border-light rounded-xl overflow-hidden shadow-sm bg-white relative">
           {currentMindmap ? (
             <div className="h-full w-full" data-testid="mindmap-container">
               <ReactFlow
@@ -306,21 +309,21 @@ export function MindmapPage() {
                 onEdgesChange={onEdgesChange}
                 fitView
                 attributionPosition="bottom-left"
-                className="bg-muted/5"
+                className="bg-gfg-bg-secondary/5"
               >
-                <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="hsl(var(--muted-foreground) / 0.2)" />
-                <Controls showInteractive={false} className="bg-background border shadow-sm rounded-lg overflow-hidden" />
+                <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#6b7280" />
+                <Controls showInteractive={false} className="bg-white border border-gfg-border-light shadow-sm rounded-lg overflow-hidden" />
                 <MiniMap
-                  nodeColor="hsl(var(--primary))"
-                  maskColor="hsl(var(--background) / 0.8)"
-                  className="bg-background border shadow-sm rounded-lg overflow-hidden"
+                  nodeColor="#2F8D46"
+                  maskColor="rgba(255, 255, 255, 0.8)"
+                  className="bg-white border border-gfg-border-light shadow-sm rounded-lg overflow-hidden"
                 />
                 <Panel position="top-right" className="flex gap-2 p-2">
-                  <div className="bg-background/80 backdrop-blur-sm border shadow-sm rounded-lg p-1 flex gap-1">
+                  <div className="bg-white/80 backdrop-blur-sm border border-gfg-border-light shadow-sm rounded-lg p-1 flex gap-1">
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8"
+                      className="h-8 w-8 hover:bg-gfg-green-50 hover:text-gfg-green"
                       onClick={() => { }}
                       data-testid="button-zoom-in"
                     >
@@ -329,17 +332,17 @@ export function MindmapPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8"
+                      className="h-8 w-8 hover:bg-gfg-green-50 hover:text-gfg-green"
                       onClick={() => { }}
                       data-testid="button-zoom-out"
                     >
                       <ZoomOut className="h-4 w-4" />
                     </Button>
-                    <div className="w-px bg-border my-1" />
+                    <div className="w-px bg-gfg-border-light my-1" />
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8"
+                      className="h-8 w-8 hover:bg-gfg-green-50 hover:text-gfg-green"
                       onClick={() => { }}
                       data-testid="button-fit"
                     >
@@ -350,13 +353,13 @@ export function MindmapPage() {
               </ReactFlow>
             </div>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
+            <div className="h-full flex flex-col items-center justify-center text-gfg-text-light">
               <Layout className="h-12 w-12 mb-4 opacity-20" />
               <p>Select or generate a mindmap to view</p>
             </div>
           )}
         </TabsContent>
       </Tabs>
-    </div >
+    </Section>
   );
 }

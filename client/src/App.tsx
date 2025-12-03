@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppStore } from "@/lib/store";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import { LibraryPage } from "@/pages/library";
 import { FlashcardsPage } from "@/pages/flashcards";
@@ -17,6 +18,14 @@ import { QuizPage } from "@/pages/quiz";
 import { ProgressPage } from "@/pages/progress";
 import { StudyGuidePage } from "@/pages/study-guide";
 import { LandingPage } from "@/pages/landing";
+
+import { Navbar } from "@/components/ui/navbar";
+
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
+import AuthPage from "@/pages/auth-page";
+import { Switch, Route } from "wouter";
+import { DocumentViewerPage } from "@/pages/document-viewer";
 
 function MainContent() {
   const { currentFeature } = useAppStore();
@@ -47,22 +56,14 @@ function MainContent() {
   };
 
   return (
-    <div className="flex flex-col flex-1 min-h-screen">
-      <header className="sticky top-0 z-50 flex h-14 items-center justify-between gap-4 border-b bg-background px-4">
-        <SidebarTrigger data-testid="button-sidebar-toggle" />
-        <ThemeToggle />
-      </header>
-      <main className="flex-1 overflow-auto">
+    <div className="flex flex-col flex-1 min-h-screen bg-gfg-bg">
+      <Navbar />
+      <main className="flex-1 overflow-auto p-4 md:p-6">
         {renderFeature()}
       </main>
     </div>
   );
 }
-
-import { AuthProvider, useAuth } from "@/hooks/use-auth";
-import { ProtectedRoute } from "@/lib/protected-route";
-import AuthPage from "@/pages/auth-page";
-import { Switch, Route } from "wouter";
 
 function App() {
   const style = {
@@ -72,16 +73,16 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <AppContent />
-        </TooltipProvider>
-      </AuthProvider>
+      <ThemeProvider defaultTheme="system" storageKey="eduquest-theme">
+        <AuthProvider>
+          <TooltipProvider>
+            <AppContent />
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
-
-import { DocumentViewerPage } from "@/pages/document-viewer";
 
 function AppContent() {
   const { user } = useAuth();

@@ -1,0 +1,41 @@
+:root {
+    --gfg-bg: #F7F7F7;
+    --gfg-card: #FFFFFF;
+    --gfg-text: #333333;
+    --gfg-muted: #6A6A6A;
+    --gfg-green: #2F8D46;
+    --gfg-green-light: #28A745;
+    --gfg-green-cta: #00A15C;
+    --gfg-border: #E5E5E5;
+    --gfg-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    --gfg-nav: #0F0F0F;
+}
+
+.dark {
+    /* REAL GFG DARK THEME — No Blue Allowed */
+    --gfg-bg: #0A0A0A;
+    /* page background - pure near-black */
+    --gfg-card: #111111;
+    /* card surface */
+    --gfg-text: #E6F0E9;
+    /* soft off-white text */
+    --gfg-muted: #9DBAA7;
+    /* green-gray muted text */
+    --gfg-green: #2F8D46;
+    /* GFG primary green */
+    --gfg-green-light: #28A745;
+    /* lighter green for hover */
+    --gfg-green-cta: #28A745;
+    --gfg-border: rgba(255, 255, 255, 0.06);
+    --gfg-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+    --gfg-nav: #0C0C0C;
+    /* slightly lighter black for nav/panels */
+
+    /* Additional Dark Mode Tokens */
+    --gfg-dark-panel: #0C0C0C;
+    --gfg-dark-accent: #2F8D46;
+    --gfg-dark-accent-2: #28A745;
+    --gfg-dark-positive: #00C96B;
+    --gfg-dark-warning: #E3A008;
+    --gfg-dark-danger: #EF4444;
+}

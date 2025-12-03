@@ -8,7 +8,8 @@ import { AnnotationSidebar } from "@/components/pdf/AnnotationSidebar";
 import { apiRequest } from "@/lib/queryClient";
 import { Highlight, UserNote, UserFlashcard } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const DocumentViewerPage: React.FC = () => {
     const params = useParams<{ id: string }>();
@@ -134,25 +135,33 @@ export const DocumentViewerPage: React.FC = () => {
 
     if (isLoadingPdf) {
         return (
-            <div className="h-screen w-full flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2 text-muted-foreground">Loading PDF...</span>
+            <div className="h-screen w-full flex flex-col items-center justify-center bg-white dark:bg-gfg-dark-bg">
+                <Loader2 className="h-10 w-10 animate-spin text-gfg-green dark:text-gfg-green-light" />
+                <span className="mt-4 text-lg font-medium text-gfg-text-light dark:text-gfg-dark-muted">Loading Document...</span>
             </div>
         );
     }
 
     if (pdfError) {
         return (
-            <div className="h-screen w-full flex flex-col items-center justify-center gap-4">
-                <div className="text-destructive font-medium">Failed to load PDF</div>
-                <div className="text-muted-foreground text-sm">{pdfError.message}</div>
+            <div className="h-screen w-full flex flex-col items-center justify-center gap-4 bg-white dark:bg-gfg-dark-bg p-6 text-center">
+                <div className="rounded-full bg-red-50 dark:bg-red-900/20 p-4">
+                    <AlertCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
+                </div>
+                <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-gfg-text dark:text-gfg-dark-text">Failed to load PDF</h3>
+                    <p className="text-gfg-text-light dark:text-gfg-dark-muted max-w-md mx-auto">{pdfError.message}</p>
+                </div>
+                <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
+                    Try Again
+                </Button>
             </div>
         );
     }
 
     return (
-        <div className="h-screen w-full overflow-hidden flex flex-row">
-            <div className="flex-1 relative overflow-auto flex flex-col">
+        <div className="h-screen w-full overflow-hidden flex flex-row bg-gfg-bg dark:bg-gfg-dark-bg transition-colors duration-300">
+            <div className="flex-1 relative overflow-auto flex flex-col bg-white dark:bg-gfg-dark-panel shadow-sm m-4 rounded-xl border border-gfg-border dark:border-gfg-dark-border">
                 <PdfViewer
                     file={pdfBlob}
                     highlights={highlights}
@@ -166,7 +175,9 @@ export const DocumentViewerPage: React.FC = () => {
                 />
             </div>
 
-            <AnnotationSidebar documentId={id} />
+            <div className="w-[350px] border-l border-gfg-border dark:border-gfg-dark-border bg-white dark:bg-gfg-dark-panel">
+                <AnnotationSidebar documentId={id} />
+            </div>
 
             {/* Note Editor Modal */}
             <NoteEditor
