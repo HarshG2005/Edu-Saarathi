@@ -24,14 +24,14 @@ function FlipCard({ question, answer }: { question: string; answer: string }) {
             >
                 {/* Front */}
                 <div className="absolute inset-0 backface-hidden">
-                    <Card className="w-full h-full flex flex-col items-center justify-center p-6 text-center border-0 shadow-lg bg-gradient-to-br from-gfg-green to-emerald-600 text-white">
-                        <div className="absolute top-4 left-4 text-xs font-medium text-green-100 uppercase tracking-wider">
+                    <Card className="w-full h-full flex flex-col items-center justify-center p-6 text-center border-2 border-gfg-border dark:border-gfg-dark-border shadow-lg bg-card text-card-foreground">
+                        <div className="absolute top-4 left-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Question
                         </div>
                         <p className="text-lg font-medium leading-relaxed line-clamp-4">
                             {question}
                         </p>
-                        <div className="absolute bottom-4 text-xs text-green-100 flex items-center gap-2">
+                        <div className="absolute bottom-4 text-xs text-muted-foreground flex items-center gap-2">
                             <RotateCw className="h-3 w-3" />
                             Click to flip
                         </div>
@@ -40,11 +40,11 @@ function FlipCard({ question, answer }: { question: string; answer: string }) {
 
                 {/* Back */}
                 <div className="absolute inset-0 backface-hidden rotate-y-180">
-                    <Card className="w-full h-full flex flex-col items-center justify-center p-6 text-center border-0 shadow-lg bg-gradient-to-br from-emerald-600 to-teal-700 text-white">
-                        <div className="absolute top-4 left-4 text-xs font-medium text-emerald-100 uppercase tracking-wider">
+                    <Card className="w-full h-full flex flex-col items-center justify-center p-6 text-center border-2 border-gfg-border dark:border-gfg-dark-border shadow-lg bg-card text-card-foreground">
+                        <div className="absolute top-4 left-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Answer
                         </div>
-                        <p className="text-base leading-relaxed line-clamp-6">
+                        <p className="text-base leading-relaxed line-clamp-6 whitespace-pre-wrap">
                             {answer}
                         </p>
                     </Card>
@@ -64,7 +64,7 @@ export function StudyGuidePage() {
     });
 
     const { data: flashcards = [], isLoading: isLoadingFlashcards } = useQuery<UserFlashcard[]>({
-        queryKey: ["/api/documents", selectedDocId, "user-flashcards"],
+        queryKey: ["/api/documents", selectedDocId, "flashcards"],
         enabled: !!selectedDocId,
     });
 

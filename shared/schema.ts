@@ -303,7 +303,13 @@ export const userFlashcards = pgTable("user_flashcards", {
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   tags: jsonb("tags").default([]),
+  difficulty: integer("difficulty").default(0), // 0-5
+  interval: integer("interval").default(0),
+  ease: integer("ease").default(250), // Scaled by 100 (2.5 -> 250)
+  repetition: integer("repetition").default(0),
+  nextReview: timestamp("next_review"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const userFlashcardSchema = createInsertSchema(userFlashcards);

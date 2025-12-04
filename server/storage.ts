@@ -13,13 +13,14 @@ import type {
   Highlight,
   UserNote,
   UserFlashcard,
+  InsertUserFlashcard,
   MindmapSnapshot
 } from "@shared/schema";
 
 export interface IStorage {
   // Users
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
 
@@ -84,9 +85,14 @@ export interface IStorage {
 
   // User Flashcards
   getUserFlashcards(documentId: string): Promise<UserFlashcard[]>;
+  getDueUserFlashcards(userId: string): Promise<UserFlashcard[]>;
   getAllUserFlashcards(userId: string): Promise<UserFlashcard[]>;
-  createUserFlashcard(flashcard: Omit<UserFlashcard, "id">): Promise<UserFlashcard>;
+  createUserFlashcard(flashcard: InsertUserFlashcard): Promise<UserFlashcard>;
+  updateUserFlashcard(id: string, updates: Partial<UserFlashcard>): Promise<UserFlashcard | undefined>;
+  deleteUserFlashcard(id: string): Promise<boolean>;
 }
+
+
 
 export class MemStorage implements IStorage {
   private documents: Map<string, Document>;
@@ -124,9 +130,7 @@ export class MemStorage implements IStorage {
     return this.users.get(id);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find((user) => user.username === username);
-  }
+
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find((user) => user.email === email);
@@ -134,7 +138,7 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id };
+    const user: User = { ...insertUser, id, createdAt: new Date(), displayName: insertUser.displayName || null };
     this.users.set(id, user);
     return user;
   }
@@ -357,15 +361,49 @@ export class MemStorage implements IStorage {
     return Array.from(this.userFlashcards.values()).filter(f => f.documentId === documentId);
   }
 
+  async getDueUserFlashcards(userId: string): Promise<UserFlashcard[]> {
+    const now = new Date();
+    return Array.from(this.userFlashcards.values()).filter(
+      (f) => f.userId === userId && (!f.nextReview || f.nextReview <= now)
+    );
+  }
+
   async getAllUserFlashcards(userId: string): Promise<UserFlashcard[]> {
     return Array.from(this.userFlashcards.values()).filter(f => f.userId === userId);
   }
 
-  async createUserFlashcard(flashcard: Omit<UserFlashcard, "id">): Promise<UserFlashcard> {
+  async createUserFlashcard(flashcard: InsertUserFlashcard): Promise<UserFlashcard> {
     const id = randomUUID();
-    const newFlashcard: UserFlashcard = { ...flashcard, id };
+    const newFlashcard: UserFlashcard = {
+      ...flashcard,
+      id,
+      highlightId: flashcard.highlightId ?? null,
+      difficulty: flashcard.difficulty ?? 0,
+      tags: flashcard.tags ?? [],
+      interval: flashcard.interval ?? 0,
+      repetition: flashcard.repetition ?? 0,
+      ease: flashcard.ease ?? 250,
+      nextReview: flashcard.nextReview ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      // Handle missing required fields if any (but InsertUserFlashcard should have them)
+      // Actually InsertUserFlashcard makes default fields optional.
+      // We need to ensure all UserFlashcard fields are present.
+    } as UserFlashcard;
     this.userFlashcards.set(id, newFlashcard);
     return newFlashcard;
+  }
+
+  async updateUserFlashcard(id: string, updates: Partial<UserFlashcard>): Promise<UserFlashcard | undefined> {
+    const existing = this.userFlashcards.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...updates, updatedAt: new Date() };
+    this.userFlashcards.set(id, updated);
+    return updated;
+  }
+
+  async deleteUserFlashcard(id: string): Promise<boolean> {
+    return this.userFlashcards.delete(id);
   }
 }
 

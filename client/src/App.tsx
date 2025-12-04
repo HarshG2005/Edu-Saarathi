@@ -10,6 +10,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import { LibraryPage } from "@/pages/library";
 import { FlashcardsPage } from "@/pages/flashcards";
+import { FlashcardsPage as SmartReviewPage } from "@/pages/flashcards/dashboard";
+import { FlashcardReviewPage } from "@/pages/flashcards/review";
 import { SummaryPage } from "@/pages/summary";
 import { MindmapPage } from "@/pages/mindmap";
 import { NotesPage } from "@/pages/notes";
@@ -26,6 +28,7 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import AuthPage from "@/pages/auth-page";
 import { Switch, Route } from "wouter";
 import { DocumentViewerPage } from "@/pages/document-viewer";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 function MainContent() {
   const { currentFeature } = useAppStore();
@@ -59,7 +62,9 @@ function MainContent() {
     <div className="flex flex-col flex-1 min-h-screen bg-gfg-bg">
       <Navbar />
       <main className="flex-1 overflow-auto p-4 md:p-6">
-        {renderFeature()}
+        <ErrorBoundary>
+          {renderFeature()}
+        </ErrorBoundary>
       </main>
     </div>
   );
@@ -106,7 +111,21 @@ function AppContent() {
   return (
     <Switch>
       <Route path="/auth" component={AuthPage} />
-      <ProtectedRoute path="/documents/:id" component={() => <DocumentViewerPage />} />
+      <ProtectedRoute path="/documents/:id" component={() => (
+        <ErrorBoundary>
+          <DocumentViewerPage />
+        </ErrorBoundary>
+      )} />
+      <ProtectedRoute path="/flashcards/review" component={() => (
+        <ErrorBoundary>
+          <FlashcardReviewPage />
+        </ErrorBoundary>
+      )} />
+      <ProtectedRoute path="/flashcards/smart-review" component={() => (
+        <ErrorBoundary>
+          <SmartReviewPage />
+        </ErrorBoundary>
+      )} />
       <Route path="/">
         {user ? (
           <ProtectedRoute

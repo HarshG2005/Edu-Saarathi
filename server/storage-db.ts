@@ -1,10 +1,10 @@
 import { IStorage } from "./storage";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, or, isNull, lte } from "drizzle-orm";
 import {
     users, documents, mcqSets, flashcardSets, summaries, mindmaps, notes, quizResults, chatSessions, highlights, userNotes, userFlashcards, mindmapSnapshots,
     type User, type InsertUser, type Document, type MCQSet, type FlashcardSet, type Summary, type Mindmap, type Notes, type QuizResult, type ChatSession,
-    type Highlight, type UserNote, type UserFlashcard, type MindmapSnapshot
+    type Highlight, type UserNote, type UserFlashcard, type InsertUserFlashcard, type MindmapSnapshot
 } from "@shared/schema";
 
 export class DbStorage implements IStorage {
@@ -14,10 +14,7 @@ export class DbStorage implements IStorage {
         return user;
     }
 
-    async getUserByUsername(username: string): Promise<User | undefined> {
-        const [user] = await db.select().from(users).where(eq(users.username, username));
-        return user;
-    }
+
 
     async getUserByEmail(email: string): Promise<User | undefined> {
         const [user] = await db.select().from(users).where(eq(users.email, email));
@@ -222,12 +219,32 @@ export class DbStorage implements IStorage {
         return db.select().from(userFlashcards).where(eq(userFlashcards.documentId, documentId)).orderBy(desc(userFlashcards.createdAt));
     }
 
+    async getDueUserFlashcards(userId: string): Promise<UserFlashcard[]> {
+        const now = new Date();
+        return db.select().from(userFlashcards).where(
+            and(
+                eq(userFlashcards.userId, userId),
+                or(isNull(userFlashcards.nextReview), lte(userFlashcards.nextReview, now))
+            )
+        );
+    }
+
     async getAllUserFlashcards(userId: string): Promise<UserFlashcard[]> {
         return db.select().from(userFlashcards).where(eq(userFlashcards.userId, userId)).orderBy(desc(userFlashcards.createdAt));
     }
 
-    async createUserFlashcard(flashcard: Omit<UserFlashcard, "id">): Promise<UserFlashcard> {
+    async createUserFlashcard(flashcard: InsertUserFlashcard): Promise<UserFlashcard> {
         const [newFlashcard] = await db.insert(userFlashcards).values(flashcard).returning();
         return newFlashcard;
+    }
+
+    async updateUserFlashcard(id: string, updates: Partial<UserFlashcard>): Promise<UserFlashcard | undefined> {
+        const [updated] = await db.update(userFlashcards).set({ ...updates, updatedAt: new Date() }).where(eq(userFlashcards.id, id)).returning();
+        return updated;
+    }
+
+    async deleteUserFlashcard(id: string): Promise<boolean> {
+        const [deleted] = await db.delete(userFlashcards).where(eq(userFlashcards.id, id)).returning();
+        return !!deleted;
     }
 }

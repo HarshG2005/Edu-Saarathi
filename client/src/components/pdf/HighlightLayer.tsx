@@ -16,6 +16,7 @@ export const HighlightLayer: React.FC<HighlightLayerProps> = ({
         <div className="absolute inset-0 pointer-events-none">
             {highlights.map((highlight) => {
                 const bbox = highlight.bbox as { x: number; y: number; width: number; height: number };
+                if (!bbox) return null;
 
                 let colorClass = "bg-yellow-300/40 border-yellow-500/50";
                 if (highlight.color === "orange") colorClass = "bg-orange-300/40 border-orange-500/50";

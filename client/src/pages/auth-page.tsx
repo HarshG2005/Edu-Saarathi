@@ -22,7 +22,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Brain, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
@@ -67,11 +67,7 @@ export default function AuthPage() {
             <div className="w-full max-w-[420px]">
                 <Card className="w-full shadow-gfg-light dark:shadow-gfg-dark border-gfg-border dark:border-gfg-dark-border bg-gfg-card dark:bg-gfg-dark-card">
                     <CardHeader className="space-y-3 pb-6 text-center">
-                        <div className="flex justify-center mb-2">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gfg-green/10 text-gfg-green ring-1 ring-gfg-green/20 dark:bg-gfg-green/20 dark:text-gfg-green-light dark:ring-gfg-green-light/30">
-                                <Brain className="h-6 w-6" />
-                            </div>
-                        </div>
+
                         <div className="space-y-1">
                             <CardTitle className="text-2xl font-bold tracking-tight text-gfg-text dark:text-gfg-dark-text">
                                 Welcome back

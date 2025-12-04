@@ -1,122 +1,63 @@
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useParams, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "wouter";
 import { PdfViewer } from "@/components/pdf/PdfViewer";
 import { NoteEditor } from "@/components/notes/NoteEditor";
-import { FlashcardCreator } from "@/components/flashcards/FlashcardCreator";
+import { FlashcardModal } from "@/components/flashcards/FlashcardModal";
 import { AnnotationSidebar } from "@/components/pdf/AnnotationSidebar";
 import { apiRequest } from "@/lib/queryClient";
-import { Highlight, UserNote, UserFlashcard } from "@shared/schema";
+import { Highlight } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useHighlights } from "@/hooks/useHighlights";
+import { useFlashcards } from "@/hooks/useFlashcards";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export const DocumentViewerPage: React.FC = () => {
     const params = useParams<{ id: string }>();
-    const id = params.id;
+    const id = params.id || "";
     const { toast } = useToast();
-    const queryClient = useQueryClient();
     const [activeHighlight, setActiveHighlight] = useState<Highlight | null>(null);
     const [isNoteEditorOpen, setIsNoteEditorOpen] = useState(false);
-    const [isFlashcardCreatorOpen, setIsFlashcardCreatorOpen] = useState(false);
-    const [pendingHighlight, setPendingHighlight] = useState<Omit<Highlight, "id" | "createdAt" | "userId" | "documentId"> | null>(null);
+    const [isFlashcardModalOpen, setIsFlashcardModalOpen] = useState(false);
 
-    // Fetch Highlights
-    const { data: highlights = [], isLoading: isLoadingHighlights } = useQuery<Highlight[]>({
-        queryKey: ["/api/documents", id, "highlights"],
-    });
+    // Hooks
+    const { highlights, createHighlight } = useHighlights(id);
+    // useFlashcards is used inside FlashcardModal, but we might need it here if we want to show list?
+    // The sidebar shows the list.
 
-    // Create Highlight Mutation
-    const createHighlightMutation = useMutation({
-        mutationFn: async (newHighlight: Omit<Highlight, "id" | "createdAt" | "userId" | "documentId">) => {
-            const res = await apiRequest("POST", `/api/documents/${id}/highlights`, newHighlight);
-            return res.json();
-        },
-        onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["/api/documents", id, "highlights"] });
-            return data;
-        },
-        onError: (error) => {
-            toast({
-                title: "Error creating highlight",
-                description: error.message,
-                variant: "destructive",
-            });
-        },
-    });
-
-    // Create Note Mutation
-    const createNoteMutation = useMutation({
-        mutationFn: async ({ highlightId, text }: { highlightId: string; text: string }) => {
-            const res = await apiRequest("POST", "/api/user-notes", {
-                documentId: id,
-                highlightId,
-                text,
-            });
-            return res.json();
-        },
-        onSuccess: () => {
-            toast({ title: "Note saved successfully" });
-        },
-        onError: (error) => {
-            toast({
-                title: "Error saving note",
-                description: error.message,
-                variant: "destructive",
-            });
-        },
-    });
-
-    // Create Flashcard Mutation
-    const createFlashcardMutation = useMutation({
-        mutationFn: async ({ highlightId, question, answer }: { highlightId: string; question: string; answer: string }) => {
-            const res = await apiRequest("POST", "/api/user-flashcards", {
-                documentId: id,
-                highlightId,
-                question,
-                answer,
-            });
-            return res.json();
-        },
-        onSuccess: () => {
-            toast({ title: "Flashcard created successfully" });
-        },
-        onError: (error) => {
-            toast({
-                title: "Error creating flashcard",
-                description: error.message,
-                variant: "destructive",
-            });
-        },
-    });
+    // Create Note Mutation (Still manual as I didn't create useNotes hook yet, or maybe I should have?)
+    // I'll keep it manual for now or move to a hook later.
+    // Actually, I should probably leave notes as is for now to minimize scope creep, 
+    // but I'll use apiRequest directly as before.
+    // Wait, I can just copy the existing mutation logic for notes.
 
     const handleHighlightCreate = async (
-        highlight: Omit<Highlight, "id" | "createdAt" | "userId" | "documentId">,
+        highlightData: Omit<Highlight, "id" | "createdAt" | "userId" | "documentId">,
         action?: "note" | "flashcard"
     ) => {
         try {
-            // Optimistically create highlight
-            const newHighlight = await createHighlightMutation.mutateAsync(highlight);
+            // Create highlight
+            const newHighlight = await createHighlight({
+                ...highlightData,
+                bbox: highlightData.bbox as any
+            });
 
             if (action === "note") {
                 setActiveHighlight(newHighlight);
                 setIsNoteEditorOpen(true);
             } else if (action === "flashcard") {
                 setActiveHighlight(newHighlight);
-                setIsFlashcardCreatorOpen(true);
+                setIsFlashcardModalOpen(true);
             }
         } catch (error) {
-            console.error("Failed to create highlight:", error);
+            // Error handled by hook
         }
     };
 
     const handleHighlightClick = (highlight: Highlight) => {
         setActiveHighlight(highlight);
-        // For now, clicking a highlight opens the note editor. 
-        // Ideally, we should show a menu or existing notes.
-        // But per requirements: "Clicking an existing highlight opens NoteEditor/FlashcardCreator for that highlight."
-        // I'll default to NoteEditor for now, or maybe a small menu?
-        // Let's open NoteEditor as it's more generic.
         setIsNoteEditorOpen(true);
     };
 
@@ -150,7 +91,7 @@ export const DocumentViewerPage: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                     <h3 className="text-xl font-bold text-gfg-text dark:text-gfg-dark-text">Failed to load PDF</h3>
-                    <p className="text-gfg-text-light dark:text-gfg-dark-muted max-w-md mx-auto">{pdfError.message}</p>
+                    <p className="text-gfg-text-light dark:text-gfg-dark-muted max-w-md mx-auto">{(pdfError as Error).message}</p>
                 </div>
                 <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
                     Try Again
@@ -160,56 +101,55 @@ export const DocumentViewerPage: React.FC = () => {
     }
 
     return (
-        <div className="h-screen w-full overflow-hidden flex flex-row bg-gfg-bg dark:bg-gfg-dark-bg transition-colors duration-300">
-            <div className="flex-1 relative overflow-auto flex flex-col bg-white dark:bg-gfg-dark-panel shadow-sm m-4 rounded-xl border border-gfg-border dark:border-gfg-dark-border">
-                <PdfViewer
-                    file={pdfBlob}
-                    highlights={highlights}
-                    onHighlightCreate={(
-                        h: Omit<Highlight, "id" | "createdAt" | "userId" | "documentId">,
-                        action?: "note" | "flashcard"
-                    ) => {
-                        handleHighlightCreate(h, action);
+        <ErrorBoundary>
+            <div className="h-screen w-full overflow-hidden flex flex-row bg-gfg-bg dark:bg-gfg-dark-bg transition-colors duration-300">
+                <div className="flex-1 relative overflow-auto flex flex-col bg-white dark:bg-gfg-dark-panel shadow-sm m-4 rounded-xl border border-gfg-border dark:border-gfg-dark-border">
+                    <PdfViewer
+                        file={pdfBlob}
+                        highlights={highlights}
+                        onHighlightCreate={handleHighlightCreate}
+                        onHighlightClick={handleHighlightClick}
+                    />
+                </div>
+
+                <div className="w-[350px] border-l border-gfg-border dark:border-gfg-dark-border bg-white dark:bg-gfg-dark-panel">
+                    <AnnotationSidebar documentId={id} />
+                </div>
+
+                {/* Note Editor Modal */}
+                <NoteEditor
+                    isOpen={isNoteEditorOpen}
+                    onClose={() => {
+                        setIsNoteEditorOpen(false);
+                        setActiveHighlight(null);
                     }}
-                    onHighlightClick={handleHighlightClick}
+                    onSave={async (text) => {
+                        if (activeHighlight) {
+                            await apiRequest("POST", "/api/user-notes", {
+                                documentId: id,
+                                highlightId: activeHighlight.id,
+                                text,
+                            });
+                        }
+                    }}
+                    highlightText={activeHighlight?.text}
                 />
+
+                {/* Flashcard Modal */}
+                {activeHighlight && activeHighlight.text && (
+                    <FlashcardModal
+                        isOpen={isFlashcardModalOpen}
+                        onClose={() => {
+                            setIsFlashcardModalOpen(false);
+                            setActiveHighlight(null);
+                        }}
+                        documentId={id}
+                        highlightId={activeHighlight.id}
+                        initialQuestion={`Explain: "${activeHighlight.text.slice(0, 100)}${activeHighlight.text.length > 100 ? "..." : ""}"`}
+                        initialAnswer={activeHighlight.text}
+                    />
+                )}
             </div>
-
-            <div className="w-[350px] border-l border-gfg-border dark:border-gfg-dark-border bg-white dark:bg-gfg-dark-panel">
-                <AnnotationSidebar documentId={id} />
-            </div>
-
-            {/* Note Editor Modal */}
-            <NoteEditor
-                isOpen={isNoteEditorOpen}
-                onClose={() => {
-                    setIsNoteEditorOpen(false);
-                    setActiveHighlight(null);
-                }}
-                onSave={async (text) => {
-                    if (activeHighlight) {
-                        await createNoteMutation.mutateAsync({ highlightId: activeHighlight.id, text });
-                        queryClient.invalidateQueries({ queryKey: ["/api/documents", id, "user-notes"] });
-                    }
-                }}
-                highlightText={activeHighlight?.text}
-            />
-
-            {/* Flashcard Creator Modal */}
-            <FlashcardCreator
-                isOpen={isFlashcardCreatorOpen}
-                onClose={() => {
-                    setIsFlashcardCreatorOpen(false);
-                    setActiveHighlight(null);
-                }}
-                onSave={async (question, answer) => {
-                    if (activeHighlight) {
-                        await createFlashcardMutation.mutateAsync({ highlightId: activeHighlight.id, question, answer });
-                        queryClient.invalidateQueries({ queryKey: ["/api/documents", id, "user-flashcards"] });
-                    }
-                }}
-                highlightText={activeHighlight?.text}
-            />
-        </div>
+        </ErrorBoundary>
     );
 };

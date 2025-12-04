@@ -71,6 +71,8 @@ function chunkText(text: string, chunkSize: number = 500): string[] {
 }
 
 import mindmapRoutes from "./routes/mindmaps";
+import highlightRoutes from "./routes/highlights";
+import flashcardRoutes from "./routes/flashcards";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -79,6 +81,8 @@ export async function registerRoutes(
 
   // Register Mindmap Routes
   app.use("/api", mindmapRoutes);
+  app.use("/api", highlightRoutes);
+  app.use("/api", flashcardRoutes);
 
   // Document Upload
   app.post("/api/documents/upload", requireAuth, upload.single("file"), async (req, res) => {
@@ -234,7 +238,7 @@ export async function registerRoutes(
 
       const mcqSet = await storage.createMCQSet({
         userId: req.user!.id,
-        documentId,
+        documentId: documentId || null,
         topic: finalTopic,
         mcqs: result.mcqs.map((mcq) => ({
           id: randomUUID(),
@@ -288,7 +292,7 @@ export async function registerRoutes(
 
       const flashcardSet = await storage.createFlashcardSet({
         userId: req.user!.id,
-        documentId,
+        documentId: documentId || null,
         topic: finalTopic,
         flashcards: result.flashcards.map((fc) => ({
           id: randomUUID(),
@@ -337,7 +341,7 @@ export async function registerRoutes(
 
       const summary = await storage.createSummary({
         userId: req.user!.id,
-        documentId,
+        documentId: documentId || null,
         topic: finalTopic,
         mode,
         content: result.content,
@@ -386,7 +390,7 @@ export async function registerRoutes(
 
       const notes = await storage.createNotes({
         userId: req.user!.id,
-        documentId,
+        documentId: documentId || null,
         topic: finalTopic,
         keyPoints: result.keyPoints,
         definitions: result.definitions,
@@ -422,7 +426,7 @@ export async function registerRoutes(
         }
       }
 
-      const conversationHistory = session?.messages || [];
+      const conversationHistory = (session?.messages as any[]) || [];
 
       const provider = req.body.provider || "gemini";
       const response = await tutorChat(message, conversationHistory, documentContext, provider);
@@ -443,12 +447,12 @@ export async function registerRoutes(
 
       if (session) {
         session = await storage.updateChatSession(session.id, {
-          messages: [...session.messages, userMessage, assistantMessage],
+          messages: [...(session.messages as any[]), userMessage, assistantMessage],
         });
       } else {
         session = await storage.createChatSession({
           userId: req.user!.id,
-          documentId,
+          documentId: documentId || null,
           messages: [userMessage, assistantMessage],
           createdAt: new Date(),
         });
@@ -677,38 +681,7 @@ export async function registerRoutes(
     }
   });
 
-  // Highlights
-  app.post("/api/documents/:id/highlights", requireAuth, async (req, res) => {
-    try {
-      const highlight = await storage.createHighlight({
-        ...req.body,
-        userId: req.user!.id,
-        documentId: req.params.id,
-        createdAt: new Date(),
-      });
-      res.json(highlight);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message || "Failed to create highlight" });
-    }
-  });
 
-  app.get("/api/documents/:id/highlights", requireAuth, async (req, res) => {
-    try {
-      const highlights = await storage.getHighlights(req.params.id);
-      res.json(highlights);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message || "Failed to get highlights" });
-    }
-  });
-
-  app.delete("/api/highlights/:id", requireAuth, async (req, res) => {
-    try {
-      await storage.deleteHighlight(req.params.id);
-      res.json({ success: true });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message || "Failed to delete highlight" });
-    }
-  });
 
   // User Notes
   app.post("/api/user-notes", requireAuth, async (req, res) => {
@@ -733,28 +706,7 @@ export async function registerRoutes(
     }
   });
 
-  // User Flashcards
-  app.post("/api/user-flashcards", requireAuth, async (req, res) => {
-    try {
-      const flashcard = await storage.createUserFlashcard({
-        ...req.body,
-        userId: req.user!.id,
-        createdAt: new Date(),
-      });
-      res.json(flashcard);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message || "Failed to create flashcard" });
-    }
-  });
 
-  app.get("/api/documents/:id/user-flashcards", requireAuth, async (req, res) => {
-    try {
-      const flashcards = await storage.getUserFlashcards(req.params.id);
-      res.json(flashcards);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message || "Failed to get flashcards" });
-    }
-  });
 
   return httpServer;
 }

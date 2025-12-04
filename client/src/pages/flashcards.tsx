@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "wouter";
 import { Lightbulb, Loader2, ChevronLeft, ChevronRight, RotateCw, CheckCircle2, XCircle, Trophy, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -138,7 +139,12 @@ export function FlashcardsPage() {
     updateSetMutation.mutate(updatedSet);
   };
 
+  // Calculate stats
+  const masteryCount = Object.values(mastery).filter(Boolean).length;
+  const progress = currentSet ? (masteryCount / (currentSet.flashcards as Flashcard[]).length) * 100 : 0;
+
   // ... rest of component
+
 
   return (
     <Section className="flex flex-col gap-6">
@@ -149,7 +155,15 @@ export function FlashcardsPage() {
             Master concepts through active recall and spaced repetition
           </p>
         </div>
-        <AISettings />
+        <div className="flex gap-2">
+          <Link href="/flashcards/smart-review">
+            <Button variant="outline" className="gap-2 border-gfg-green text-gfg-green hover:bg-gfg-green/10">
+              <Sparkles className="h-4 w-4" />
+              Try Smart Review Mode
+            </Button>
+          </Link>
+          <AISettings />
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "study")} className="flex-1 flex flex-col min-h-0">

@@ -1,12 +1,14 @@
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { UserNote, UserFlashcard } from "@shared/schema";
+import { UserNote } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, StickyNote, GraduationCap } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+
+import { FlashcardsList } from "@/components/flashcards/FlashcardsList";
 
 interface AnnotationSidebarProps {
     documentId: string;
@@ -15,10 +17,6 @@ interface AnnotationSidebarProps {
 export const AnnotationSidebar: React.FC<AnnotationSidebarProps> = ({ documentId }) => {
     const { data: notes = [], isLoading: isLoadingNotes } = useQuery<UserNote[]>({
         queryKey: ["/api/documents", documentId, "user-notes"],
-    });
-
-    const { data: flashcards = [], isLoading: isLoadingFlashcards } = useQuery<UserFlashcard[]>({
-        queryKey: ["/api/documents", documentId, "user-flashcards"],
     });
 
     return (
@@ -33,7 +31,7 @@ export const AnnotationSidebar: React.FC<AnnotationSidebarProps> = ({ documentId
                         Notes ({notes.length})
                     </TabsTrigger>
                     <TabsTrigger value="flashcards" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none shadow-none">
-                        Flashcards ({flashcards.length})
+                        Flashcards
                     </TabsTrigger>
                 </TabsList>
 
@@ -46,7 +44,8 @@ export const AnnotationSidebar: React.FC<AnnotationSidebarProps> = ({ documentId
                         ) : notes.length === 0 ? (
                             <div className="text-center text-muted-foreground p-8 text-sm">
                                 <StickyNote className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                                No notes yet. Highlight text to add one.
+                                <p>No notes yet.</p>
+                                <p className="text-xs mt-1">Highlight text and select "Note" to add one.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -67,33 +66,7 @@ export const AnnotationSidebar: React.FC<AnnotationSidebarProps> = ({ documentId
 
                 <TabsContent value="flashcards" className="flex-1 min-h-0 m-0">
                     <ScrollArea className="h-full p-4">
-                        {isLoadingFlashcards ? (
-                            <div className="flex justify-center p-4">
-                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                            </div>
-                        ) : flashcards.length === 0 ? (
-                            <div className="text-center text-muted-foreground p-8 text-sm">
-                                <GraduationCap className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                                No flashcards yet. Highlight text to create one.
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {flashcards.map((card) => (
-                                    <Card key={card.id} className="bg-muted/50">
-                                        <CardContent className="p-3 space-y-3">
-                                            <div>
-                                                <span className="text-xs font-semibold text-primary uppercase tracking-wider">Q</span>
-                                                <p className="text-sm font-medium mt-1">{card.question}</p>
-                                            </div>
-                                            <div className="border-t pt-2">
-                                                <span className="text-xs font-semibold text-green-600 uppercase tracking-wider">A</span>
-                                                <p className="text-sm mt-1">{card.answer}</p>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        )}
+                        <FlashcardsList documentId={documentId} />
                     </ScrollArea>
                 </TabsContent>
             </Tabs>
