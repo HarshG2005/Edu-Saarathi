@@ -26,7 +26,7 @@ export function Navbar() {
                         <img
                             src="/logo.png"
                             alt="Edu Saarathi Logo"
-                            className="h-10 w-auto mix-blend-multiply dark:mix-blend-normal dark:brightness-200"
+                            className="h-10 w-auto mix-blend-multiply dark:invert dark:mix-blend-screen"
                         />
                         <span className="hidden text-xl font-bold text-gfg-text dark:text-gfg-dark-text md:inline-block">
                             Edu Saarathi

@@ -56,7 +56,7 @@ export function LandingPage() {
                         <img
                             src="/logo.png"
                             alt="Edu Saarathi Logo"
-                            className="h-8 w-auto mix-blend-multiply dark:mix-blend-normal dark:brightness-200"
+                            className="h-8 w-auto mix-blend-multiply dark:invert dark:mix-blend-screen"
                         />
                         Edu Saarathi
                     </div>
