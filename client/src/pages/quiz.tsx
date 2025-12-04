@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { useLocation } from "wouter";
-import { HelpCircle, Play, Clock, Check, X, Trophy, RotateCcw, ChevronRight, BarChart2, Loader2, Sparkles } from "lucide-react";
+import { useLocation, Link } from "wouter";
+import { HelpCircle, Play, Clock, Check, X, Trophy, RotateCcw, ChevronRight, BarChart2, Loader2, Sparkles, Settings } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getStoredProvider, AISettings } from "@/components/ai-settings";
+import { getStoredProvider } from "@/pages/settings";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -320,6 +320,13 @@ export function QuizPage() {
         <p className="text-gfg-text-light">
           Test your knowledge with timed or untimed quizzes
         </p>
+      </div>
+      <div className="flex justify-end">
+        <Link href="/settings">
+          <Button variant="outline" size="icon">
+            <Settings className="h-4 w-4" />
+          </Button>
+        </Link>
       </div>
 
       {quizState === "setup" && (

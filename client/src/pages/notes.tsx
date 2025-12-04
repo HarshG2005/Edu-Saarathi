@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { StickyNote, Loader2, Download, Copy, BookOpen, Lightbulb, Quote, Calculator } from "lucide-react";
+import { Link } from "wouter";
+import { StickyNote, Loader2, Download, Copy, BookOpen, Lightbulb, Quote, Calculator, Settings } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Notes } from "@shared/schema";
-import { getStoredProvider, AISettings } from "@/components/ai-settings";
+import { getStoredProvider } from "@/pages/settings";
 import { formatDate } from "@/lib/utils";
 
 export function NotesPage() {
@@ -157,7 +158,11 @@ export function NotesPage() {
             Extract key points, definitions, and important information from your documents
           </p>
         </div>
-        <AISettings />
+        <Link href="/settings">
+          <Button variant="outline" size="icon">
+            <Settings className="h-4 w-4" />
+          </Button>
+        </Link>
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "view")}>

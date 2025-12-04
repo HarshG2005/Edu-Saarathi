@@ -8,7 +8,7 @@ import { Loader2, Network, Sparkles } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { getStoredProvider } from "@/components/ai-settings";
+import { getStoredProvider } from "@/pages/settings";
 import { Mindmap } from "@shared/schema";
 
 interface AutoGenerateModalProps {

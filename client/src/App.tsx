@@ -12,13 +12,14 @@ import { LibraryPage } from "@/pages/library";
 import { FlashcardsPage } from "@/pages/flashcards";
 import { FlashcardsPage as SmartReviewPage } from "@/pages/flashcards/dashboard";
 import { FlashcardReviewPage } from "@/pages/flashcards/review";
+import SettingsPage from "@/pages/settings";
 import { SummaryPage } from "@/pages/summary";
 import { MindmapPage } from "@/pages/mindmap";
 import { NotesPage } from "@/pages/notes";
 import { TutorPage } from "@/pages/tutor";
 import { QuizPage } from "@/pages/quiz";
 import { ProgressPage } from "@/pages/progress";
-import { StudyGuidePage } from "@/pages/study-guide";
+import StudyGuidePage from "@/pages/study-guide";
 import { LandingPage } from "@/pages/landing";
 
 import { Navbar } from "@/components/ui/navbar";
@@ -124,6 +125,11 @@ function AppContent() {
       <ProtectedRoute path="/flashcards/smart-review" component={() => (
         <ErrorBoundary>
           <SmartReviewPage />
+        </ErrorBoundary>
+      )} />
+      <ProtectedRoute path="/settings" component={() => (
+        <ErrorBoundary>
+          <SettingsPage />
         </ErrorBoundary>
       )} />
       <Route path="/">

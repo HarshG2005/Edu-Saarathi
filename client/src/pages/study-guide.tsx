@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAppStore } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -11,8 +11,9 @@ import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { Section } from "@/components/ui/section";
+import { getFlashcardTheme } from "@/lib/flashcard-theme";
 
-function FlipCard({ question, answer }: { question: string; answer: string }) {
+function FlipCard({ question, answer, theme }: { question: string; answer: string; theme: any }) {
     const [isFlipped, setIsFlipped] = useState(false);
 
     return (
@@ -24,14 +25,14 @@ function FlipCard({ question, answer }: { question: string; answer: string }) {
             >
                 {/* Front */}
                 <div className="absolute inset-0 backface-hidden">
-                    <Card className="w-full h-full flex flex-col items-center justify-center p-6 text-center border-2 border-gfg-border dark:border-gfg-dark-border shadow-lg bg-card text-card-foreground">
-                        <div className="absolute top-4 left-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <Card className={`w-full h-full flex flex-col items-center justify-center p-6 text-center border-2 shadow-lg ${theme.class}`}>
+                        <div className="absolute top-4 left-4 text-xs font-medium opacity-70 uppercase tracking-wider">
                             Question
                         </div>
                         <p className="text-lg font-medium leading-relaxed line-clamp-4">
                             {question}
                         </p>
-                        <div className="absolute bottom-4 text-xs text-muted-foreground flex items-center gap-2">
+                        <div className="absolute bottom-4 text-xs opacity-70 flex items-center gap-2">
                             <RotateCw className="h-3 w-3" />
                             Click to flip
                         </div>
@@ -40,8 +41,8 @@ function FlipCard({ question, answer }: { question: string; answer: string }) {
 
                 {/* Back */}
                 <div className="absolute inset-0 backface-hidden rotate-y-180">
-                    <Card className="w-full h-full flex flex-col items-center justify-center p-6 text-center border-2 border-gfg-border dark:border-gfg-dark-border shadow-lg bg-card text-card-foreground">
-                        <div className="absolute top-4 left-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <Card className={`w-full h-full flex flex-col items-center justify-center p-6 text-center border-2 shadow-lg ${theme.class}`}>
+                        <div className="absolute top-4 left-4 text-xs font-medium opacity-70 uppercase tracking-wider">
                             Answer
                         </div>
                         <p className="text-base leading-relaxed line-clamp-6 whitespace-pre-wrap">
@@ -54,9 +55,20 @@ function FlipCard({ question, answer }: { question: string; answer: string }) {
     );
 }
 
-export function StudyGuidePage() {
+export default function StudyGuidePage() {
     const { documents } = useAppStore();
     const [selectedDocId, setSelectedDocId] = useState<string>("");
+    const [cardTheme, setCardTheme] = useState(getFlashcardTheme("default"));
+
+    useEffect(() => {
+        const loadTheme = () => {
+            const savedColor = localStorage.getItem("flashcard_color") || "default";
+            setCardTheme(getFlashcardTheme(savedColor));
+        };
+        loadTheme();
+        window.addEventListener("flashcard-theme-changed", loadTheme);
+        return () => window.removeEventListener("flashcard-theme-changed", loadTheme);
+    }, []);
 
     const { data: notes = [], isLoading: isLoadingNotes } = useQuery<UserNote[]>({
         queryKey: ["/api/documents", selectedDocId, "user-notes"],
@@ -218,7 +230,7 @@ export function StudyGuidePage() {
                                 ) : (
                                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                                         {flashcards.map((card) => (
-                                            <FlipCard key={card.id} question={card.question} answer={card.answer} />
+                                            <FlipCard key={card.id} question={card.question} answer={card.answer} theme={cardTheme} />
                                         ))}
                                     </div>
                                 )}

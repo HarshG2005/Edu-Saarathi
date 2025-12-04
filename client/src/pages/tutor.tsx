@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare, Send, Loader2, Bot, User, Trash2, Plus, FileText } from "lucide-react";
+import { Link } from "wouter";
+import { MessageSquare, Send, Loader2, Bot, User, Trash2, Plus, FileText, Settings } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { ChatSession, ChatMessage } from "@shared/schema";
-import { getStoredProvider, AISettings } from "@/components/ai-settings";
+import { getStoredProvider } from "@/pages/settings";
 
 export function TutorPage() {
   const { documents, chatSessions, addChatSession, updateChatSession } = useAppStore();
@@ -116,7 +117,11 @@ export function TutorPage() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <AISettings />
+          <Link href="/settings">
+            <Button variant="outline" size="icon">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
       <div className="flex flex-wrap items-center justify-end gap-4">

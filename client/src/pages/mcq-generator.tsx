@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ListChecks, Loader2, Download, RefreshCw, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
+import { Link } from "wouter";
+import { ListChecks, Loader2, Download, RefreshCw, ChevronLeft, ChevronRight, Check, X, Settings } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { MCQSet, MCQ } from "@shared/schema";
-import { getStoredProvider, AISettings } from "@/components/ai-settings";
+import { getStoredProvider } from "@/pages/settings";
 
 export function MCQGeneratorPage() {
   const { documents, currentDocumentId, mcqSets, addMCQSet } = useAppStore();
@@ -149,7 +150,11 @@ export function MCQGeneratorPage() {
             Generate multiple choice questions from your documents or any topic
           </p>
         </div>
-        <AISettings />
+        <Link href="/settings">
+          <Button variant="outline" size="icon">
+            <Settings className="h-4 w-4" />
+          </Button>
+        </Link>
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "view")}>

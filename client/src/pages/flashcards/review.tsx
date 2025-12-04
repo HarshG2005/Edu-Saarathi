@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Loader2, ArrowLeft, RotateCcw, CheckCircle, Clock, ThumbsUp, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { getFlashcardTheme } from "@/lib/flashcard-theme";
 
 export const FlashcardReviewPage: React.FC = () => {
     const [location, setLocation] = useLocation();
@@ -16,6 +17,17 @@ export const FlashcardReviewPage: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
     const [sessionComplete, setSessionComplete] = useState(false);
+    const [cardTheme, setCardTheme] = useState(getFlashcardTheme("default"));
+
+    useEffect(() => {
+        const loadTheme = () => {
+            const savedColor = localStorage.getItem("flashcard_color") || "default";
+            setCardTheme(getFlashcardTheme(savedColor));
+        };
+        loadTheme();
+        window.addEventListener("flashcard-theme-changed", loadTheme);
+        return () => window.removeEventListener("flashcard-theme-changed", loadTheme);
+    }, []);
 
     // Fetch due flashcards
     // We need an endpoint for "due" flashcards.
@@ -162,20 +174,20 @@ export const FlashcardReviewPage: React.FC = () => {
                     style={{ transformStyle: "preserve-3d" }}
                 >
                     {/* Front */}
-                    <Card className="absolute inset-0 backface-hidden flex flex-col items-center justify-center p-8 text-center border-2 border-gfg-border dark:border-gfg-dark-border shadow-lg">
+                    <Card className={`absolute inset-0 backface-hidden flex flex-col items-center justify-center p-8 text-center border-2 shadow-lg ${cardTheme.class}`}>
                         <CardContent>
-                            <h2 className="text-2xl font-semibold text-gfg-text dark:text-gfg-dark-text mb-4">{currentCard.question}</h2>
-                            <p className="text-sm text-gfg-text-light dark:text-gfg-dark-muted">Tap to flip</p>
+                            <h2 className="text-2xl font-semibold mb-4">{currentCard.question}</h2>
+                            <p className="text-sm opacity-70">Tap to flip</p>
                         </CardContent>
                     </Card>
 
                     {/* Back */}
                     <Card
-                        className="absolute inset-0 backface-hidden flex flex-col items-center justify-center p-8 text-center border-2 border-gfg-border dark:border-gfg-dark-border shadow-lg"
+                        className={`absolute inset-0 backface-hidden flex flex-col items-center justify-center p-8 text-center border-2 shadow-lg ${cardTheme.class}`}
                         style={{ transform: "rotateY(180deg)" }}
                     >
                         <CardContent className="overflow-y-auto max-h-[60%] w-full">
-                            <p className="text-xl text-gfg-text dark:text-gfg-dark-text whitespace-pre-wrap">{currentCard.answer}</p>
+                            <p className="text-xl whitespace-pre-wrap">{currentCard.answer}</p>
                         </CardContent>
                     </Card>
                 </motion.div>

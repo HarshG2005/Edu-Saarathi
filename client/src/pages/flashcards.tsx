@@ -22,7 +22,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { FlashcardSet, Flashcard } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
-import { AISettings, getStoredProvider } from "@/components/ai-settings";
+import { Settings } from "lucide-react";
+import { getStoredProvider } from "@/pages/settings";
 
 export function FlashcardsPage() {
   const { documents, currentDocumentId, flashcardSets, addFlashcardSet } = useAppStore();
@@ -162,7 +163,11 @@ export function FlashcardsPage() {
               Try Smart Review Mode
             </Button>
           </Link>
-          <AISettings />
+          <Link href="/settings">
+            <Button variant="outline" size="icon">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
 
