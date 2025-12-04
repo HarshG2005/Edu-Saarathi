@@ -303,9 +303,9 @@ export function QuizPage() {
   };
 
   const getScoreColor = (percentage: number) => {
-    if (percentage >= 80) return "text-gfg-green bg-gfg-green-50 border-gfg-green";
-    if (percentage >= 60) return "text-yellow-600 bg-yellow-50 border-yellow-200";
-    return "text-red-600 bg-red-50 border-red-200";
+    if (percentage >= 80) return "text-gfg-green bg-gfg-green-50 dark:bg-gfg-green-900/20 border-gfg-green";
+    if (percentage >= 60) return "text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-900/30";
+    return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900/30";
   };
 
   const getChartData = (result: QuizResult) => [
@@ -324,7 +324,7 @@ export function QuizPage() {
 
       {quizState === "setup" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card>
+          <Card className="dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gfg-text">
                 <HelpCircle className="h-5 w-5 text-gfg-green" />
@@ -333,7 +333,7 @@ export function QuizPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <Tabs value={setupTab} onValueChange={(v) => setSetupTab(v as "existing" | "generate")}>
-                <TabsList className="grid w-full grid-cols-2 bg-gfg-bg-card border border-gfg-border-light">
+                <TabsList className="grid w-full grid-cols-2 bg-gfg-bg-card dark:bg-gfg-dark-bg border border-gfg-border-light dark:border-gfg-dark-border">
                   <TabsTrigger value="existing" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white">Select Existing</TabsTrigger>
                   <TabsTrigger value="generate" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white">
                     <Sparkles className="mr-2 h-4 w-4" />
@@ -345,7 +345,7 @@ export function QuizPage() {
                   <div className="space-y-2">
                     <Label htmlFor="mcq-set" className="text-gfg-text">Select MCQ Set</Label>
                     <Select value={selectedSetId} onValueChange={setSelectedSetId}>
-                      <SelectTrigger id="mcq-set" className="bg-white border-gfg-border-medium" data-testid="select-mcq-set">
+                      <SelectTrigger id="mcq-set" className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light" data-testid="select-mcq-set">
                         <SelectValue placeholder="Choose an MCQ set to quiz on" />
                       </SelectTrigger>
                       <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
@@ -380,7 +380,7 @@ export function QuizPage() {
                   <div className="space-y-2">
                     <Label htmlFor="gen-doc" className="text-gfg-text">Source Document (Optional)</Label>
                     <Select value={genDocId} onValueChange={setGenDocId}>
-                      <SelectTrigger id="gen-doc" className="bg-white border-gfg-border-medium">
+                      <SelectTrigger id="gen-doc" className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
                         <SelectValue placeholder="Or enter a topic below" />
                       </SelectTrigger>
                       <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
@@ -403,7 +403,7 @@ export function QuizPage() {
                       placeholder="e.g., Machine Learning, Solar System, Web Development"
                       value={genTopic}
                       onChange={(e) => setGenTopic(e.target.value)}
-                      className="bg-white border-gfg-border-medium"
+                      className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light"
                     />
                   </div>
 
@@ -411,7 +411,7 @@ export function QuizPage() {
                     <div className="space-y-2">
                       <Label className="text-gfg-text">Question Count</Label>
                       <Select value={genCount} onValueChange={(v) => setGenCount(v as "5" | "10" | "20")}>
-                        <SelectTrigger className="bg-white border-gfg-border-medium">
+                        <SelectTrigger className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
@@ -425,7 +425,7 @@ export function QuizPage() {
                     <div className="space-y-2">
                       <Label className="text-gfg-text">Difficulty</Label>
                       <Select value={genDifficulty} onValueChange={(v) => setGenDifficulty(v as "easy" | "medium" | "hard")}>
-                        <SelectTrigger className="bg-white border-gfg-border-medium">
+                        <SelectTrigger className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
@@ -458,7 +458,7 @@ export function QuizPage() {
                 </TabsContent>
               </Tabs>
 
-              <div className="flex items-center justify-between rounded-lg border border-gfg-border-light bg-gray-50 p-4">
+              <div className="flex items-center justify-between rounded-lg border border-gfg-border-light dark:border-gfg-dark-border bg-gray-50 dark:bg-gfg-dark-bg p-4">
                 <div className="flex items-center gap-3">
                   <Clock className="h-5 w-5 text-gfg-text-light" />
                   <div>
@@ -484,7 +484,7 @@ export function QuizPage() {
                     value={timePerQuestion.toString()}
                     onValueChange={(v) => setTimePerQuestion(parseInt(v))}
                   >
-                    <SelectTrigger data-testid="select-time" className="bg-white border-gfg-border-medium">
+                    <SelectTrigger data-testid="select-time" className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
@@ -501,7 +501,7 @@ export function QuizPage() {
           </Card>
 
           {quizResults.length > 0 && (
-            <Card>
+            <Card className="dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-gfg-text">
                   <Trophy className="h-5 w-5 text-gfg-green" />
@@ -517,7 +517,7 @@ export function QuizPage() {
                     .map((result) => (
                       <div
                         key={result.id}
-                        className="flex items-center justify-between rounded-lg border border-gfg-border-light p-3 bg-white hover:shadow-md transition-all cursor-pointer hover:border-gfg-green/50"
+                        className="flex items-center justify-between rounded-lg border border-gfg-border-light dark:border-gfg-dark-border p-3 bg-white dark:bg-gfg-dark-bg hover:shadow-md transition-all cursor-pointer hover:border-gfg-green/50"
                         onClick={() => handleViewResult(result)}
                         data-testid={`result - ${result.id} `}
                       >
@@ -528,9 +528,9 @@ export function QuizPage() {
                             {result.timeTaken && ` • ${formatTime(result.timeTaken)} `}
                           </p>
                         </div>
-                        <Badge variant="outline" className={getScoreColor(result.percentage)}>
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${getScoreColor(result.percentage)}`}>
                           {result.percentage}%
-                        </Badge>
+                        </div>
                       </div>
                     ))}
                 </div>
@@ -543,7 +543,7 @@ export function QuizPage() {
       {quizState === "active" && currentMCQ && currentMCQSet && (
         <div className="mx-auto w-full max-w-2xl">
           <div className="mb-6 flex items-center justify-between">
-            <Badge variant="outline" className="text-gfg-text border-gfg-border-medium bg-white">
+            <Badge variant="outline" className="text-gfg-text border-gfg-border-medium dark:border-gfg-dark-border bg-white dark:bg-gfg-dark-card">
               Question {currentIndex + 1} of {(currentMCQSet.mcqs as any[]).length}
             </Badge>
             {timedMode && (
@@ -562,7 +562,7 @@ export function QuizPage() {
             className="mb-6 h-2 bg-gray-200"
           />
 
-          <Card className="mb-6 border-gfg-border-light shadow-md">
+          <Card className="mb-6 border-gfg-border-light dark:border-gfg-dark-border shadow-md dark:bg-gfg-dark-card">
             <CardContent className="p-6">
               <p className="mb-6 text-lg leading-relaxed text-gfg-text font-medium" data-testid="text-question">
                 {currentMCQ.question}
@@ -574,10 +574,10 @@ export function QuizPage() {
                     key={option.id}
                     onClick={() => handleAnswer(option.id)}
                     disabled={isSubmitting}
-                    className={`flex w-full items-center gap-3 rounded-lg border border-gfg-border-medium p-4 text-left transition-all hover:border-gfg-green hover:bg-gfg-green-50 group ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`flex w-full items-center gap-3 rounded-lg border border-gfg-border-medium dark:border-gfg-dark-border p-4 text-left transition-all hover:border-gfg-green hover:bg-gfg-green-50 dark:hover:bg-gfg-green-900/20 group ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     data-testid={`button - option - ${option.id} `}
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-gfg-border-medium text-sm font-medium text-gfg-text-light group-hover:border-gfg-green group-hover:text-gfg-green">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-gfg-border-medium dark:border-gfg-dark-border text-sm font-medium text-gfg-text-light group-hover:border-gfg-green group-hover:text-gfg-green">
                       {String.fromCharCode(65 + idx)}
                     </div>
                     <span className="flex-1 text-gfg-text">{option.text}</span>
@@ -593,7 +593,7 @@ export function QuizPage() {
       {quizState === "results" && currentResult && (
         <div className="mx-auto w-full max-w-4xl">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="h-full">
+            <Card className="h-full dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-gfg-text">
                   <Trophy className="h-5 w-5 text-yellow-500" />
@@ -628,17 +628,17 @@ export function QuizPage() {
                 </div>
 
                 <div className="mt-6 grid w-full grid-cols-3 gap-4 text-center">
-                  <div className="rounded-lg bg-gfg-green-50 p-3 border border-gfg-green/20">
+                  <div className="rounded-lg bg-gfg-green-50 dark:bg-gfg-green-900/20 p-3 border border-gfg-green/20">
                     <p className="text-2xl font-bold text-gfg-green">{currentResult.score}</p>
                     <p className="text-xs text-gfg-text-light">Correct</p>
                   </div>
-                  <div className="rounded-lg bg-red-50 p-3 border border-red-200">
-                    <p className="text-2xl font-bold text-red-600">
+                  <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 border border-red-200 dark:border-red-900/30">
+                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                       {currentResult.totalQuestions - currentResult.score}
                     </p>
                     <p className="text-xs text-muted-foreground">Incorrect</p>
                   </div>
-                  <div className="rounded-lg bg-gray-50 p-3 border border-gray-200">
+                  <div className="rounded-lg bg-gray-50 dark:bg-gfg-dark-bg p-3 border border-gray-200 dark:border-gfg-dark-border">
                     <p className="text-2xl font-bold text-gfg-text">
                       {currentResult.timeTaken ? formatTime(currentResult.timeTaken) : "--:--"}
                     </p>
@@ -657,7 +657,7 @@ export function QuizPage() {
               </CardContent>
             </Card>
 
-            <Card className="h-full overflow-hidden">
+            <Card className="h-full overflow-hidden dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-gfg-text">
                   <BarChart2 className="h-5 w-5 text-gfg-green" />
@@ -666,7 +666,7 @@ export function QuizPage() {
                 <div className="flex items-center gap-2">
                   <Label htmlFor="review-filter" className="text-sm text-gfg-text-light">Show:</Label>
                   <Select value={reviewFilter} onValueChange={(v: "all" | "incorrect") => setReviewFilter(v)}>
-                    <SelectTrigger id="review-filter" className="h-8 w-[120px] bg-white border-gfg-border-medium">
+                    <SelectTrigger id="review-filter" className="h-8 w-[120px] bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
@@ -700,8 +700,8 @@ export function QuizPage() {
                           <div
                             key={mcq.id}
                             className={`rounded - lg border p - 4 transition - all ${answer?.isCorrect
-                              ? "border-gfg-green bg-gfg-green-50"
-                              : "border-red-200 bg-red-50"
+                              ? "border-gfg-green bg-gfg-green-50 dark:bg-gfg-green-900/20"
+                              : "border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/20"
                               } `}
                             data-testid={`review - ${mcq.id} `}
                           >
@@ -724,7 +724,7 @@ export function QuizPage() {
                               </div>
                             </div>
                             <div className="ml-7 space-y-2 text-sm">
-                              <div className="flex items-center gap-2 rounded bg-white border border-gfg-green/20 px-2 py-1">
+                              <div className="flex items-center gap-2 rounded bg-white dark:bg-gfg-dark-bg border border-gfg-green/20 px-2 py-1">
                                 <Check className="h-3 w-3 text-gfg-green" />
                                 <span className="font-medium text-gfg-green">
                                   Correct: {correctOption?.text}
@@ -742,7 +742,7 @@ export function QuizPage() {
                                 <p className="text-gfg-text-light italic">Skipped / Time ran out</p>
                               )}
                               {mcq.explanation && (
-                                <div className="mt-2 rounded bg-white p-2 text-xs text-gfg-text-light border border-gfg-border-light">
+                                <div className="mt-2 rounded bg-white dark:bg-gfg-dark-bg p-2 text-xs text-gfg-text-light border border-gfg-border-light dark:border-gfg-dark-border">
                                   <span className="font-bold text-gfg-text">Explanation:</span> {mcq.explanation}
                                 </div>
                               )}
@@ -759,7 +759,7 @@ export function QuizPage() {
       )}
       {isSubmitting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-8 shadow-xl">
+          <div className="flex flex-col items-center gap-4 rounded-lg bg-white dark:bg-gfg-dark-card p-8 shadow-xl border border-gfg-border-light dark:border-gfg-dark-border">
             <Loader2 className="h-12 w-12 animate-spin text-gfg-green" />
             <p className="text-lg font-medium text-gfg-text">Submitting Quiz...</p>
           </div>

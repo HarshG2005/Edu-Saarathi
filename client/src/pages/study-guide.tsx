@@ -88,17 +88,17 @@ export function StudyGuidePage() {
                 </p>
             </div>
 
-            <Card className="border-gfg-border-light shadow-sm">
+            <Card className="border-gfg-border-light dark:border-gfg-dark-border shadow-sm dark:bg-gfg-dark-card">
                 <CardHeader>
                     <CardTitle className="text-gfg-text">Select Document</CardTitle>
                     <CardDescription className="text-gfg-text-light">Choose a document to view its study guide</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Select value={selectedDocId} onValueChange={setSelectedDocId}>
-                        <SelectTrigger className="w-full md:w-[400px] bg-white border-gfg-border-medium">
+                        <SelectTrigger className="w-full md:w-[400px] bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
                             <SelectValue placeholder="Select a document..." />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
                             {sortedDocuments.map((doc) => (
                                 <SelectItem key={doc.id} value={doc.id}>
                                     {doc.name}
@@ -112,7 +112,7 @@ export function StudyGuidePage() {
             {selectedDocId && (
                 <div className="flex-1 flex flex-col min-h-0">
                     <Tabs defaultValue="overview" className="flex-1 flex flex-col">
-                        <TabsList className="bg-gfg-bg-card border border-gfg-border-light">
+                        <TabsList className="bg-gfg-bg-card dark:bg-gfg-dark-bg border border-gfg-border-light dark:border-gfg-dark-border">
                             <TabsTrigger value="overview" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white">Overview</TabsTrigger>
                             <TabsTrigger value="notes" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white">Notes ({notes.length})</TabsTrigger>
                             <TabsTrigger value="flashcards" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white">Flashcards ({flashcards.length})</TabsTrigger>
@@ -121,7 +121,7 @@ export function StudyGuidePage() {
 
                         <TabsContent value="overview" className="mt-6 space-y-6">
                             <div className="grid gap-4 md:grid-cols-3">
-                                <Card className="border-gfg-border-light shadow-sm">
+                                <Card className="border-gfg-border-light dark:border-gfg-dark-border shadow-sm dark:bg-gfg-dark-card">
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                         <CardTitle className="text-sm font-medium text-gfg-text">Total Notes</CardTitle>
                                         <StickyNote className="h-4 w-4 text-gfg-text-light" />
@@ -151,7 +151,7 @@ export function StudyGuidePage() {
                             </div>
 
                             {selectedDoc && (
-                                <Card className="border-gfg-border-light shadow-sm">
+                                <Card className="border-gfg-border-light dark:border-gfg-dark-border shadow-sm dark:bg-gfg-dark-card">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2 text-gfg-text">
                                             <FileText className="h-5 w-5 text-gfg-green" />
@@ -159,7 +159,7 @@ export function StudyGuidePage() {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
-                                        <div className="flex justify-between py-1 border-b border-gfg-border-light">
+                                        <div className="flex justify-between py-1 border-b border-gfg-border-light dark:border-gfg-dark-border">
                                             <span className="font-medium text-gfg-text">Name</span>
                                             <span className="text-gfg-text-light">{selectedDoc.name}</span>
                                         </div>
@@ -181,7 +181,7 @@ export function StudyGuidePage() {
                         </TabsContent>
 
                         <TabsContent value="notes" className="mt-6">
-                            <ScrollArea className="h-[600px] rounded-md border border-gfg-border-light p-4 bg-white">
+                            <ScrollArea className="h-[600px] rounded-md border border-gfg-border-light dark:border-gfg-dark-border p-4 bg-white dark:bg-gfg-dark-card">
                                 {isLoadingNotes ? (
                                     <div className="flex justify-center p-8">
                                         <Loader2 className="h-8 w-8 animate-spin text-gfg-green" />
@@ -191,7 +191,7 @@ export function StudyGuidePage() {
                                 ) : (
                                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                         {notes.map((note) => (
-                                            <Card key={note.id} className="border-gfg-border-light shadow-sm">
+                                            <Card key={note.id} className="border-gfg-border-light dark:border-gfg-dark-border shadow-sm dark:bg-gfg-dark-bg">
                                                 <CardHeader>
                                                     <CardTitle className="text-sm font-medium text-gfg-text-light">
                                                         {formatDate(note.createdAt)}
@@ -208,7 +208,7 @@ export function StudyGuidePage() {
                         </TabsContent>
 
                         <TabsContent value="flashcards" className="mt-6">
-                            <ScrollArea className="h-[600px] rounded-md border border-gfg-border-light p-4 bg-white">
+                            <ScrollArea className="h-[600px] rounded-md border border-gfg-border-light dark:border-gfg-dark-border p-4 bg-white dark:bg-gfg-dark-card">
                                 {isLoadingFlashcards ? (
                                     <div className="flex justify-center p-8">
                                         <Loader2 className="h-8 w-8 animate-spin text-gfg-green" />
@@ -226,7 +226,7 @@ export function StudyGuidePage() {
                         </TabsContent>
 
                         <TabsContent value="highlights" className="mt-6">
-                            <ScrollArea className="h-[600px] rounded-md border border-gfg-border-light p-4 bg-white">
+                            <ScrollArea className="h-[600px] rounded-md border border-gfg-border-light dark:border-gfg-dark-border p-4 bg-white dark:bg-gfg-dark-card">
                                 {isLoadingHighlights ? (
                                     <div className="flex justify-center p-8">
                                         <Loader2 className="h-8 w-8 animate-spin text-gfg-green" />
@@ -236,7 +236,7 @@ export function StudyGuidePage() {
                                 ) : (
                                     <div className="space-y-4">
                                         {highlights.map((highlight) => (
-                                            <Card key={highlight.id} className="border-gfg-border-light shadow-sm">
+                                            <Card key={highlight.id} className="border-gfg-border-light dark:border-gfg-dark-border shadow-sm dark:bg-gfg-dark-bg">
                                                 <CardContent className="p-4 flex gap-4">
                                                     <div
                                                         className="w-1 self-stretch rounded-full shrink-0"

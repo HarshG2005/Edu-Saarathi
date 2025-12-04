@@ -174,8 +174,8 @@ export function MindmapPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "view")} className="flex-1 flex flex-col min-h-0">
-        <div className="flex items-center justify-between border-b border-gfg-border-light pb-4 shrink-0">
-          <TabsList className="bg-gfg-bg-card border border-gfg-border-light p-1">
+        <div className="flex items-center justify-between border-b border-gfg-border-light dark:border-gfg-dark-border pb-4 shrink-0">
+          <TabsList className="bg-gfg-bg-card dark:bg-gfg-dark-bg border border-gfg-border-light dark:border-gfg-dark-border p-1">
             <TabsTrigger value="generate" className="px-6 data-[state=active]:bg-gfg-green data-[state=active]:text-white" data-testid="tab-generate">Generate</TabsTrigger>
             <TabsTrigger value="view" className="px-6 data-[state=active]:bg-gfg-green data-[state=active]:text-white" data-testid="tab-view" disabled={!currentMindmap}>
               View Mindmap
@@ -202,7 +202,7 @@ export function MindmapPage() {
         </div>
 
         <TabsContent value="generate" className="mt-6">
-          <Card className="max-w-xl">
+          <Card className="max-w-xl dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gfg-text">
                 <Sparkles className="h-5 w-5 text-gfg-green" />
@@ -217,10 +217,10 @@ export function MindmapPage() {
                 <div className="space-y-2">
                   <Label htmlFor="document" className="text-gfg-text">Source Document (Optional)</Label>
                   <Select value={selectedDocId} onValueChange={setSelectedDocId}>
-                    <SelectTrigger id="document" className="bg-white border-gfg-border-medium" data-testid="select-document">
+                    <SelectTrigger id="document" className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light" data-testid="select-document">
                       <SelectValue placeholder="Select a document..." />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
                       <SelectItem value="none">No document (use topic only)</SelectItem>
                       {[...documents]
                         .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
@@ -240,7 +240,7 @@ export function MindmapPage() {
                     placeholder="e.g., Quantum Physics, The French Revolution"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="bg-white border-gfg-border-medium"
+                    className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light"
                     data-testid="input-topic"
                   />
                 </div>
@@ -275,7 +275,7 @@ export function MindmapPage() {
                 {mindmaps.slice().reverse().slice(0, 5).map((mindmap) => (
                   <Card
                     key={mindmap.id}
-                    className="cursor-pointer hover:shadow-md transition-shadow border-gfg-border-light hover:border-gfg-green"
+                    className="cursor-pointer hover:shadow-md transition-shadow border-gfg-border-light dark:border-gfg-dark-border hover:border-gfg-green dark:bg-gfg-dark-card"
                     onClick={() => loadMindmap(mindmap)}
                     data-testid={`card-mindmap-${mindmap.id}`}
                   >
@@ -299,7 +299,7 @@ export function MindmapPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="view" className="mt-4 flex-1 min-h-0 border border-gfg-border-light rounded-xl overflow-hidden shadow-sm bg-white relative">
+        <TabsContent value="view" className="mt-4 flex-1 min-h-0 border border-gfg-border-light dark:border-gfg-dark-border rounded-xl overflow-hidden shadow-sm bg-white dark:bg-gfg-dark-card relative">
           {currentMindmap ? (
             <div className="h-full w-full" data-testid="mindmap-container">
               <ReactFlow
@@ -312,14 +312,14 @@ export function MindmapPage() {
                 className="bg-gfg-bg-secondary/5"
               >
                 <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#6b7280" />
-                <Controls showInteractive={false} className="bg-white border border-gfg-border-light shadow-sm rounded-lg overflow-hidden" />
+                <Controls showInteractive={false} className="bg-white dark:bg-gfg-dark-card border border-gfg-border-light dark:border-gfg-dark-border shadow-sm rounded-lg overflow-hidden" />
                 <MiniMap
                   nodeColor="#2F8D46"
                   maskColor="rgba(255, 255, 255, 0.8)"
-                  className="bg-white border border-gfg-border-light shadow-sm rounded-lg overflow-hidden"
+                  className="bg-white dark:bg-gfg-dark-card border border-gfg-border-light dark:border-gfg-dark-border shadow-sm rounded-lg overflow-hidden"
                 />
                 <Panel position="top-right" className="flex gap-2 p-2">
-                  <div className="bg-white/80 backdrop-blur-sm border border-gfg-border-light shadow-sm rounded-lg p-1 flex gap-1">
+                  <div className="bg-white/80 dark:bg-gfg-dark-card/80 backdrop-blur-sm border border-gfg-border-light dark:border-gfg-dark-border shadow-sm rounded-lg p-1 flex gap-1">
                     <Button
                       size="icon"
                       variant="ghost"
