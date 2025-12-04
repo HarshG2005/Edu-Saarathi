@@ -12,7 +12,8 @@ import type {
   InsertUser,
   Highlight,
   UserNote,
-  UserFlashcard
+  UserFlashcard,
+  MindmapSnapshot
 } from "@shared/schema";
 
 export interface IStorage {
@@ -37,7 +38,7 @@ export interface IStorage {
   getFlashcardSet(id: string): Promise<FlashcardSet | undefined>;
   getFlashcardSets(userId: string): Promise<FlashcardSet[]>;
   createFlashcardSet(set: Omit<FlashcardSet, "id">): Promise<FlashcardSet>;
-  updateFlashcardSet(id: string, set: Partial<FlashcardSet>): Promise<FlashcardSet | undefined>;
+  updateFlashcardSet(id: string, updates: Partial<FlashcardSet>): Promise<FlashcardSet | undefined>;
 
   // Summaries
   getSummary(id: string): Promise<Summary | undefined>;
@@ -47,7 +48,13 @@ export interface IStorage {
   // Mindmaps
   getMindmap(id: string): Promise<Mindmap | undefined>;
   getMindmaps(userId: string): Promise<Mindmap[]>;
-  createMindmap(mindmap: Omit<Mindmap, "id">): Promise<Mindmap>;
+  createMindmap(mindmap: Omit<Mindmap, "id" | "createdAt" | "updatedAt">): Promise<Mindmap>;
+  updateMindmap(id: string, mindmap: Partial<Mindmap>): Promise<Mindmap | undefined>;
+  deleteMindmap(id: string): Promise<boolean>;
+
+  // Mindmap Snapshots
+  createMindmapSnapshot(snapshot: Omit<MindmapSnapshot, "id" | "createdAt">): Promise<MindmapSnapshot>;
+  getMindmapSnapshots(mindmapId: string): Promise<MindmapSnapshot[]>;
 
   // Notes
   getNotes(id: string): Promise<Notes | undefined>;
@@ -87,6 +94,7 @@ export class MemStorage implements IStorage {
   private flashcardSets: Map<string, FlashcardSet>;
   private summaries: Map<string, Summary>;
   private mindmaps: Map<string, Mindmap>;
+  private mindmapSnapshots: Map<string, MindmapSnapshot>;
   private notes: Map<string, Notes>;
   private quizResults: Map<string, QuizResult>;
   private chatSessions: Map<string, ChatSession>;
@@ -101,6 +109,7 @@ export class MemStorage implements IStorage {
     this.flashcardSets = new Map();
     this.summaries = new Map();
     this.mindmaps = new Map();
+    this.mindmapSnapshots = new Map();
     this.notes = new Map();
     this.quizResults = new Map();
     this.chatSessions = new Map();
@@ -190,6 +199,8 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
+
+
   // Summaries
   async getSummary(id: string): Promise<Summary | undefined> {
     return this.summaries.get(id);
@@ -215,11 +226,38 @@ export class MemStorage implements IStorage {
     return Array.from(this.mindmaps.values()).filter(m => m.userId === userId);
   }
 
-  async createMindmap(mindmap: Omit<Mindmap, "id">): Promise<Mindmap> {
+  async createMindmap(mindmap: Omit<Mindmap, "id" | "createdAt" | "updatedAt">): Promise<Mindmap> {
     const id = randomUUID();
-    const newMindmap: Mindmap = { ...mindmap, id };
+    const now = new Date();
+    const newMindmap: Mindmap = { ...mindmap, id, createdAt: now, updatedAt: now };
     this.mindmaps.set(id, newMindmap);
     return newMindmap;
+  }
+
+  async updateMindmap(id: string, updates: Partial<Mindmap>): Promise<Mindmap | undefined> {
+    const existing = this.mindmaps.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...updates, updatedAt: new Date() };
+    this.mindmaps.set(id, updated);
+    return updated;
+  }
+
+  async deleteMindmap(id: string): Promise<boolean> {
+    return this.mindmaps.delete(id);
+  }
+
+  // Mindmap Snapshots
+  async createMindmapSnapshot(snapshot: Omit<MindmapSnapshot, "id" | "createdAt">): Promise<MindmapSnapshot> {
+    const id = randomUUID();
+    const newSnapshot: MindmapSnapshot = { ...snapshot, id, createdAt: new Date() };
+    this.mindmapSnapshots.set(id, newSnapshot);
+    return newSnapshot;
+  }
+
+  async getMindmapSnapshots(mindmapId: string): Promise<MindmapSnapshot[]> {
+    return Array.from(this.mindmapSnapshots.values())
+      .filter(s => s.mindmapId === mindmapId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   // Notes

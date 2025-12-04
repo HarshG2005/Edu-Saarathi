@@ -70,10 +70,15 @@ function chunkText(text: string, chunkSize: number = 500): string[] {
   return chunks;
 }
 
+import mindmapRoutes from "./routes/mindmaps";
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  // Register Mindmap Routes
+  app.use("/api", mindmapRoutes);
 
   // Document Upload
   app.post("/api/documents/upload", requireAuth, upload.single("file"), async (req, res) => {
@@ -348,60 +353,7 @@ export async function registerRoutes(
     }
   });
 
-  // Generate Mindmap
-  app.post("/api/mindmap/generate", requireAuth, async (req, res) => {
-    try {
-      const parsed = generateMindmapRequestSchema.safeParse(req.body);
-      if (!parsed.success) {
-        return res.status(400).json({ message: "Invalid request", errors: parsed.error.errors });
-      }
 
-      const { documentId, topic } = parsed.data;
-
-      let content = "";
-      let finalTopic = topic || "";
-
-      if (documentId) {
-        const doc = await storage.getDocument(documentId);
-        if (!doc) {
-          return res.status(404).json({ message: "Document not found" });
-        }
-        content = doc.content;
-        finalTopic = topic || doc.name;
-      }
-
-      if (!content && !topic) {
-        return res.status(400).json({ message: "Either a document or topic is required" });
-      }
-
-      const provider = req.body.provider || "gemini";
-      const result = await generateMindmap(content, finalTopic, provider);
-
-      const mindmap = await storage.createMindmap({
-        userId: req.user!.id,
-        documentId,
-        topic: finalTopic,
-        nodes: result.nodes.map((node) => ({
-          id: node.id,
-          type: "default",
-          position: { x: node.x, y: node.y },
-          data: { label: node.label },
-        })),
-        edges: result.edges.map((edge) => ({
-          id: randomUUID(),
-          source: edge.source,
-          target: edge.target,
-          animated: true,
-        })),
-        createdAt: new Date(),
-      });
-
-      res.json(mindmap);
-    } catch (error: any) {
-      console.error("Error generating mindmap:", error);
-      res.status(500).json({ message: error.message || "Failed to generate mindmap" });
-    }
-  });
 
   // Generate Notes
   app.post("/api/notes/generate", requireAuth, async (req, res) => {
@@ -532,6 +484,24 @@ export async function registerRoutes(
     }
   });
 
+  // Update Flashcard Set (for mastery)
+  app.put("/api/flashcards/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { flashcards } = req.body;
+      const userId = req.user!.id;
+
+      const set = await storage.getFlashcardSet(id);
+      if (!set) return res.status(404).json({ message: "Flashcard set not found" });
+      if (set.userId !== userId) return res.status(403).json({ message: "Unauthorized" });
+
+      const updated = await storage.updateFlashcardSet(id, { flashcards });
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to update flashcard set" });
+    }
+  });
+
   // Stats Endpoint
   app.get("/api/stats", requireAuth, async (req, res) => {
     try {
@@ -601,9 +571,9 @@ export async function registerRoutes(
         ? Math.round(filteredQuizResults.reduce((acc, r) => acc + r.percentage, 0) / totalQuizzes)
         : 0;
 
-      const totalFlashcards = filteredFlashcardSets.reduce((acc, s) => acc + s.flashcards.length, 0);
+      const totalFlashcards = filteredFlashcardSets.reduce((acc, s) => acc + (s.flashcards as any[]).length, 0);
       const totalFlashcardsMastered = filteredFlashcardSets.reduce((acc, s) =>
-        acc + s.flashcards.filter(c => c.mastered).length, 0
+        acc + (s.flashcards as any[]).filter((c: any) => c.mastered).length, 0
       );
 
       const studyTime = (filteredQuizResults.reduce((acc, r) => acc + (r.timeTaken || 0), 0) / 60) + (totalFlashcards * 0.5); // Minutes (Quizzes + 30s per flashcard)

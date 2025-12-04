@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useAppStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { FlashcardSet, Flashcard } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,6 +26,7 @@ import { AISettings, getStoredProvider } from "@/components/ai-settings";
 export function FlashcardsPage() {
   const { documents, currentDocumentId, flashcardSets, addFlashcardSet } = useAppStore();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const [topic, setTopic] = useState("");
   const [count, setCount] = useState("10");
@@ -38,6 +39,31 @@ export function FlashcardsPage() {
   const [mastery, setMastery] = useState<Record<number, boolean>>({});
 
   const hasDocumentSelected = selectedDocId && selectedDocId !== "none";
+
+  // Initialize mastery from currentSet
+  useEffect(() => {
+    if (currentSet) {
+      const initialMastery: Record<number, boolean> = {};
+      (currentSet.flashcards as Flashcard[]).forEach((card, idx) => {
+        if (card.mastered) {
+          initialMastery[idx] = true;
+        }
+      });
+      setMastery(initialMastery);
+    }
+  }, [currentSet]);
+
+  const updateSetMutation = useMutation({
+    mutationFn: async (updatedSet: FlashcardSet) => {
+      const res = await apiRequest("PUT", `/api/flashcards/${updatedSet.id}`, {
+        flashcards: updatedSet.flashcards,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+    },
+  });
 
   const generateMutation = useMutation({
     mutationFn: async (): Promise<FlashcardSet> => {
@@ -88,14 +114,31 @@ export function FlashcardsPage() {
   };
 
   const toggleMastery = () => {
+    if (!currentSet) return;
+
+    const newMastery = !mastery[currentIndex];
+
+    // Optimistic update
     setMastery((prev) => ({
       ...prev,
-      [currentIndex]: !prev[currentIndex],
+      [currentIndex]: newMastery,
     }));
+
+    // Update currentSet
+    const updatedFlashcards = [...(currentSet.flashcards as Flashcard[])];
+    updatedFlashcards[currentIndex] = {
+      ...updatedFlashcards[currentIndex],
+      mastered: newMastery
+    };
+
+    const updatedSet = { ...currentSet, flashcards: updatedFlashcards };
+    setCurrentSet(updatedSet);
+
+    // Persist
+    updateSetMutation.mutate(updatedSet);
   };
 
-  const masteryCount = Object.values(mastery).filter(Boolean).length;
-  const progress = currentSet ? (masteryCount / (currentSet.flashcards as Flashcard[]).length) * 100 : 0;
+  // ... rest of component
 
   return (
     <Section className="flex flex-col gap-6">
@@ -260,11 +303,11 @@ export function FlashcardsPage() {
                   <motion.div
                     className="w-full h-full relative preserve-3d transition-all duration-500"
                     animate={{ rotateY: isFlipped ? 180 : 0 }}
-                    transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
+                    transition={{ duration: 0.3, type: "spring", stiffness: 260, damping: 20 }}
                   >
                     {/* Front */}
                     <div className="absolute inset-0 backface-hidden">
-                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 bg-gradient-to-br from-[#FF9A9E] to-[#FECFEF] dark:from-[#FF9A9E] dark:to-[#FECFEF] shadow-lg">
+                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 bg-gradient-to-br from-[#cc2b5e] to-[#753a88] dark:from-[#cc2b5e] dark:to-[#753a88] shadow-lg">
                         <div className="absolute top-4 left-4 text-xs font-bold text-white/80 uppercase tracking-wider">
                           Question
                         </div>
@@ -280,7 +323,7 @@ export function FlashcardsPage() {
 
                     {/* Back */}
                     <div className="absolute inset-0 backface-hidden rotate-y-180">
-                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 shadow-lg bg-gradient-to-br from-[#a18cd1] to-[#fbc2eb] dark:from-[#a18cd1] dark:to-[#fbc2eb] text-white">
+                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 shadow-lg bg-gradient-to-br from-[#141E30] to-[#243B55] dark:from-[#141E30] dark:to-[#243B55] text-white">
                         <div className="absolute top-4 left-4 text-xs font-bold text-white/80 uppercase tracking-wider">
                           Answer
                         </div>

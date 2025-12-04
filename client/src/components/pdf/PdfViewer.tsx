@@ -20,12 +20,17 @@ interface PdfViewerProps {
     onHighlightClick: (highlight: Highlight) => void;
 }
 
-export const PdfViewer: React.FC<PdfViewerProps> = ({
+export interface PdfViewerHandle {
+    scrollToPage: (page: number) => void;
+    scrollToHighlight: (highlightId: string) => void;
+}
+
+export const PdfViewer = React.forwardRef<PdfViewerHandle, PdfViewerProps>(({
     file,
     highlights,
     onHighlightCreate,
     onHighlightClick,
-}) => {
+}, ref) => {
     const [numPages, setNumPages] = useState<number>(0);
     const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
     const [selection, setSelection] = useState<{
@@ -35,6 +40,26 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
     } | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
+    const pageRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+
+    React.useImperativeHandle(ref, () => ({
+        scrollToPage: (page: number) => {
+            const pageEl = pageRefs.current[page];
+            if (pageEl) {
+                pageEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        },
+        scrollToHighlight: (highlightId: string) => {
+            const highlight = highlights.find(h => h.id === highlightId);
+            if (highlight) {
+                const pageEl = pageRefs.current[highlight.page];
+                if (pageEl) {
+                    pageEl.scrollIntoView({ behavior: "smooth", block: "center" });
+                    // Optional: flash effect could be added here
+                }
+            }
+        }
+    }));
 
     function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
         setNumPages(numPages);
@@ -149,7 +174,11 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
                 className="flex flex-col gap-8"
             >
                 {Array.from(new Array(numPages), (el, index) => (
-                    <div key={`page_${index + 1}`} className="relative shadow-gfg-light dark:shadow-gfg-dark">
+                    <div
+                        key={`page_${index + 1}`}
+                        className="relative shadow-gfg-light dark:shadow-gfg-dark"
+                        ref={(el) => (pageRefs.current[index + 1] = el)}
+                    >
                         <Page
                             pageNumber={index + 1}
                             width={800}
@@ -173,4 +202,5 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
             />
         </div>
     );
-};
+});
+PdfViewer.displayName = "PdfViewer";

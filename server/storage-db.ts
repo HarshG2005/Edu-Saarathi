@@ -2,9 +2,9 @@ import { IStorage } from "./storage";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 import {
-    users, documents, mcqSets, flashcardSets, summaries, mindmaps, notes, quizResults, chatSessions, highlights, userNotes, userFlashcards,
+    users, documents, mcqSets, flashcardSets, summaries, mindmaps, notes, quizResults, chatSessions, highlights, userNotes, userFlashcards, mindmapSnapshots,
     type User, type InsertUser, type Document, type MCQSet, type FlashcardSet, type Summary, type Mindmap, type Notes, type QuizResult, type ChatSession,
-    type Highlight, type UserNote, type UserFlashcard
+    type Highlight, type UserNote, type UserFlashcard, type MindmapSnapshot
 } from "@shared/schema";
 
 export class DbStorage implements IStorage {
@@ -109,9 +109,29 @@ export class DbStorage implements IStorage {
         return db.select().from(mindmaps).where(eq(mindmaps.userId, userId)).orderBy(desc(mindmaps.createdAt));
     }
 
-    async createMindmap(mindmap: Omit<Mindmap, "id">): Promise<Mindmap> {
+    async createMindmap(mindmap: Omit<Mindmap, "id" | "createdAt" | "updatedAt">): Promise<Mindmap> {
         const [newMindmap] = await db.insert(mindmaps).values(mindmap).returning();
         return newMindmap;
+    }
+
+    async updateMindmap(id: string, updates: Partial<Mindmap>): Promise<Mindmap | undefined> {
+        const [updated] = await db.update(mindmaps).set({ ...updates, updatedAt: new Date() }).where(eq(mindmaps.id, id)).returning();
+        return updated;
+    }
+
+    async deleteMindmap(id: string): Promise<boolean> {
+        const [deleted] = await db.delete(mindmaps).where(eq(mindmaps.id, id)).returning();
+        return !!deleted;
+    }
+
+    // Mindmap Snapshots
+    async createMindmapSnapshot(snapshot: Omit<MindmapSnapshot, "id" | "createdAt">): Promise<MindmapSnapshot> {
+        const [newSnapshot] = await db.insert(mindmapSnapshots).values(snapshot).returning();
+        return newSnapshot;
+    }
+
+    async getMindmapSnapshots(mindmapId: string): Promise<MindmapSnapshot[]> {
+        return db.select().from(mindmapSnapshots).where(eq(mindmapSnapshots.mindmapId, mindmapId)).orderBy(desc(mindmapSnapshots.createdAt));
     }
 
     // Notes

@@ -173,16 +173,22 @@ Respond with JSON in this exact format:
         );
 
         // Calculate positions (same logic as before)
+        // Calculate positions and structure for React Flow
         const nodesWithPositions = result.nodes.map((node: { id: string; label: string }, index: number) => {
-            if (index === 0) {
-                return { ...node, x: 400, y: 300 };
+            let position = { x: 400, y: 300 };
+            if (index !== 0) {
+                const angle = ((index - 1) / (result.nodes.length - 1)) * 2 * Math.PI;
+                const radius = 150 + (index % 3) * 80;
+                position = {
+                    x: 400 + Math.cos(angle) * radius,
+                    y: 300 + Math.sin(angle) * radius,
+                };
             }
-            const angle = ((index - 1) / (result.nodes.length - 1)) * 2 * Math.PI;
-            const radius = 150 + (index % 3) * 80;
+
             return {
-                ...node,
-                x: 400 + Math.cos(angle) * radius,
-                y: 300 + Math.sin(angle) * radius,
+                id: node.id,
+                position,
+                data: { label: node.label }
             };
         });
 

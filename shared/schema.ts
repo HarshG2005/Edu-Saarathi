@@ -146,18 +146,31 @@ export const summarySchema = createInsertSchema(summaries);
 export type Summary = typeof summaries.$inferSelect;
 
 // Mindmaps
+// Mindmaps
 export const mindmaps = pgTable("mindmaps", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id),
   documentId: uuid("document_id").references(() => documents.id),
-  topic: text("topic").notNull(),
-  nodes: jsonb("nodes").notNull(),
-  edges: jsonb("edges").notNull(),
+  name: text("name").notNull().default("Untitled Mindmap"),
+  graph: jsonb("graph").notNull(), // Contains nodes, edges, viewport
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const mindmapSchema = createInsertSchema(mindmaps);
 export type Mindmap = typeof mindmaps.$inferSelect;
+
+// Mindmap Snapshots
+export const mindmapSnapshots = pgTable("mindmap_snapshots", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  mindmapId: uuid("mindmap_id").notNull().references(() => mindmaps.id, { onDelete: "cascade" }),
+  graph: jsonb("graph").notNull(),
+  note: text("note"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const mindmapSnapshotSchema = createInsertSchema(mindmapSnapshots);
+export type MindmapSnapshot = typeof mindmapSnapshots.$inferSelect;
 
 // Notes
 export const notes = pgTable("notes", {
