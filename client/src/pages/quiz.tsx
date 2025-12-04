@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useLocation } from "wouter";
 import { HelpCircle, Play, Clock, Check, X, Trophy, RotateCcw, ChevronRight, BarChart2, Loader2, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getStoredProvider, AISettings } from "@/components/ai-settings";
@@ -30,6 +31,7 @@ type QuizState = "setup" | "active" | "results";
 export function QuizPage() {
   const { mcqSets, quizResults, addQuizResult, documents, currentDocumentId, addMCQSet } = useAppStore();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const [quizState, setQuizState] = useState<QuizState>("setup");
   const [selectedSetId, setSelectedSetId] = useState("");
@@ -51,6 +53,8 @@ export function QuizPage() {
   const [questionStartTime, setQuestionStartTime] = useState<number>(0);
 
   const [currentResult, setCurrentResult] = useState<QuizResult | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reviewFilter, setReviewFilter] = useState<"all" | "incorrect">("all");
 
   const hasDocumentSelected = genDocId && genDocId !== "none";
 
@@ -93,6 +97,12 @@ export function QuizPage() {
   });
 
   const currentMCQ = currentMCQSet?.mcqs[currentIndex];
+
+  useEffect(() => {
+    if (quizState === "results") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [quizState]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -155,7 +165,7 @@ export function QuizPage() {
   };
 
   const handleAnswer = (optionId: string) => {
-    if (!currentMCQ || !currentMCQSet) return;
+    if (!currentMCQ || !currentMCQSet || isSubmitting) return;
 
     const timeTaken = Math.round((Date.now() - questionStartTime) / 1000);
     const correctOption = currentMCQ.options.find((o: any) => o.isCorrect);
@@ -183,7 +193,7 @@ export function QuizPage() {
   };
 
   const handleSkip = () => {
-    if (!currentMCQ || !currentMCQSet) return;
+    if (!currentMCQ || !currentMCQSet || isSubmitting) return;
 
     const timeTaken = Math.round((Date.now() - questionStartTime) / 1000);
     const answer: QuizAnswer = {
@@ -212,7 +222,8 @@ export function QuizPage() {
   };
 
   const finishQuiz = (finalAnswers: QuizAnswer[]) => {
-    if (!currentMCQSet) return;
+    if (!currentMCQSet || isSubmitting) return;
+    setIsSubmitting(true);
 
     const totalTime = Math.round((Date.now() - startTime) / 1000);
     const correct = finalAnswers.filter((a) => a.isCorrect).length;
@@ -260,6 +271,9 @@ export function QuizPage() {
           description: "Failed to save to server. Progress may not update.",
           variant: "destructive",
         });
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
   };
 
@@ -269,6 +283,17 @@ export function QuizPage() {
     setCurrentIndex(0);
     setAnswers([]);
     setCurrentResult(null);
+    setIsSubmitting(false);
+    setReviewFilter("all");
+  };
+
+  const handleViewResult = (result: QuizResult) => {
+    const mcqSet = mcqSets.find(s => s.id === result.mcqSetId);
+    if (mcqSet) {
+      setCurrentMCQSet(mcqSet);
+    }
+    setCurrentResult(result);
+    setQuizState("results");
   };
 
   const formatTime = (seconds: number) => {
@@ -323,7 +348,7 @@ export function QuizPage() {
                       <SelectTrigger id="mcq-set" className="bg-white border-gfg-border-medium" data-testid="select-mcq-set">
                         <SelectValue placeholder="Choose an MCQ set to quiz on" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
                         {mcqSets.length === 0 ? (
                           <SelectItem value="empty" disabled>
                             No MCQ sets available - generate some first!
@@ -358,7 +383,7 @@ export function QuizPage() {
                       <SelectTrigger id="gen-doc" className="bg-white border-gfg-border-medium">
                         <SelectValue placeholder="Or enter a topic below" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
                         <SelectItem value="none">No document - use topic only</SelectItem>
                         {[...documents]
                           .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
@@ -389,7 +414,7 @@ export function QuizPage() {
                         <SelectTrigger className="bg-white border-gfg-border-medium">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
                           <SelectItem value="5">5 questions</SelectItem>
                           <SelectItem value="10">10 questions</SelectItem>
                           <SelectItem value="20">20 questions</SelectItem>
@@ -403,7 +428,7 @@ export function QuizPage() {
                         <SelectTrigger className="bg-white border-gfg-border-medium">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
                           <SelectItem value="easy">Easy</SelectItem>
                           <SelectItem value="medium">Medium</SelectItem>
                           <SelectItem value="hard">Hard</SelectItem>
@@ -462,7 +487,7 @@ export function QuizPage() {
                     <SelectTrigger data-testid="select-time" className="bg-white border-gfg-border-medium">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
                       <SelectItem value="15">15 seconds</SelectItem>
                       <SelectItem value="30">30 seconds</SelectItem>
                       <SelectItem value="45">45 seconds</SelectItem>
@@ -492,7 +517,8 @@ export function QuizPage() {
                     .map((result) => (
                       <div
                         key={result.id}
-                        className="flex items-center justify-between rounded-lg border border-gfg-border-light p-3 bg-white hover:shadow-sm transition-shadow"
+                        className="flex items-center justify-between rounded-lg border border-gfg-border-light p-3 bg-white hover:shadow-md transition-all cursor-pointer hover:border-gfg-green/50"
+                        onClick={() => handleViewResult(result)}
                         data-testid={`result - ${result.id} `}
                       >
                         <div>
@@ -547,7 +573,8 @@ export function QuizPage() {
                   <button
                     key={option.id}
                     onClick={() => handleAnswer(option.id)}
-                    className="flex w-full items-center gap-3 rounded-lg border border-gfg-border-medium p-4 text-left transition-all hover:border-gfg-green hover:bg-gfg-green-50 group"
+                    disabled={isSubmitting}
+                    className={`flex w-full items-center gap-3 rounded-lg border border-gfg-border-medium p-4 text-left transition-all hover:border-gfg-green hover:bg-gfg-green-50 group ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     data-testid={`button - option - ${option.id} `}
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-gfg-border-medium text-sm font-medium text-gfg-text-light group-hover:border-gfg-green group-hover:text-gfg-green">
@@ -563,7 +590,7 @@ export function QuizPage() {
         </div>
       )}
 
-      {quizState === "results" && currentResult && currentMCQSet && (
+      {quizState === "results" && currentResult && (
         <div className="mx-auto w-full max-w-4xl">
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="h-full">
@@ -623,73 +650,118 @@ export function QuizPage() {
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Take Another Quiz
                 </Button>
+                <Button onClick={() => setLocation("/progress")} className="mt-2 w-full" variant="ghost">
+                  <BarChart2 className="mr-2 h-4 w-4" />
+                  Go to Progress Dashboard
+                </Button>
               </CardContent>
             </Card>
 
             <Card className="h-full overflow-hidden">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-gfg-text">
                   <BarChart2 className="h-5 w-5 text-gfg-green" />
                   Detailed Review
                 </CardTitle>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="review-filter" className="text-sm text-gfg-text-light">Show:</Label>
+                  <Select value={reviewFilter} onValueChange={(v: "all" | "incorrect") => setReviewFilter(v)}>
+                    <SelectTrigger id="review-filter" className="h-8 w-[120px] bg-white border-gfg-border-medium">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
+                      <SelectItem value="all">All Questions</SelectItem>
+                      <SelectItem value="incorrect">Incorrect Only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardHeader>
               <CardContent className="max-h-[500px] overflow-y-auto pr-2">
                 <div className="space-y-4">
-                  {(currentMCQSet.mcqs as any[]).map((mcq: any, idx: number) => {
-                    const answer = (currentResult.answers as any[])[idx];
-                    const correctOption = mcq.options.find((o: any) => o.isCorrect);
-                    const selectedOption = mcq.options.find((o: any) => o.id === answer?.selectedOptionId);
+                  {(() => {
+                    // Robustly get the MCQ set for review
+                    const reviewSet = currentMCQSet || mcqSets.find(s => s.id === currentResult.mcqSetId);
+                    if (!reviewSet) return <p className="text-center text-muted-foreground">Original questions not found.</p>;
 
-                    return (
-                      <div
-                        key={mcq.id}
-                        className={`rounded - lg border p - 4 transition - all ${answer?.isCorrect
-                          ? "border-gfg-green bg-gfg-green-50"
-                          : "border-red-200 bg-red-50"
-                          } `}
-                        data-testid={`review - ${mcq.id} `}
-                      >
-                        <div className="mb-2 flex items-start gap-2">
-                          {answer?.isCorrect ? (
-                            <Check className="mt-0.5 h-5 w-5 shrink-0 text-gfg-green" />
-                          ) : (
-                            <X className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-                          )}
-                          <p className="font-medium text-sm text-gfg-text">
-                            <span className="mr-2 font-bold text-gfg-text-light">Q{idx + 1}</span>
-                            {mcq.question}
-                          </p>
-                        </div>
-                        <div className="ml-7 space-y-2 text-sm">
-                          <div className="flex items-center gap-2 rounded bg-white border border-gfg-green/20 px-2 py-1">
-                            <Check className="h-3 w-3 text-gfg-green" />
-                            <span className="font-medium text-gfg-green">
-                              Correct: {correctOption?.text}
-                            </span>
+                    return (reviewSet.mcqs as any[])
+                      .filter((_, idx) => {
+                        if (reviewFilter === "all") return true;
+                        const answer = (currentResult.answers as any[])[idx];
+                        return !answer?.isCorrect;
+                      })
+                      .map((mcq: any, idx: number) => {
+                        // Find original index for question numbering
+                        const originalIdx = (reviewSet.mcqs as any[]).findIndex(m => m.id === mcq.id);
+                        const answer = (currentResult.answers as any[])[originalIdx];
+                        const correctOption = mcq.options.find((o: any) => o.isCorrect);
+                        const selectedOption = mcq.options.find((o: any) => o.id === answer?.selectedOptionId);
+
+                        return (
+                          <div
+                            key={mcq.id}
+                            className={`rounded - lg border p - 4 transition - all ${answer?.isCorrect
+                              ? "border-gfg-green bg-gfg-green-50"
+                              : "border-red-200 bg-red-50"
+                              } `}
+                            data-testid={`review - ${mcq.id} `}
+                          >
+                            <div className="mb-2 flex items-start gap-2">
+                              {answer?.isCorrect ? (
+                                <Check className="mt-0.5 h-5 w-5 shrink-0 text-gfg-green" />
+                              ) : (
+                                <X className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                              )}
+                              <p className="font-medium text-sm text-gfg-text">
+                                <span className="mr-2 font-bold text-gfg-text-light">Q{originalIdx + 1}</span>
+                                {mcq.question}
+                              </p>
+                              <div className="ml-auto flex items-center gap-2">
+                                {mcq.difficulty && (
+                                  <Badge variant="outline" className="capitalize text-xs">
+                                    {mcq.difficulty}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            <div className="ml-7 space-y-2 text-sm">
+                              <div className="flex items-center gap-2 rounded bg-white border border-gfg-green/20 px-2 py-1">
+                                <Check className="h-3 w-3 text-gfg-green" />
+                                <span className="font-medium text-gfg-green">
+                                  Correct: {correctOption?.text}
+                                </span>
+                              </div>
+                              {!answer?.isCorrect && selectedOption && (
+                                <div className="flex items-center gap-2 rounded bg-white border border-red-200 px-2 py-1">
+                                  <X className="h-3 w-3 text-red-600" />
+                                  <span className="font-medium text-red-600">
+                                    Your Answer: {selectedOption.text}
+                                  </span>
+                                </div>
+                              )}
+                              {!answer?.selectedOptionId && (
+                                <p className="text-gfg-text-light italic">Skipped / Time ran out</p>
+                              )}
+                              {mcq.explanation && (
+                                <div className="mt-2 rounded bg-white p-2 text-xs text-gfg-text-light border border-gfg-border-light">
+                                  <span className="font-bold text-gfg-text">Explanation:</span> {mcq.explanation}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          {!answer?.isCorrect && selectedOption && (
-                            <div className="flex items-center gap-2 rounded bg-white border border-red-200 px-2 py-1">
-                              <X className="h-3 w-3 text-red-600" />
-                              <span className="font-medium text-red-600">
-                                Your Answer: {selectedOption.text}
-                              </span>
-                            </div>
-                          )}
-                          {!answer?.selectedOptionId && (
-                            <p className="text-gfg-text-light italic">Skipped / Time ran out</p>
-                          )}
-                          {mcq.explanation && (
-                            <div className="mt-2 rounded bg-white p-2 text-xs text-gfg-text-light border border-gfg-border-light">
-                              <span className="font-bold text-gfg-text">Explanation:</span> {mcq.explanation}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                        );
+                      })
+                  })()}
                 </div>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      )}
+      {isSubmitting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-8 shadow-xl">
+            <Loader2 className="h-12 w-12 animate-spin text-gfg-green" />
+            <p className="text-lg font-medium text-gfg-text">Submitting Quiz...</p>
           </div>
         </div>
       )}

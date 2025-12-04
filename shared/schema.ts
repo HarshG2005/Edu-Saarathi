@@ -75,11 +75,13 @@ export type QuizAnswer = z.infer<typeof quizAnswerSchema>;
 // Users
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  displayName: text("display_name"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).omit({ id: true });
+export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 

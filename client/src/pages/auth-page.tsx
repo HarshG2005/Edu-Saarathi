@@ -39,14 +39,14 @@ export default function AuthPage() {
     }, [user, setLocation]);
 
     const formSchema = z.object({
-        username: z.string().min(2, "Username must be at least 2 characters"),
+        email: z.string().email("Please enter a valid email address"),
         password: z.string().min(6, "Password must be at least 6 characters"),
     });
 
     const loginForm = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: "",
+            email: "",
             password: "",
         },
     });
@@ -54,7 +54,7 @@ export default function AuthPage() {
     const registerForm = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: "",
+            email: "",
             password: "",
         },
     });
@@ -77,7 +77,7 @@ export default function AuthPage() {
                                 Welcome back
                             </CardTitle>
                             <CardDescription className="text-gfg-text-light dark:text-gfg-dark-muted">
-                                Sign in to EduQuest to continue learning
+                                Sign in to Edu Saarathi to continue learning
                             </CardDescription>
                         </div>
                     </CardHeader>
@@ -107,7 +107,7 @@ export default function AuthPage() {
                             <Form {...loginForm}>
                                 <form
                                     onSubmit={loginForm.handleSubmit((data) =>
-                                        loginMutation.mutate(data)
+                                        loginMutation.mutate(data as any)
                                     )}
                                     className="space-y-4"
                                 >
@@ -119,13 +119,13 @@ export default function AuthPage() {
                                     )}
                                     <FormField
                                         control={loginForm.control}
-                                        name="username"
+                                        name="email"
                                         render={({ field }) => (
                                             <FormItem className="space-y-1.5">
-                                                <FormLabel className="text-xs font-bold text-gfg-text dark:text-gfg-dark-text">Username</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-gfg-text dark:text-gfg-dark-text">Email</FormLabel>
                                                 <FormControl>
                                                     <Input
-                                                        placeholder="johndoe"
+                                                        placeholder="john@example.com"
                                                         {...field}
                                                         autoFocus
                                                         className="h-10"
@@ -208,7 +208,7 @@ export default function AuthPage() {
                             <Form {...registerForm}>
                                 <form
                                     onSubmit={registerForm.handleSubmit((data) =>
-                                        registerMutation.mutate(data)
+                                        registerMutation.mutate(data as any)
                                     )}
                                     className="space-y-4"
                                 >
@@ -220,13 +220,13 @@ export default function AuthPage() {
                                     )}
                                     <FormField
                                         control={registerForm.control}
-                                        name="username"
+                                        name="email"
                                         render={({ field }) => (
                                             <FormItem className="space-y-1.5">
-                                                <FormLabel className="text-xs font-bold text-gfg-text dark:text-gfg-dark-text">Username</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-gfg-text dark:text-gfg-dark-text">Email</FormLabel>
                                                 <FormControl>
                                                     <Input
-                                                        placeholder="johndoe"
+                                                        placeholder="john@example.com"
                                                         {...field}
                                                         className="h-10"
                                                     />

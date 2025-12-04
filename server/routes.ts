@@ -19,8 +19,8 @@ import {
   tutorChatRequestSchema,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { setupAuth } from "./auth";
 import { toSafeISO } from "./date-utils";
+import { requireAuth } from "./middleware/requireAuth";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -74,18 +74,9 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  setupAuth(app);
-
-  // Middleware to check if user is authenticated
-  const isAuthenticated = (req: any, res: any, next: any) => {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    res.status(401).send("Unauthorized");
-  };
 
   // Document Upload
-  app.post("/api/documents/upload", isAuthenticated, upload.single("file"), async (req, res) => {
+  app.post("/api/documents/upload", requireAuth, upload.single("file"), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -97,11 +88,7 @@ export async function registerRoutes(
       const { text, pageCount } = await extractTextFromPDF(req.file.buffer);
       const chunks = chunkText(text);
 
-      const userId = (req.user as any)?.id;
-      if (!userId) {
-        console.error("User ID missing in request:", req.user);
-        return res.status(401).json({ message: "User not authenticated correctly" });
-      }
+      const userId = req.user!.id;
 
       const pdfBase64 = req.file.buffer.toString("base64");
       console.log("DEBUG: PDF Base64 length:", pdfBase64.length);
@@ -131,10 +118,10 @@ export async function registerRoutes(
   });
 
   // Get all documents
-  app.get("/api/documents", async (req, res) => {
-    console.log("DEBUG: Getting docs for", (req.user as any)?.id);
+  app.get("/api/documents", requireAuth, async (req, res) => {
+    console.log("DEBUG: Getting docs for", req.user!.id);
     try {
-      const documents = await storage.getDocuments((req.user as any).id);
+      const documents = await storage.getDocuments(req.user!.id);
       // Don't send pdfData in list view to save bandwidth
       const docsWithoutPdf = documents.map(({ pdfData, ...rest }) => rest);
       res.json(docsWithoutPdf);
@@ -144,14 +131,14 @@ export async function registerRoutes(
   });
 
   // Get single document
-  app.get("/api/documents/:id", async (req, res) => {
+  app.get("/api/documents/:id", requireAuth, async (req, res) => {
     try {
       const document = await storage.getDocument(req.params.id);
       if (!document) {
         return res.status(404).json({ message: "Document not found" });
       }
 
-      if (document.userId !== (req.user as any).id) {
+      if (document.userId !== req.user!.id) {
         return res.status(403).json({ message: "Unauthorized" });
       }
 
@@ -162,7 +149,7 @@ export async function registerRoutes(
   });
 
   // Serve PDF file
-  app.get("/api/documents/:id/pdf", async (req, res) => {
+  app.get("/api/documents/:id/pdf", requireAuth, async (req, res) => {
     console.log("DEBUG: Fetching PDF for doc ID:", req.params.id);
     try {
       const document = await storage.getDocument(req.params.id);
@@ -178,7 +165,7 @@ export async function registerRoutes(
 
       console.log("DEBUG: Found PDF data, length:", document.pdfData.length);
 
-      if (document.userId !== (req.user as any).id) {
+      if (document.userId !== req.user!.id) {
         return res.status(403).json({ message: "Unauthorized" });
       }
 
@@ -193,14 +180,14 @@ export async function registerRoutes(
   });
 
   // Delete document
-  app.delete("/api/documents/:id", async (req, res) => {
+  app.delete("/api/documents/:id", requireAuth, async (req, res) => {
     try {
       const document = await storage.getDocument(req.params.id);
       if (!document) {
         return res.status(404).json({ message: "Document not found" });
       }
 
-      if (document.userId !== (req.user as any).id) {
+      if (document.userId !== req.user!.id) {
         return res.status(403).json({ message: "Unauthorized" });
       }
 
@@ -212,7 +199,7 @@ export async function registerRoutes(
   });
 
   // Generate MCQs
-  app.post("/api/mcq/generate", async (req, res) => {
+  app.post("/api/mcq/generate", requireAuth, async (req, res) => {
     try {
       const parsed = generateMCQRequestSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -241,7 +228,7 @@ export async function registerRoutes(
       const result = await generateMCQs(content, finalTopic, parseInt(count), difficulty, provider);
 
       const mcqSet = await storage.createMCQSet({
-        userId: (req.user as any).id,
+        userId: req.user!.id,
         documentId,
         topic: finalTopic,
         mcqs: result.mcqs.map((mcq) => ({
@@ -266,7 +253,7 @@ export async function registerRoutes(
   });
 
   // Generate Flashcards
-  app.post("/api/flashcards/generate", async (req, res) => {
+  app.post("/api/flashcards/generate", requireAuth, async (req, res) => {
     try {
       const parsed = generateFlashcardsRequestSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -295,7 +282,7 @@ export async function registerRoutes(
       const result = await generateFlashcards(content, finalTopic, count, provider);
 
       const flashcardSet = await storage.createFlashcardSet({
-        userId: (req.user as any).id,
+        userId: req.user!.id,
         documentId,
         topic: finalTopic,
         flashcards: result.flashcards.map((fc) => ({
@@ -315,7 +302,7 @@ export async function registerRoutes(
   });
 
   // Generate Summary
-  app.post("/api/summary/generate", async (req, res) => {
+  app.post("/api/summary/generate", requireAuth, async (req, res) => {
     try {
       const parsed = generateSummaryRequestSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -344,7 +331,7 @@ export async function registerRoutes(
       const result = await generateSummary(content, finalTopic, mode, bulletPoints || false, provider);
 
       const summary = await storage.createSummary({
-        userId: (req.user as any).id,
+        userId: req.user!.id,
         documentId,
         topic: finalTopic,
         mode,
@@ -362,7 +349,7 @@ export async function registerRoutes(
   });
 
   // Generate Mindmap
-  app.post("/api/mindmap/generate", async (req, res) => {
+  app.post("/api/mindmap/generate", requireAuth, async (req, res) => {
     try {
       const parsed = generateMindmapRequestSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -391,7 +378,7 @@ export async function registerRoutes(
       const result = await generateMindmap(content, finalTopic, provider);
 
       const mindmap = await storage.createMindmap({
-        userId: (req.user as any).id,
+        userId: req.user!.id,
         documentId,
         topic: finalTopic,
         nodes: result.nodes.map((node) => ({
@@ -417,7 +404,7 @@ export async function registerRoutes(
   });
 
   // Generate Notes
-  app.post("/api/notes/generate", async (req, res) => {
+  app.post("/api/notes/generate", requireAuth, async (req, res) => {
     try {
       const parsed = generateNotesRequestSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -446,7 +433,7 @@ export async function registerRoutes(
       const result = await generateNotes(content, finalTopic, provider);
 
       const notes = await storage.createNotes({
-        userId: (req.user as any).id,
+        userId: req.user!.id,
         documentId,
         topic: finalTopic,
         keyPoints: result.keyPoints,
@@ -464,7 +451,7 @@ export async function registerRoutes(
   });
 
   // Tutor Chat
-  app.post("/api/tutor/chat", async (req, res) => {
+  app.post("/api/tutor/chat", requireAuth, async (req, res) => {
     try {
       const parsed = tutorChatRequestSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -508,7 +495,7 @@ export async function registerRoutes(
         });
       } else {
         session = await storage.createChatSession({
-          userId: (req.user as any).id,
+          userId: req.user!.id,
           documentId,
           messages: [userMessage, assistantMessage],
           createdAt: new Date(),
@@ -523,16 +510,12 @@ export async function registerRoutes(
   });
 
   // Quiz Results
-  app.post("/api/quiz/results", async (req, res) => {
+  app.post("/api/quiz/results", requireAuth, async (req, res) => {
     try {
-      if (!req.user) {
-        throw new Error("User not authenticated");
-      }
-
       const result = await storage.createQuizResult({
         ...req.body,
         completedAt: req.body.completedAt ? new Date(req.body.completedAt) : new Date(),
-        userId: (req.user as any).id,
+        userId: req.user!.id,
       });
       res.json(result);
     } catch (error: any) {
@@ -540,9 +523,9 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/quiz/results", async (req, res) => {
+  app.get("/api/quiz/results", requireAuth, async (req, res) => {
     try {
-      const results = await storage.getQuizResults((req.user as any).id);
+      const results = await storage.getQuizResults(req.user!.id);
       res.json(results);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to get quiz results" });
@@ -550,9 +533,9 @@ export async function registerRoutes(
   });
 
   // Stats Endpoint
-  app.get("/api/stats", async (req, res) => {
+  app.get("/api/stats", requireAuth, async (req, res) => {
     try {
-      const userId = (req.user as any).id;
+      const userId = req.user!.id;
       const { documentId, range } = req.query;
 
       const [quizResults, mcqSets, flashcardSets, highlights, userNotes, userFlashcards] = await Promise.all([
@@ -623,7 +606,7 @@ export async function registerRoutes(
         acc + s.flashcards.filter(c => c.mastered).length, 0
       );
 
-      const studyTime = filteredQuizResults.reduce((acc, r) => acc + (r.timeTaken || 0), 0) / 60; // Minutes
+      const studyTime = (filteredQuizResults.reduce((acc, r) => acc + (r.timeTaken || 0), 0) / 60) + (totalFlashcards * 0.5); // Minutes (Quizzes + 30s per flashcard)
 
       // Calculate Streak
       const activityDates = new Set<string>();
@@ -725,12 +708,11 @@ export async function registerRoutes(
   });
 
   // Highlights
-  app.post("/api/documents/:id/highlights", async (req, res) => {
+  app.post("/api/documents/:id/highlights", requireAuth, async (req, res) => {
     try {
-      if (!req.user) return res.status(401).send("Unauthorized");
       const highlight = await storage.createHighlight({
         ...req.body,
-        userId: (req.user as any).id,
+        userId: req.user!.id,
         documentId: req.params.id,
         createdAt: new Date(),
       });
@@ -740,9 +722,8 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/documents/:id/highlights", async (req, res) => {
+  app.get("/api/documents/:id/highlights", requireAuth, async (req, res) => {
     try {
-      if (!req.user) return res.status(401).send("Unauthorized");
       const highlights = await storage.getHighlights(req.params.id);
       res.json(highlights);
     } catch (error: any) {
@@ -750,9 +731,8 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/highlights/:id", async (req, res) => {
+  app.delete("/api/highlights/:id", requireAuth, async (req, res) => {
     try {
-      if (!req.user) return res.status(401).send("Unauthorized");
       await storage.deleteHighlight(req.params.id);
       res.json({ success: true });
     } catch (error: any) {
@@ -761,12 +741,11 @@ export async function registerRoutes(
   });
 
   // User Notes
-  app.post("/api/user-notes", async (req, res) => {
+  app.post("/api/user-notes", requireAuth, async (req, res) => {
     try {
-      if (!req.user) return res.status(401).send("Unauthorized");
       const note = await storage.createUserNote({
         ...req.body,
-        userId: (req.user as any).id,
+        userId: req.user!.id,
         createdAt: new Date(),
       });
       res.json(note);
@@ -775,9 +754,8 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/documents/:id/user-notes", async (req, res) => {
+  app.get("/api/documents/:id/user-notes", requireAuth, async (req, res) => {
     try {
-      if (!req.user) return res.status(401).send("Unauthorized");
       const notes = await storage.getUserNotes(req.params.id);
       res.json(notes);
     } catch (error: any) {
@@ -786,12 +764,11 @@ export async function registerRoutes(
   });
 
   // User Flashcards
-  app.post("/api/user-flashcards", async (req, res) => {
+  app.post("/api/user-flashcards", requireAuth, async (req, res) => {
     try {
-      if (!req.user) return res.status(401).send("Unauthorized");
       const flashcard = await storage.createUserFlashcard({
         ...req.body,
-        userId: (req.user as any).id,
+        userId: req.user!.id,
         createdAt: new Date(),
       });
       res.json(flashcard);
@@ -800,17 +777,14 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/documents/:id/user-flashcards", async (req, res) => {
+  app.get("/api/documents/:id/user-flashcards", requireAuth, async (req, res) => {
     try {
-      if (!req.user) return res.status(401).send("Unauthorized");
       const flashcards = await storage.getUserFlashcards(req.params.id);
       res.json(flashcards);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to get flashcards" });
     }
   });
-
-
 
   return httpServer;
 }

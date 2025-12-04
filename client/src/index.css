@@ -97,4 +97,21 @@
   .gfg-card-hover {
     @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
   }
+
+  /* 3D Transform Utilities for Flashcards */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
 }

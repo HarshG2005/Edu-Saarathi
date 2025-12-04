@@ -85,12 +85,23 @@ function App() {
 }
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
   const style = {
     "--sidebar-width": "16rem",
     "--sidebar-width-icon": "3rem",
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gfg-bg dark:bg-gfg-dark-bg">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gfg-green border-t-transparent dark:border-gfg-green-light dark:border-t-transparent" />
+          <p className="text-gfg-text-light dark:text-gfg-dark-muted animate-pulse">Loading Edu Saarathi...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Switch>

@@ -264,14 +264,14 @@ export function FlashcardsPage() {
                   >
                     {/* Front */}
                     <div className="absolute inset-0 backface-hidden">
-                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-2 border-gfg-green dark:border-gfg-green-light bg-white dark:bg-gfg-dark-card shadow-lg">
-                        <div className="absolute top-4 left-4 text-xs font-bold text-gfg-green dark:text-gfg-green-light uppercase tracking-wider">
+                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 bg-gradient-to-br from-[#FF9A9E] to-[#FECFEF] dark:from-[#FF9A9E] dark:to-[#FECFEF] shadow-lg">
+                        <div className="absolute top-4 left-4 text-xs font-bold text-white/80 uppercase tracking-wider">
                           Question
                         </div>
-                        <p className="text-2xl font-medium leading-relaxed text-gfg-text dark:text-gfg-dark-text">
+                        <p className="text-2xl font-medium leading-relaxed text-white drop-shadow-sm">
                           {(currentSet.flashcards as Flashcard[])[currentIndex].front}
                         </p>
-                        <div className="absolute bottom-4 text-xs text-gfg-text-light dark:text-gfg-dark-muted flex items-center gap-2">
+                        <div className="absolute bottom-4 text-xs text-white/80 flex items-center gap-2">
                           <RotateCw className="h-3 w-3" />
                           Click to flip
                         </div>
@@ -280,11 +280,11 @@ export function FlashcardsPage() {
 
                     {/* Back */}
                     <div className="absolute inset-0 backface-hidden rotate-y-180">
-                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 shadow-lg bg-gfg-green dark:bg-gfg-green-cta text-white">
+                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 shadow-lg bg-gradient-to-br from-[#a18cd1] to-[#fbc2eb] dark:from-[#a18cd1] dark:to-[#fbc2eb] text-white">
                         <div className="absolute top-4 left-4 text-xs font-bold text-white/80 uppercase tracking-wider">
                           Answer
                         </div>
-                        <p className="text-xl leading-relaxed text-white">
+                        <p className="text-xl leading-relaxed text-white drop-shadow-sm">
                           {(currentSet.flashcards as Flashcard[])[currentIndex].back}
                         </p>
                       </Card>
