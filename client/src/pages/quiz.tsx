@@ -3,7 +3,7 @@ import { useLocation, Link } from "wouter";
 import { HelpCircle, Play, Clock, Check, X, Trophy, RotateCcw, ChevronRight, BarChart2, Loader2, Sparkles, Settings } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getStoredProvider } from "@/pages/settings";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getGradient } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -303,27 +303,27 @@ export function QuizPage() {
   };
 
   const getScoreColor = (percentage: number) => {
-    if (percentage >= 80) return "text-gfg-green bg-gfg-green-50 dark:bg-gfg-green-900/20 border-gfg-green";
-    if (percentage >= 60) return "text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-900/30";
-    return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900/30";
+    if (percentage >= 80) return "text-green-400 bg-green-500/10 border-green-500/50";
+    if (percentage >= 60) return "text-yellow-400 bg-yellow-500/10 border-yellow-500/50";
+    return "text-red-400 bg-red-500/10 border-red-500/50";
   };
 
   const getChartData = (result: QuizResult) => [
-    { name: "Correct", value: result.score, color: "#2F8D46" }, // GFG Green
+    { name: "Correct", value: result.score, color: "#4ade80" }, // Green 400
     { name: "Incorrect", value: result.totalQuestions - result.score, color: "#ef4444" },
   ];
 
   return (
     <Section className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold text-gfg-text" data-testid="text-page-title">Quiz Mode</h1>
-        <p className="text-gfg-text-light">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-teal-300 bg-clip-text text-transparent" data-testid="text-page-title">Quiz Mode</h1>
+        <p className="text-gray-400">
           Test your knowledge with timed or untimed quizzes
         </p>
       </div>
       <div className="flex justify-end">
         <Link href="/settings">
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="border-white/10 text-gray-400 hover:bg-white/5 hover:text-white">
             <Settings className="h-4 w-4" />
           </Button>
         </Link>
@@ -331,18 +331,18 @@ export function QuizPage() {
 
       {quizState === "setup" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
+          <Card className="bg-[#0b0f12] border-white/10">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gfg-text">
-                <HelpCircle className="h-5 w-5 text-gfg-green" />
+              <CardTitle className="flex items-center gap-2 text-white">
+                <HelpCircle className="h-5 w-5 text-green-400" />
                 Start a Quiz
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <Tabs value={setupTab} onValueChange={(v) => setSetupTab(v as "existing" | "generate")}>
-                <TabsList className="grid w-full grid-cols-2 bg-gfg-bg-card dark:bg-gfg-dark-bg border border-gfg-border-light dark:border-gfg-dark-border">
-                  <TabsTrigger value="existing" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white">Select Existing</TabsTrigger>
-                  <TabsTrigger value="generate" className="data-[state=active]:bg-gfg-green data-[state=active]:text-white">
+                <TabsList className="grid w-full grid-cols-2 bg-white/5 border border-white/5">
+                  <TabsTrigger value="existing" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400">Select Existing</TabsTrigger>
+                  <TabsTrigger value="generate" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400">
                     <Sparkles className="mr-2 h-4 w-4" />
                     Generate New
                   </TabsTrigger>
@@ -350,19 +350,19 @@ export function QuizPage() {
 
                 <TabsContent value="existing" className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="mcq-set" className="text-gfg-text">Select MCQ Set</Label>
+                    <Label htmlFor="mcq-set" className="text-white">Select MCQ Set</Label>
                     <Select value={selectedSetId} onValueChange={setSelectedSetId}>
-                      <SelectTrigger id="mcq-set" className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light" data-testid="select-mcq-set">
+                      <SelectTrigger id="mcq-set" className="bg-white/5 border-white/10 text-white" data-testid="select-mcq-set">
                         <SelectValue placeholder="Choose an MCQ set to quiz on" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
+                      <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
                         {mcqSets.length === 0 ? (
                           <SelectItem value="empty" disabled>
                             No MCQ sets available - generate some first!
                           </SelectItem>
                         ) : (
                           mcqSets.slice().reverse().slice(0, 5).map((set) => (
-                            <SelectItem key={set.id} value={set.id}>
+                            <SelectItem key={set.id} value={set.id} className="hover:bg-white/5 cursor-pointer">
                               {set.topic || "MCQ Set"} ({(set.mcqs as any[]).length} questions) - {formatDate(set.createdAt)}
                             </SelectItem>
                           ))
@@ -374,8 +374,7 @@ export function QuizPage() {
                   <Button
                     onClick={startQuiz}
                     disabled={!selectedSetId || mcqSets.length === 0}
-                    className="w-full"
-                    variant="cta"
+                    className="w-full bg-green-600 hover:bg-green-500 text-white"
                     data-testid="button-start-quiz"
                   >
                     <Play className="mr-2 h-4 w-4" />
@@ -385,17 +384,17 @@ export function QuizPage() {
 
                 <TabsContent value="generate" className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="gen-doc" className="text-gfg-text">Source Document (Optional)</Label>
+                    <Label htmlFor="gen-doc" className="text-white">Source Document (Optional)</Label>
                     <Select value={genDocId} onValueChange={setGenDocId}>
-                      <SelectTrigger id="gen-doc" className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
+                      <SelectTrigger id="gen-doc" className="bg-white/5 border-white/10 text-white">
                         <SelectValue placeholder="Or enter a topic below" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
-                        <SelectItem value="none">No document - use topic only</SelectItem>
+                      <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                        <SelectItem value="none" className="hover:bg-white/5 cursor-pointer">No document - use topic only</SelectItem>
                         {[...documents]
                           .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
                           .map((doc) => (
-                            <SelectItem key={doc.id} value={doc.id}>
+                            <SelectItem key={doc.id} value={doc.id} className="hover:bg-white/5 cursor-pointer">
                               {doc.name}
                             </SelectItem>
                           ))}
@@ -404,41 +403,41 @@ export function QuizPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="gen-topic" className="text-gfg-text">Topic</Label>
+                    <Label htmlFor="gen-topic" className="text-white">Topic</Label>
                     <Input
                       id="gen-topic"
                       placeholder="e.g., Machine Learning, Solar System, Web Development"
                       value={genTopic}
                       onChange={(e) => setGenTopic(e.target.value)}
-                      className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-gfg-text">Question Count</Label>
+                      <Label className="text-white">Question Count</Label>
                       <Select value={genCount} onValueChange={(v) => setGenCount(v as "5" | "10" | "20")}>
-                        <SelectTrigger className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
+                        <SelectTrigger className="bg-white/5 border-white/10 text-white">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
-                          <SelectItem value="5">5 questions</SelectItem>
-                          <SelectItem value="10">10 questions</SelectItem>
-                          <SelectItem value="20">20 questions</SelectItem>
+                        <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                          <SelectItem value="5" className="hover:bg-white/5 cursor-pointer">5 questions</SelectItem>
+                          <SelectItem value="10" className="hover:bg-white/5 cursor-pointer">10 questions</SelectItem>
+                          <SelectItem value="20" className="hover:bg-white/5 cursor-pointer">20 questions</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-gfg-text">Difficulty</Label>
+                      <Label className="text-white">Difficulty</Label>
                       <Select value={genDifficulty} onValueChange={(v) => setGenDifficulty(v as "easy" | "medium" | "hard")}>
-                        <SelectTrigger className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
+                        <SelectTrigger className="bg-white/5 border-white/10 text-white">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
-                          <SelectItem value="easy">Easy</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="hard">Hard</SelectItem>
+                        <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                          <SelectItem value="easy" className="hover:bg-white/5 cursor-pointer">Easy</SelectItem>
+                          <SelectItem value="medium" className="hover:bg-white/5 cursor-pointer">Medium</SelectItem>
+                          <SelectItem value="hard" className="hover:bg-white/5 cursor-pointer">Hard</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -447,8 +446,7 @@ export function QuizPage() {
                   <Button
                     onClick={() => generateMCQsMutation.mutate()}
                     disabled={generateMCQsMutation.isPending || (!hasDocumentSelected && !genTopic)}
-                    className="w-full"
-                    variant="cta"
+                    className="w-full bg-green-600 hover:bg-green-500 text-white"
                   >
                     {generateMCQsMutation.isPending ? (
                       <>
@@ -465,12 +463,12 @@ export function QuizPage() {
                 </TabsContent>
               </Tabs>
 
-              <div className="flex items-center justify-between rounded-lg border border-gfg-border-light dark:border-gfg-dark-border bg-gray-50 dark:bg-gfg-dark-bg p-4">
+              <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4">
                 <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-gfg-text-light" />
+                  <Clock className="h-5 w-5 text-gray-400" />
                   <div>
-                    <Label htmlFor="timed-mode" className="text-gfg-text">Timed Mode</Label>
-                    <p className="text-xs text-gfg-text-light">
+                    <Label htmlFor="timed-mode" className="text-white">Timed Mode</Label>
+                    <p className="text-xs text-gray-400">
                       Set a time limit per question
                     </p>
                   </div>
@@ -480,26 +478,26 @@ export function QuizPage() {
                   checked={timedMode}
                   onCheckedChange={setTimedMode}
                   data-testid="switch-timed-mode"
-                  className="data-[state=checked]:bg-gfg-green"
+                  className="data-[state=checked]:bg-green-500"
                 />
               </div>
 
               {timedMode && (
                 <div className="space-y-2">
-                  <Label className="text-gfg-text">Seconds per Question</Label>
+                  <Label className="text-white">Seconds per Question</Label>
                   <Select
                     value={timePerQuestion.toString()}
                     onValueChange={(v) => setTimePerQuestion(parseInt(v))}
                   >
-                    <SelectTrigger data-testid="select-time" className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
+                    <SelectTrigger data-testid="select-time" className="bg-white/5 border-white/10 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
-                      <SelectItem value="15">15 seconds</SelectItem>
-                      <SelectItem value="30">30 seconds</SelectItem>
-                      <SelectItem value="45">45 seconds</SelectItem>
-                      <SelectItem value="60">60 seconds</SelectItem>
-                      <SelectItem value="90">90 seconds</SelectItem>
+                    <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                      <SelectItem value="15" className="hover:bg-white/5 cursor-pointer">15 seconds</SelectItem>
+                      <SelectItem value="30" className="hover:bg-white/5 cursor-pointer">30 seconds</SelectItem>
+                      <SelectItem value="45" className="hover:bg-white/5 cursor-pointer">45 seconds</SelectItem>
+                      <SelectItem value="60" className="hover:bg-white/5 cursor-pointer">60 seconds</SelectItem>
+                      <SelectItem value="90" className="hover:bg-white/5 cursor-pointer">90 seconds</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -508,10 +506,10 @@ export function QuizPage() {
           </Card>
 
           {quizResults.length > 0 && (
-            <Card className="dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
+            <Card className="bg-[#0b0f12] border-white/10">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gfg-text">
-                  <Trophy className="h-5 w-5 text-gfg-green" />
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Trophy className="h-5 w-5 text-green-400" />
                   Recent Results
                 </CardTitle>
               </CardHeader>
@@ -521,22 +519,49 @@ export function QuizPage() {
                     .slice()
                     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
                     .slice(0, 5)
-                    .map((result) => (
+                    .map((result, index) => (
                       <div
                         key={result.id}
-                        className="flex items-center justify-between rounded-lg border border-gfg-border-light dark:border-gfg-dark-border p-3 bg-white dark:bg-gfg-dark-bg hover:shadow-md transition-all cursor-pointer hover:border-gfg-green/50"
+                        className="group relative overflow-hidden rounded-xl transition-all hover:scale-[1.02] cursor-pointer"
                         onClick={() => handleViewResult(result)}
-                        data-testid={`result - ${result.id} `}
+                        data-testid={`result-${result.id}`}
                       >
-                        <div>
-                          <p className="font-medium text-gfg-text">{result.topic}</p>
-                          <p className="text-sm text-gfg-text-light">
-                            {result.score}/{result.totalQuestions} correct
-                            {result.timeTaken && ` • ${formatTime(result.timeTaken)} `}
-                          </p>
+                        {/* Gradient header/background */}
+                        <div className={`p-4 bg-gradient-to-br ${getGradient(index)}`}>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm text-white">
+                                <Trophy className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-white line-clamp-1">{result.topic}</p>
+                                <p className="text-xs text-white/80">
+                                  {formatDate(result.completedAt)}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-sm font-bold text-white shadow-sm">
+                              {result.percentage}%
+                            </div>
+                          </div>
                         </div>
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${getScoreColor(result.percentage)}`}>
-                          {result.percentage}%
+
+                        {/* Card Body */}
+                        <div className="bg-neutral-900 p-4 border border-white/5 border-t-0 group-hover:border-white/10">
+                          <div className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-4 text-gray-400">
+                              <span>{result.score}/{result.totalQuestions} correct</span>
+                              {result.timeTaken && (
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {formatTime(result.timeTaken)}
+                                </span>
+                              )}
+                            </div>
+                            <Button variant="ghost" size="sm" className="h-auto p-0 text-green-400 hover:text-green-300 hover:bg-transparent">
+                              View Details &rarr;
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -550,7 +575,7 @@ export function QuizPage() {
       {quizState === "active" && currentMCQ && currentMCQSet && (
         <div className="mx-auto w-full max-w-2xl">
           <div className="mb-6 flex items-center justify-between">
-            <Badge variant="outline" className="text-gfg-text border-gfg-border-medium dark:border-gfg-dark-border bg-white dark:bg-gfg-dark-card">
+            <Badge variant="outline" className="text-white border-white/10 bg-white/5">
               Question {currentIndex + 1} of {(currentMCQSet.mcqs as any[]).length}
             </Badge>
             {timedMode && (
@@ -566,12 +591,12 @@ export function QuizPage() {
 
           <Progress
             value={(currentIndex / (currentMCQSet.mcqs as any[]).length) * 100}
-            className="mb-6 h-2 bg-gray-200"
+            className="mb-6 h-2 bg-white/10"
           />
 
-          <Card className="mb-6 border-gfg-border-light dark:border-gfg-dark-border shadow-md dark:bg-gfg-dark-card">
+          <Card className="mb-6 border-white/10 shadow-md bg-[#0b0f12]">
             <CardContent className="p-6">
-              <p className="mb-6 text-lg leading-relaxed text-gfg-text font-medium" data-testid="text-question">
+              <p className="mb-6 text-lg leading-relaxed text-white font-medium" data-testid="text-question">
                 {currentMCQ.question}
               </p>
 
@@ -581,14 +606,14 @@ export function QuizPage() {
                     key={option.id}
                     onClick={() => handleAnswer(option.id)}
                     disabled={isSubmitting}
-                    className={`flex w-full items-center gap-3 rounded-lg border border-gfg-border-medium dark:border-gfg-dark-border p-4 text-left transition-all hover:border-gfg-green hover:bg-gfg-green-50 dark:hover:bg-gfg-green-900/20 group ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`flex w-full items-center gap-3 rounded-lg border border-white/10 p-4 text-left transition-all hover:border-green-500 hover:bg-green-500/10 group ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     data-testid={`button - option - ${option.id} `}
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-gfg-border-medium dark:border-gfg-dark-border text-sm font-medium text-gfg-text-light group-hover:border-gfg-green group-hover:text-gfg-green">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white/10 text-sm font-medium text-gray-400 group-hover:border-green-500 group-hover:text-green-400">
                       {String.fromCharCode(65 + idx)}
                     </div>
-                    <span className="flex-1 text-gfg-text">{option.text}</span>
-                    <ChevronRight className="h-5 w-5 text-gfg-text-light group-hover:text-gfg-green" />
+                    <span className="flex-1 text-white">{option.text}</span>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-green-400" />
                   </button>
                 ))}
               </div>
@@ -600,9 +625,9 @@ export function QuizPage() {
       {quizState === "results" && currentResult && (
         <div className="mx-auto w-full max-w-4xl">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="h-full dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
+            <Card className="h-full bg-[#0b0f12] border-white/10">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gfg-text">
+                <CardTitle className="flex items-center gap-2 text-white">
                   <Trophy className="h-5 w-5 text-yellow-500" />
                   Performance Summary
                 </CardTitle>
@@ -629,56 +654,56 @@ export function QuizPage() {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center">
-                    <p className="text-3xl font-bold text-gfg-text">{currentResult.percentage}%</p>
-                    <p className="text-xs text-gfg-text-light">Score</p>
+                    <p className="text-3xl font-bold text-white">{currentResult.percentage}%</p>
+                    <p className="text-xs text-gray-400">Score</p>
                   </div>
                 </div>
 
                 <div className="mt-6 grid w-full grid-cols-3 gap-4 text-center">
-                  <div className="rounded-lg bg-gfg-green-50 dark:bg-gfg-green-900/20 p-3 border border-gfg-green/20">
-                    <p className="text-2xl font-bold text-gfg-green">{currentResult.score}</p>
-                    <p className="text-xs text-gfg-text-light">Correct</p>
+                  <div className="rounded-lg bg-green-500/10 p-3 border border-green-500/20">
+                    <p className="text-2xl font-bold text-green-400">{currentResult.score}</p>
+                    <p className="text-xs text-gray-400">Correct</p>
                   </div>
-                  <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 border border-red-200 dark:border-red-900/30">
-                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                  <div className="rounded-lg bg-red-500/10 p-3 border border-red-500/20">
+                    <p className="text-2xl font-bold text-red-400">
                       {currentResult.totalQuestions - currentResult.score}
                     </p>
                     <p className="text-xs text-muted-foreground">Incorrect</p>
                   </div>
-                  <div className="rounded-lg bg-gray-50 dark:bg-gfg-dark-bg p-3 border border-gray-200 dark:border-gfg-dark-border">
-                    <p className="text-2xl font-bold text-gfg-text">
+                  <div className="rounded-lg bg-white/5 p-3 border border-white/10">
+                    <p className="text-2xl font-bold text-white">
                       {currentResult.timeTaken ? formatTime(currentResult.timeTaken) : "--:--"}
                     </p>
-                    <p className="text-xs text-gfg-text-light">Time Taken</p>
+                    <p className="text-xs text-gray-400">Time Taken</p>
                   </div>
                 </div>
 
-                <Button onClick={resetQuiz} className="mt-6 w-full" variant="outline" data-testid="button-try-again">
+                <Button onClick={resetQuiz} className="mt-6 w-full border-white/10 text-white hover:bg-white/5" variant="outline" data-testid="button-try-again">
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Take Another Quiz
                 </Button>
-                <Button onClick={() => setLocation("/progress")} className="mt-2 w-full" variant="ghost">
+                <Button onClick={() => setLocation("/progress")} className="mt-2 w-full text-gray-400 hover:text-white hover:bg-white/5" variant="ghost">
                   <BarChart2 className="mr-2 h-4 w-4" />
                   Go to Progress Dashboard
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="h-full overflow-hidden dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
+            <Card className="h-full overflow-hidden bg-[#0b0f12] border-white/10">
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-gfg-text">
-                  <BarChart2 className="h-5 w-5 text-gfg-green" />
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <BarChart2 className="h-5 w-5 text-green-400" />
                   Detailed Review
                 </CardTitle>
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="review-filter" className="text-sm text-gfg-text-light">Show:</Label>
+                  <Label htmlFor="review-filter" className="text-sm text-gray-400">Show:</Label>
                   <Select value={reviewFilter} onValueChange={(v: "all" | "incorrect") => setReviewFilter(v)}>
-                    <SelectTrigger id="review-filter" className="h-8 w-[120px] bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light">
+                    <SelectTrigger id="review-filter" className="h-8 w-[120px] bg-white/5 border-white/10 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
-                      <SelectItem value="all">All Questions</SelectItem>
-                      <SelectItem value="incorrect">Incorrect Only</SelectItem>
+                    <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                      <SelectItem value="all" className="hover:bg-white/5 cursor-pointer">All Questions</SelectItem>
+                      <SelectItem value="incorrect" className="hover:bg-white/5 cursor-pointer">Incorrect Only</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -707,50 +732,50 @@ export function QuizPage() {
                           <div
                             key={mcq.id}
                             className={`rounded - lg border p - 4 transition - all ${answer?.isCorrect
-                              ? "border-gfg-green bg-gfg-green-50 dark:bg-gfg-green-900/20"
-                              : "border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/20"
+                              ? "border-green-500/50 bg-green-500/10"
+                              : "border-red-500/50 bg-red-500/10"
                               } `}
                             data-testid={`review - ${mcq.id} `}
                           >
                             <div className="mb-2 flex items-start gap-2">
                               {answer?.isCorrect ? (
-                                <Check className="mt-0.5 h-5 w-5 shrink-0 text-gfg-green" />
+                                <Check className="mt-0.5 h-5 w-5 shrink-0 text-green-400" />
                               ) : (
-                                <X className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                                <X className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
                               )}
-                              <p className="font-medium text-sm text-gfg-text">
-                                <span className="mr-2 font-bold text-gfg-text-light">Q{originalIdx + 1}</span>
+                              <p className="font-medium text-sm text-white">
+                                <span className="mr-2 font-bold text-gray-400">Q{originalIdx + 1}</span>
                                 {mcq.question}
                               </p>
                               <div className="ml-auto flex items-center gap-2">
                                 {mcq.difficulty && (
-                                  <Badge variant="outline" className="capitalize text-xs">
+                                  <Badge variant="outline" className="capitalize text-xs border-white/10 text-gray-400">
                                     {mcq.difficulty}
                                   </Badge>
                                 )}
                               </div>
                             </div>
                             <div className="ml-7 space-y-2 text-sm">
-                              <div className="flex items-center gap-2 rounded bg-white dark:bg-gfg-dark-bg border border-gfg-green/20 px-2 py-1">
-                                <Check className="h-3 w-3 text-gfg-green" />
-                                <span className="font-medium text-gfg-green">
+                              <div className="flex items-center gap-2 rounded bg-white/5 border border-green-500/20 px-2 py-1">
+                                <Check className="h-3 w-3 text-green-400" />
+                                <span className="font-medium text-green-400">
                                   Correct: {correctOption?.text}
                                 </span>
                               </div>
                               {!answer?.isCorrect && selectedOption && (
-                                <div className="flex items-center gap-2 rounded bg-white border border-red-200 px-2 py-1">
-                                  <X className="h-3 w-3 text-red-600" />
-                                  <span className="font-medium text-red-600">
+                                <div className="flex items-center gap-2 rounded bg-white/5 border border-red-500/20 px-2 py-1">
+                                  <X className="h-3 w-3 text-red-400" />
+                                  <span className="font-medium text-red-400">
                                     Your Answer: {selectedOption.text}
                                   </span>
                                 </div>
                               )}
                               {!answer?.selectedOptionId && (
-                                <p className="text-gfg-text-light italic">Skipped / Time ran out</p>
+                                <p className="text-gray-400 italic">Skipped / Time ran out</p>
                               )}
                               {mcq.explanation && (
-                                <div className="mt-2 rounded bg-white dark:bg-gfg-dark-bg p-2 text-xs text-gfg-text-light border border-gfg-border-light dark:border-gfg-dark-border">
-                                  <span className="font-bold text-gfg-text">Explanation:</span> {mcq.explanation}
+                                <div className="mt-2 rounded bg-white/5 p-2 text-xs text-gray-400 border border-white/10">
+                                  <span className="font-bold text-white">Explanation:</span> {mcq.explanation}
                                 </div>
                               )}
                             </div>
@@ -766,9 +791,9 @@ export function QuizPage() {
       )}
       {isSubmitting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-4 rounded-lg bg-white dark:bg-gfg-dark-card p-8 shadow-xl border border-gfg-border-light dark:border-gfg-dark-border">
-            <Loader2 className="h-12 w-12 animate-spin text-gfg-green" />
-            <p className="text-lg font-medium text-gfg-text">Submitting Quiz...</p>
+          <div className="flex flex-col items-center gap-4 rounded-lg bg-[#0b0f12] p-8 shadow-xl border border-white/10">
+            <Loader2 className="h-12 w-12 animate-spin text-green-500" />
+            <p className="text-lg font-medium text-white">Submitting Quiz...</p>
           </div>
         </div>
       )}

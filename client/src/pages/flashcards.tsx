@@ -24,6 +24,7 @@ import type { FlashcardSet, Flashcard } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
 import { Settings } from "lucide-react";
 import { getStoredProvider } from "@/pages/settings";
+import { getGradient } from "@/lib/utils";
 
 export function FlashcardsPage() {
   const { documents, currentDocumentId, flashcardSets, addFlashcardSet } = useAppStore();
@@ -151,20 +152,20 @@ export function FlashcardsPage() {
     <Section className="flex flex-col gap-6">
       <div className="flex items-start justify-between shrink-0">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight text-gfg-text dark:text-gfg-dark-text" data-testid="text-page-title">Flashcards</h1>
-          <p className="text-gfg-text-light dark:text-gfg-dark-muted text-base">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-teal-300 bg-clip-text text-transparent" data-testid="text-page-title">Flashcards</h1>
+          <p className="text-gray-300 text-base">
             Master concepts through active recall and spaced repetition
           </p>
         </div>
         <div className="flex gap-2">
           <Link href="/flashcards/smart-review">
-            <Button variant="outline" className="gap-2 border-gfg-green text-gfg-green hover:bg-gfg-green/10">
+            <Button variant="outline" className="gap-2 border-green-500/50 text-green-400 hover:bg-green-500/10 hover:text-green-300">
               <Sparkles className="h-4 w-4" />
               Try Smart Review Mode
             </Button>
           </Link>
           <Link href="/settings">
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" className="border-white/10 text-gray-400 hover:bg-white/5 hover:text-white">
               <Settings className="h-4 w-4" />
             </Button>
           </Link>
@@ -172,50 +173,50 @@ export function FlashcardsPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "study")} className="flex-1 flex flex-col min-h-0">
-        <div className="flex items-center justify-between border-b border-gfg-border dark:border-gfg-dark-border pb-2 shrink-0">
-          <TabsList className="bg-gfg-bg-card dark:bg-gfg-dark-card p-1 h-9 border border-gfg-border dark:border-gfg-dark-border">
-            <TabsTrigger value="generate" className="px-4 text-xs data-[state=active]:bg-gfg-green data-[state=active]:text-white dark:data-[state=active]:bg-gfg-green-cta" data-testid="tab-generate">Generate</TabsTrigger>
-            <TabsTrigger value="study" className="px-4 text-xs data-[state=active]:bg-gfg-green data-[state=active]:text-white dark:data-[state=active]:bg-gfg-green-cta" data-testid="tab-study" disabled={!currentSet}>
+        <div className="flex items-center justify-between border-b border-white/5 pb-2 shrink-0">
+          <TabsList className="bg-white/5 p-1 h-9 border border-white/5">
+            <TabsTrigger value="generate" className="px-4 text-xs data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400" data-testid="tab-generate">Generate</TabsTrigger>
+            <TabsTrigger value="study" className="px-4 text-xs data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400" data-testid="tab-study" disabled={!currentSet}>
               Study Mode
             </TabsTrigger>
           </TabsList>
 
           {activeTab === "study" && currentSet && (
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-gfg-text dark:text-gfg-dark-text">
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
                 <Trophy className="h-4 w-4 text-yellow-500" />
                 <span>Mastery: {masteryCount}/{(currentSet.flashcards as Flashcard[]).length}</span>
               </div>
-              <Progress value={progress} className="w-32 h-2 bg-gray-200 dark:bg-gfg-dark-panel" />
+              <Progress value={progress} className="w-32 h-2 bg-white/10" />
             </div>
           )}
         </div>
 
         <TabsContent value="generate" className="mt-6">
-          <Card className="max-w-xl mx-auto border-gfg-border dark:border-gfg-dark-border shadow-gfg-light dark:shadow-gfg-dark bg-gfg-bg-card dark:bg-gfg-dark-card">
+          <Card className="max-w-xl mx-auto border-white/10 shadow-lg bg-[#0b0f12]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gfg-text dark:text-gfg-dark-text">
-                <Sparkles className="h-5 w-5 text-gfg-green dark:text-gfg-green-light" />
+              <CardTitle className="flex items-center gap-2 text-white">
+                <Sparkles className="h-5 w-5 text-green-400" />
                 Create New Deck
               </CardTitle>
-              <CardDescription className="text-gfg-text-light dark:text-gfg-dark-muted">
+              <CardDescription className="text-gray-400">
                 Generate flashcards from your documents or a specific topic
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="document" className="text-gfg-text dark:text-gfg-dark-text">Source Document (Optional)</Label>
+                  <Label htmlFor="document" className="text-white">Source Document (Optional)</Label>
                   <Select value={selectedDocId} onValueChange={setSelectedDocId}>
-                    <SelectTrigger id="document" className="bg-white dark:bg-gfg-dark-panel border-gfg-border dark:border-gfg-dark-border text-gfg-text dark:text-gfg-dark-text" data-testid="select-document">
+                    <SelectTrigger id="document" className="bg-white/5 border-white/10 text-white" data-testid="select-document">
                       <SelectValue placeholder="Select a document..." />
                     </SelectTrigger>
-                    <SelectContent className="bg-gfg-bg-card dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
-                      <SelectItem value="none" className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel">No document (use topic only)</SelectItem>
+                    <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                      <SelectItem value="none" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">No document (use topic only)</SelectItem>
                       {[...documents]
                         .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
                         .map((doc) => (
-                          <SelectItem key={doc.id} value={doc.id} className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel">
+                          <SelectItem key={doc.id} value={doc.id} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">
                             {doc.name}
                           </SelectItem>
                         ))}
@@ -224,28 +225,28 @@ export function FlashcardsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="count" className="text-gfg-text dark:text-gfg-dark-text">Number of Cards</Label>
+                  <Label htmlFor="count" className="text-white">Number of Cards</Label>
                   <Select value={count} onValueChange={setCount}>
-                    <SelectTrigger id="count" className="bg-white dark:bg-gfg-dark-panel border-gfg-border dark:border-gfg-dark-border text-gfg-text dark:text-gfg-dark-text" data-testid="select-count">
+                    <SelectTrigger id="count" className="bg-white/5 border-white/10 text-white" data-testid="select-count">
                       <SelectValue placeholder="Select count" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gfg-bg-card dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
-                      <SelectItem value="5" className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel">5 Cards</SelectItem>
-                      <SelectItem value="10" className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel">10 Cards</SelectItem>
-                      <SelectItem value="15" className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel">15 Cards</SelectItem>
-                      <SelectItem value="20" className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel">20 Cards</SelectItem>
+                    <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                      <SelectItem value="5" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">5 Cards</SelectItem>
+                      <SelectItem value="10" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">10 Cards</SelectItem>
+                      <SelectItem value="15" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">15 Cards</SelectItem>
+                      <SelectItem value="20" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">20 Cards</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="topic" className="text-gfg-text dark:text-gfg-dark-text">Topic {!hasDocumentSelected && "(Required)"}</Label>
+                  <Label htmlFor="topic" className="text-white">Topic {!hasDocumentSelected && "(Required)"}</Label>
                   <Input
                     id="topic"
                     placeholder="e.g., Key Concepts of Biology, Historical Dates"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="bg-white dark:bg-gfg-dark-panel border-gfg-border dark:border-gfg-dark-border focus-visible:ring-gfg-green text-gfg-text dark:text-gfg-dark-text"
+                    className="bg-white/5 border-white/10 focus-visible:ring-green-500 text-white placeholder:text-gray-500"
                     data-testid="input-topic"
                   />
                 </div>
@@ -254,8 +255,7 @@ export function FlashcardsPage() {
               <Button
                 onClick={() => generateMutation.mutate()}
                 disabled={generateMutation.isPending || (!hasDocumentSelected && !topic.trim())}
-                className="w-full"
-                variant="cta"
+                className="w-full bg-green-600 hover:bg-green-500 text-white"
                 data-testid="button-generate-flashcards"
               >
                 {generateMutation.isPending ? (
@@ -275,12 +275,12 @@ export function FlashcardsPage() {
 
           {flashcardSets.length > 0 && (
             <div className="mt-8">
-              <h3 className="mb-4 text-lg font-semibold text-gfg-text dark:text-gfg-dark-text">Recent Decks</h3>
+              <h3 className="mb-4 text-lg font-semibold text-white">Recent Decks</h3>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {flashcardSets.slice().reverse().slice(0, 5).map((set) => (
-                  <Card
+                {flashcardSets.slice().reverse().slice(0, 5).map((set, index) => (
+                  <div
                     key={set.id}
-                    className="cursor-pointer border-gfg-border dark:border-gfg-dark-border bg-gfg-bg-card dark:bg-gfg-dark-card hover:border-gfg-green dark:hover:border-gfg-green-light transition-colors shadow-sm"
+                    className="group relative overflow-hidden rounded-xl transition-all hover:scale-[1.02] cursor-pointer"
                     onClick={() => {
                       setCurrentSet(set);
                       setCurrentIndex(0);
@@ -290,20 +290,33 @@ export function FlashcardsPage() {
                     }}
                     data-testid={`card-flashcard-set-${set.id}`}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="space-y-1">
-                          <p className="font-medium leading-none line-clamp-1 text-gfg-text dark:text-gfg-dark-text">{set.topic || "Untitled Deck"}</p>
-                          <div className="flex items-center gap-2 text-xs text-gfg-text-light dark:text-gfg-dark-muted">
-                            <span>{new Date(set.createdAt).toLocaleDateString()}</span>
-                            <span>•</span>
-                            <span>{(set.flashcards as Flashcard[]).length} cards</span>
+                    {/* Gradient header */}
+                    <div className={`p-4 bg-gradient-to-br ${getGradient(index)}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm text-white">
+                            <Lightbulb className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white line-clamp-1">{set.topic || "Untitled Deck"}</p>
+                            <p className="text-xs text-white/80">
+                              {new Date(set.createdAt).toLocaleDateString()}
+                            </p>
                           </div>
                         </div>
-                        <Lightbulb className="h-4 w-4 text-gfg-green dark:text-gfg-green-light" />
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="bg-neutral-900 p-4 border border-white/5 border-t-0 group-hover:border-white/10">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">{(set.flashcards as Flashcard[]).length} cards</span>
+                        <Button variant="ghost" size="sm" className="h-auto p-0 text-green-400 hover:text-green-300 hover:bg-transparent">
+                          Study Now &rarr;
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -314,7 +327,7 @@ export function FlashcardsPage() {
           {currentSet && (
             <div className="w-full max-w-3xl flex flex-col gap-8 items-center">
               <div className="w-full flex justify-between items-center px-4">
-                <Button variant="ghost" size="icon" onClick={handlePrev} className="h-12 w-12 rounded-full hover:bg-gfg-green-50 dark:hover:bg-gfg-green/10 hover:text-gfg-green dark:hover:text-gfg-green-light text-gfg-text dark:text-gfg-dark-text">
+                <Button variant="ghost" size="icon" onClick={handlePrev} className="h-12 w-12 rounded-full hover:bg-white/10 hover:text-green-400 text-white">
                   <ChevronLeft className="h-6 w-6" />
                 </Button>
 
@@ -326,7 +339,7 @@ export function FlashcardsPage() {
                   >
                     {/* Front */}
                     <div className="absolute inset-0 backface-hidden">
-                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 bg-gradient-to-br from-[#cc2b5e] to-[#753a88] dark:from-[#cc2b5e] dark:to-[#753a88] shadow-lg">
+                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 bg-gradient-to-br from-[#cc2b5e] to-[#753a88] shadow-lg">
                         <div className="absolute top-4 left-4 text-xs font-bold text-white/80 uppercase tracking-wider">
                           Question
                         </div>
@@ -342,7 +355,7 @@ export function FlashcardsPage() {
 
                     {/* Back */}
                     <div className="absolute inset-0 backface-hidden rotate-y-180">
-                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 shadow-lg bg-gradient-to-br from-[#141E30] to-[#243B55] dark:from-[#141E30] dark:to-[#243B55] text-white">
+                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 shadow-lg bg-gradient-to-br from-[#141E30] to-[#243B55] text-white">
                         <div className="absolute top-4 left-4 text-xs font-bold text-white/80 uppercase tracking-wider">
                           Answer
                         </div>
@@ -354,7 +367,7 @@ export function FlashcardsPage() {
                   </motion.div>
                 </div>
 
-                <Button variant="ghost" size="icon" onClick={handleNext} className="h-12 w-12 rounded-full hover:bg-gfg-green-50 dark:hover:bg-gfg-green/10 hover:text-gfg-green dark:hover:text-gfg-green-light text-gfg-text dark:text-gfg-dark-text">
+                <Button variant="ghost" size="icon" onClick={handleNext} className="h-12 w-12 rounded-full hover:bg-white/10 hover:text-green-400 text-white">
                   <ChevronRight className="h-6 w-6" />
                 </Button>
               </div>
@@ -365,7 +378,7 @@ export function FlashcardsPage() {
                     variant={mastery[currentIndex] ? "default" : "outline"}
                     size="lg"
                     onClick={toggleMastery}
-                    className={`gap-2 min-w-[140px] transition-all ${mastery[currentIndex] ? "bg-gfg-green hover:bg-gfg-green-light border-gfg-green text-white" : "border-gfg-green text-gfg-green hover:bg-gfg-green-50 dark:border-gfg-green-light dark:text-gfg-green-light dark:hover:bg-gfg-green/10"}`}
+                    className={`gap-2 min-w-[140px] transition-all ${mastery[currentIndex] ? "bg-green-600 hover:bg-green-500 border-green-600 text-white" : "border-green-500 text-green-400 hover:bg-green-500/10"}`}
                   >
                     {mastery[currentIndex] ? (
                       <>
@@ -386,16 +399,16 @@ export function FlashcardsPage() {
                     <div
                       key={idx}
                       className={`h-2 w-2 rounded-full transition-all duration-300 ${idx === currentIndex
-                        ? "bg-gfg-green dark:bg-gfg-green-light w-6"
+                        ? "bg-green-500 w-6"
                         : mastery[idx]
-                          ? "bg-gfg-green/50 dark:bg-gfg-green-light/50"
-                          : "bg-gray-200 dark:bg-gfg-dark-panel"
+                          ? "bg-green-500/50"
+                          : "bg-white/10"
                         }`}
                     />
                   ))}
                 </div>
 
-                <p className="text-sm text-gfg-text-light dark:text-gfg-dark-muted">
+                <p className="text-sm text-gray-400">
                   Card {currentIndex + 1} of {(currentSet.flashcards as Flashcard[]).length}
                 </p>
               </div>

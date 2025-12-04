@@ -90,10 +90,10 @@ export function AppSidebar() {
   const { logoutMutation } = useAuth();
 
   return (
-    <Sidebar className="border-r border-gfg-border bg-white dark:bg-gfg-dark-panel dark:border-gfg-dark-border pt-16 md:pt-0 transition-colors duration-300">
+    <Sidebar className="border-r border-white/5 bg-[#0b0f12] text-white pt-16 md:pt-0 transition-colors duration-300">
       <SidebarContent className="px-3 py-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-2 py-1.5 text-[11px] font-bold uppercase tracking-wider text-gfg-text-light dark:text-gfg-dark-muted">
+          <SidebarGroupLabel className="px-2 py-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-500">
             Content Tools
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -103,19 +103,19 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     onClick={() => setCurrentFeature(item.id)}
                     data-active={currentFeature === item.id}
-                    className="group relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gfg-text-light dark:text-gfg-dark-text transition-all hover:bg-gfg-green-50 hover:text-gfg-green dark:hover:bg-gfg-green/10 dark:hover:text-gfg-green-light data-[active=true]:bg-gfg-green-50 data-[active=true]:text-gfg-green dark:data-[active=true]:bg-gfg-green/10 dark:data-[active=true]:text-gfg-green-light"
+                    className="group relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-all hover:bg-white/5 hover:text-green-400 data-[active=true]:bg-green-500/10 data-[active=true]:text-green-400"
                     data-testid={`nav-${item.id}`}
                   >
                     {/* Active State Accent Bar */}
                     {currentFeature === item.id && (
-                      <div className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-gfg-green dark:bg-gfg-green-light" />
+                      <div className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-green-500" />
                     )}
 
-                    <item.icon className="h-4 w-4 transition-colors group-hover:text-gfg-green dark:group-hover:text-gfg-green-light group-data-[active=true]:text-gfg-green dark:group-data-[active=true]:text-gfg-green-light" />
+                    <item.icon className="h-4 w-4 transition-colors group-hover:text-green-400 group-data-[active=true]:text-green-400" />
                     <span className="flex-1">{item.title}</span>
 
                     {item.id === "library" && documents.length > 0 && (
-                      <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-[10px] font-normal bg-gray-100 text-gray-600 dark:bg-gfg-dark-card dark:text-gfg-dark-muted">
+                      <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-[10px] font-normal bg-white/10 text-gray-400">
                         {documents.length}
                       </Badge>
                     )}
@@ -131,7 +131,7 @@ export function AppSidebar() {
         </div>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="px-2 py-1.5 text-[11px] font-bold uppercase tracking-wider text-gfg-text-light dark:text-gfg-dark-muted">
+          <SidebarGroupLabel className="px-2 py-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-500">
             Study Tools
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -141,19 +141,19 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     onClick={() => setCurrentFeature(item.id)}
                     data-active={currentFeature === item.id}
-                    className="group relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gfg-text-light dark:text-gfg-dark-text transition-all hover:bg-gfg-green-50 hover:text-gfg-green dark:hover:bg-gfg-green/10 dark:hover:text-gfg-green-light data-[active=true]:bg-gfg-green-50 data-[active=true]:text-gfg-green dark:data-[active=true]:bg-gfg-green/10 dark:data-[active=true]:text-gfg-green-light"
+                    className="group relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-all hover:bg-white/5 hover:text-green-400 data-[active=true]:bg-green-500/10 data-[active=true]:text-green-400"
                     data-testid={`nav-${item.id}`}
                   >
                     {/* Active State Accent Bar */}
                     {currentFeature === item.id && (
-                      <div className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-gfg-green dark:bg-gfg-green-light" />
+                      <div className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-green-500" />
                     )}
 
-                    <item.icon className="h-4 w-4 transition-colors group-hover:text-gfg-green dark:group-hover:text-gfg-green-light group-data-[active=true]:text-gfg-green dark:group-data-[active=true]:text-gfg-green-light" />
+                    <item.icon className="h-4 w-4 transition-colors group-hover:text-green-400 group-data-[active=true]:text-green-400" />
                     <span className="flex-1">{item.title}</span>
 
                     {item.id === "quiz" && quizResults.length > 0 && (
-                      <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-[10px] font-normal bg-gray-100 text-gray-600 dark:bg-gfg-dark-card dark:text-gfg-dark-muted">
+                      <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-[10px] font-normal bg-white/10 text-gray-400">
                         {quizResults.length}
                       </Badge>
                     )}
@@ -175,7 +175,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => logoutMutation.mutate()}
-                className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-gfg-text-light dark:text-gfg-dark-text hover:bg-destructive/10 hover:text-destructive dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
+                className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
                 disabled={logoutMutation.isPending}
               >
                 <LogOut className="h-4 w-4" />

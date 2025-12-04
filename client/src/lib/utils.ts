@@ -45,3 +45,16 @@ export function formatDate(date: string | Date | undefined | null): string {
     return "Unknown date";
   }
 }
+
+export const getGradient = (id: number | string) => {
+  const gradients = [
+    'from-purple-600 to-indigo-700',
+    'from-sky-600 to-cyan-600',
+    'from-emerald-500 to-teal-600',
+    'from-orange-400 to-red-500',
+    'from-pink-500 to-rose-500',
+    'from-blue-600 to-indigo-600'
+  ];
+  const numId = typeof id === 'string' ? id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : id;
+  return gradients[numId % gradients.length];
+};

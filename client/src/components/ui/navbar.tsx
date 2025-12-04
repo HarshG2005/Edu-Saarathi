@@ -18,7 +18,7 @@ export function Navbar() {
     const { user, logoutMutation } = useAuth()
 
     return (
-        <header className="sticky top-0 z-50 flex h-[60px] w-full items-center justify-between border-b border-gfg-border bg-gfg-bg-card px-4 shadow-gfg-light dark:bg-gfg-dark-card dark:border-gfg-dark-border dark:shadow-gfg-dark transition-colors duration-300">
+        <header className="sticky top-0 z-50 flex h-[60px] w-full items-center justify-between border-b border-white/5 bg-[#0b0f12]/80 backdrop-blur-md px-4 shadow-sm transition-colors duration-300">
             <div className="flex items-center gap-4">
                 <SidebarTrigger className="text-gfg-text hover:bg-gfg-bg-secondary hover:text-gfg-green dark:text-gfg-dark-text dark:hover:bg-gfg-dark-panel dark:hover:text-gfg-green-light" />
                 <Link href="/">
@@ -28,7 +28,7 @@ export function Navbar() {
                             alt="Edu Saarathi Logo"
                             className="h-10 w-auto mix-blend-multiply dark:invert dark:mix-blend-screen"
                         />
-                        <span className="hidden text-xl font-bold text-gfg-text dark:text-gfg-dark-text md:inline-block">
+                        <span className="hidden text-xl font-bold text-white md:inline-block">
                             Edu Saarathi
                         </span>
                     </div>

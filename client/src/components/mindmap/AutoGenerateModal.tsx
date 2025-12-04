@@ -41,30 +41,30 @@ export function AutoGenerateModal({ open, onOpenChange, onSuccess }: AutoGenerat
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] bg-white dark:bg-gfg-dark-card border-gfg-border-light dark:border-gfg-dark-border">
+            <DialogContent className="sm:max-w-[500px] bg-[#0b0f12] border-white/10 text-white">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-gfg-text">
-                        <Sparkles className="h-5 w-5 text-gfg-green" />
+                    <DialogTitle className="flex items-center gap-2 text-white">
+                        <Sparkles className="h-5 w-5 text-green-400" />
                         Generate Mindmap
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-gray-400">
                         Create a structured concept map from a document or topic using AI.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-6 py-4">
                     <div className="space-y-2">
-                        <Label htmlFor="document" className="text-gfg-text">Source Document (Optional)</Label>
+                        <Label htmlFor="document" className="text-white">Source Document (Optional)</Label>
                         <Select value={selectedDocId} onValueChange={setSelectedDocId}>
-                            <SelectTrigger id="document" className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border">
+                            <SelectTrigger id="document" className="bg-white/5 border-white/10 text-white">
                                 <SelectValue placeholder="Select a document..." />
                             </SelectTrigger>
-                            <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
-                                <SelectItem value="none">No document (use topic only)</SelectItem>
+                            <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                                <SelectItem value="none" className="hover:bg-white/5 cursor-pointer">No document (use topic only)</SelectItem>
                                 {documents
                                     .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
                                     .map((doc) => (
-                                        <SelectItem key={doc.id} value={doc.id}>
+                                        <SelectItem key={doc.id} value={doc.id} className="hover:bg-white/5 cursor-pointer">
                                             {doc.name}
                                         </SelectItem>
                                     ))}
@@ -73,23 +73,23 @@ export function AutoGenerateModal({ open, onOpenChange, onSuccess }: AutoGenerat
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="topic" className="text-gfg-text">Topic {selectedDocId === "none" && "(Required)"}</Label>
+                        <Label htmlFor="topic" className="text-white">Topic {selectedDocId === "none" && "(Required)"}</Label>
                         <Input
                             id="topic"
                             placeholder="e.g., Photosynthesis, World War II"
                             value={topic}
                             onChange={(e) => setTopic(e.target.value)}
-                            className="bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border"
+                            className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                         />
                     </div>
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/10 text-white hover:bg-white/5 hover:text-white">Cancel</Button>
                     <Button
                         onClick={() => generateMutation.mutate()}
                         disabled={generateMutation.isPending || (selectedDocId === "none" && !topic.trim())}
-                        className="bg-gfg-green hover:bg-gfg-green/90 text-white"
+                        className="bg-green-600 hover:bg-green-500 text-white"
                     >
                         {generateMutation.isPending ? (
                             <>

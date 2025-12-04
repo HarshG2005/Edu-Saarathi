@@ -111,14 +111,14 @@ export function TutorPage() {
     <Section className="flex h-[calc(100vh-4rem)] flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-gfg-text" data-testid="text-page-title">AI Tutor</h1>
-          <p className="text-gfg-text-light">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-teal-300 bg-clip-text text-transparent" data-testid="text-page-title">AI Tutor</h1>
+          <p className="text-gray-400">
             Ask questions about any topic or your uploaded documents
           </p>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/settings">
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" className="border-white/10 text-gray-400 hover:bg-white/5 hover:text-white">
               <Settings className="h-4 w-4" />
             </Button>
           </Link>
@@ -127,21 +127,21 @@ export function TutorPage() {
       <div className="flex flex-wrap items-center justify-end gap-4">
         <div className="flex gap-2">
           <Select value={selectedDocId} onValueChange={setSelectedDocId}>
-            <SelectTrigger className="w-48 bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border dark:text-gfg-text-light" data-testid="select-document">
+            <SelectTrigger className="w-48 bg-white/5 border-white/10 text-white" data-testid="select-document">
               <SelectValue placeholder="No document context" />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-gfg-dark-card border-gfg-border dark:border-gfg-dark-border">
-              <SelectItem value="none">No document context</SelectItem>
+            <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+              <SelectItem value="none" className="hover:bg-white/5 cursor-pointer">No document context</SelectItem>
               {[...documents]
                 .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
                 .map((doc) => (
-                  <SelectItem key={doc.id} value={doc.id}>
+                  <SelectItem key={doc.id} value={doc.id} className="hover:bg-white/5 cursor-pointer">
                     {doc.name}
                   </SelectItem>
                 ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={handleNewChat} className="border-gfg-green text-gfg-green hover:bg-gfg-green-50" data-testid="button-new-chat">
+          <Button variant="outline" onClick={handleNewChat} className="border-green-500/50 text-green-400 hover:bg-green-500/10 hover:text-green-300" data-testid="button-new-chat">
             <Plus className="mr-2 h-4 w-4" />
             New Chat
           </Button>
@@ -149,13 +149,13 @@ export function TutorPage() {
       </div>
 
       <div className="flex flex-1 gap-6 overflow-hidden">
-        <Card className="flex flex-1 flex-col overflow-hidden border-gfg-border-light dark:border-gfg-dark-border dark:bg-gfg-dark-card">
-          <CardHeader className="border-b border-gfg-border-light dark:border-gfg-dark-border px-6 py-4 bg-gfg-bg-secondary dark:bg-gfg-dark-bg">
-            <CardTitle className="flex items-center gap-2 text-lg text-gfg-text">
-              <MessageSquare className="h-5 w-5 text-gfg-green" />
+        <Card className="flex flex-1 flex-col overflow-hidden border-white/10 bg-[#0b0f12]">
+          <CardHeader className="border-b border-white/10 px-6 py-4 bg-white/5">
+            <CardTitle className="flex items-center gap-2 text-lg text-white">
+              <MessageSquare className="h-5 w-5 text-green-400" />
               {currentSession ? "Conversation" : "Start a Conversation"}
               {hasDocumentSelected && (
-                <Badge variant="secondary" className="ml-2 bg-gfg-green-50 text-gfg-green border-gfg-green/20">
+                <Badge variant="secondary" className="ml-2 bg-green-500/20 text-green-400 border-green-500/20">
                   <FileText className="mr-1 h-3 w-3" />
                   Document context active
                 </Badge>
@@ -163,7 +163,7 @@ export function TutorPage() {
             </CardTitle>
           </CardHeader>
 
-          <ScrollArea className="flex-1 p-6 bg-white dark:bg-gfg-dark-card" ref={scrollRef}>
+          <ScrollArea className="flex-1 p-6 bg-[#0b0f12]" ref={scrollRef}>
             {currentSession && (currentSession.messages as ChatMessage[]).length > 0 ? (
               <div className="space-y-6">
                 {(currentSession.messages as ChatMessage[]).map((msg) => (
@@ -175,15 +175,15 @@ export function TutorPage() {
                   >
                     {msg.role === "assistant" && (
                       <Avatar className="h-8 w-8 shrink-0">
-                        <AvatarFallback className="bg-gfg-green text-white">
+                        <AvatarFallback className="bg-green-600 text-white">
                           <Bot className="h-4 w-4" />
                         </AvatarFallback>
                       </Avatar>
                     )}
                     <div
                       className={`max-w-[70%] rounded-lg p-4 ${msg.role === "user"
-                        ? "bg-gfg-green text-white"
-                        : "bg-gfg-bg-secondary dark:bg-gfg-dark-bg text-gfg-text dark:text-gfg-text-light border border-gfg-border-light dark:border-gfg-dark-border"
+                        ? "bg-green-600 text-white"
+                        : "bg-white/5 text-gray-300 border border-white/10"
                         }`}
                     >
                       <p className="whitespace-pre-wrap text-sm leading-relaxed">
@@ -192,7 +192,7 @@ export function TutorPage() {
                     </div>
                     {msg.role === "user" && (
                       <Avatar className="h-8 w-8 shrink-0">
-                        <AvatarFallback className="bg-gray-200 text-gfg-text">
+                        <AvatarFallback className="bg-white/10 text-white">
                           <User className="h-4 w-4" />
                         </AvatarFallback>
                       </Avatar>
@@ -202,31 +202,31 @@ export function TutorPage() {
                 {chatMutation.isPending && (
                   <div className="flex gap-4">
                     <Avatar className="h-8 w-8 shrink-0">
-                      <AvatarFallback className="bg-gfg-green text-white">
+                      <AvatarFallback className="bg-green-600 text-white">
                         <Bot className="h-4 w-4" />
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex items-center gap-2 rounded-lg bg-gfg-bg-secondary dark:bg-gfg-dark-bg p-4 border border-gfg-border-light dark:border-gfg-dark-border">
-                      <Loader2 className="h-4 w-4 animate-spin text-gfg-green" />
-                      <span className="text-sm text-gfg-text-light">Thinking...</span>
+                    <div className="flex items-center gap-2 rounded-lg bg-white/5 p-4 border border-white/10">
+                      <Loader2 className="h-4 w-4 animate-spin text-green-400" />
+                      <span className="text-sm text-gray-400">Thinking...</span>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
               <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gfg-green-50 dark:bg-gfg-green-900/20">
-                  <Bot className="h-10 w-10 text-gfg-green" />
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-500/10">
+                  <Bot className="h-10 w-10 text-green-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gfg-text">Ask me anything!</h3>
-                  <p className="mt-1 max-w-md text-sm text-gfg-text-light">
+                  <h3 className="text-lg font-semibold text-white">Ask me anything!</h3>
+                  <p className="mt-1 max-w-md text-sm text-gray-400">
                     I can help you understand concepts, explain topics, answer questions
                     about your documents, and guide your learning journey.
                   </p>
                 </div>
                 <div className="w-full max-w-lg">
-                  <p className="mb-3 text-sm font-medium text-gfg-text-light">
+                  <p className="mb-3 text-sm font-medium text-gray-400">
                     Try asking:
                   </p>
                   <div className="flex flex-wrap justify-center gap-2">
@@ -235,7 +235,7 @@ export function TutorPage() {
                         key={idx}
                         variant="outline"
                         size="sm"
-                        className="h-auto whitespace-normal text-left border-gfg-border-medium dark:border-gfg-dark-border hover:border-gfg-green hover:text-gfg-green dark:text-gfg-text-light dark:hover:text-gfg-green"
+                        className="h-auto whitespace-normal text-left border-white/10 text-gray-300 hover:border-green-500 hover:text-green-400 hover:bg-white/5"
                         onClick={() => setMessage(q)}
                         data-testid={`button-suggestion-${idx}`}
                       >
@@ -248,21 +248,20 @@ export function TutorPage() {
             )}
           </ScrollArea>
 
-          <div className="border-t border-gfg-border-light dark:border-gfg-dark-border p-4 bg-white dark:bg-gfg-dark-card">
+          <div className="border-t border-white/10 p-4 bg-[#0b0f12]">
             <div className="flex gap-2">
               <Textarea
                 placeholder="Type your question here..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="min-h-[60px] resize-none bg-white dark:bg-gfg-dark-bg border-gfg-border-medium dark:border-gfg-dark-border focus-visible:ring-gfg-green dark:text-gfg-text-light"
+                className="min-h-[60px] resize-none bg-white/5 border-white/10 text-white focus-visible:ring-green-500 placeholder:text-gray-500"
                 data-testid="input-message"
               />
               <Button
                 onClick={handleSend}
                 disabled={!message.trim() || chatMutation.isPending}
-                className="h-auto"
-                variant="cta"
+                className="h-auto bg-green-600 hover:bg-green-500 text-white"
                 data-testid="button-send"
               >
                 {chatMutation.isPending ? (
@@ -272,33 +271,33 @@ export function TutorPage() {
                 )}
               </Button>
             </div>
-            <p className="mt-2 text-xs text-gfg-text-light">
+            <p className="mt-2 text-xs text-gray-500">
               Press Enter to send, Shift+Enter for new line
             </p>
           </div>
         </Card>
 
         {chatSessions.length > 0 && (
-          <Card className="hidden w-64 shrink-0 lg:block border-gfg-border-light dark:border-gfg-dark-border dark:bg-gfg-dark-card">
-            <CardHeader className="border-b border-gfg-border-light dark:border-gfg-dark-border px-4 py-3 bg-gfg-bg-secondary dark:bg-gfg-dark-bg">
-              <CardTitle className="text-sm font-medium text-gfg-text">Chat History</CardTitle>
+          <Card className="hidden w-64 shrink-0 lg:block border-white/10 bg-[#0b0f12]">
+            <CardHeader className="border-b border-white/10 px-4 py-3 bg-white/5">
+              <CardTitle className="text-sm font-medium text-white">Chat History</CardTitle>
             </CardHeader>
-            <ScrollArea className="h-[calc(100%-3rem)] bg-white dark:bg-gfg-dark-card">
+            <ScrollArea className="h-[calc(100%-3rem)] bg-[#0b0f12]">
               <div className="space-y-1 p-2">
                 {chatSessions.slice().reverse().slice(0, 5).map((session) => (
                   <button
                     key={session.id}
                     onClick={() => setCurrentSession(session)}
-                    className={`flex w-full items-start gap-2 rounded-lg p-3 text-left transition-colors hover:bg-gfg-bg-secondary dark:hover:bg-gfg-dark-bg ${currentSession?.id === session.id ? "bg-gfg-bg-secondary dark:bg-gfg-dark-bg border border-gfg-border-light dark:border-gfg-dark-border" : ""
+                    className={`flex w-full items-start gap-2 rounded-lg p-3 text-left transition-colors hover:bg-white/5 ${currentSession?.id === session.id ? "bg-white/5 border border-white/10" : ""
                       }`}
                     data-testid={`button-session-${session.id}`}
                   >
-                    <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-gfg-text-light" />
+                    <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
                     <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 text-sm text-gfg-text">
+                      <p className="line-clamp-2 text-sm text-white">
                         {(session.messages as ChatMessage[])[0]?.content.slice(0, 50) || "New conversation"}
                       </p>
-                      <p className="mt-1 text-xs text-gfg-text-light">
+                      <p className="mt-1 text-xs text-gray-500">
                         {(session.messages as ChatMessage[]).length} messages
                       </p>
                     </div>

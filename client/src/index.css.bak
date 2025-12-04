@@ -10,7 +10,7 @@
   }
 
   body {
-    @apply font-sans antialiased bg-gradient-to-b from-[#0b0f12] to-[#071218] text-white transition-colors duration-300 min-h-screen;
+    @apply font-sans antialiased bg-gfg-bg text-gfg-text transition-colors duration-300;
     font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
   }
 

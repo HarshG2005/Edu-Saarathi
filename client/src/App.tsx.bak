@@ -21,7 +21,6 @@ import { QuizPage } from "@/pages/quiz";
 import { ProgressPage } from "@/pages/progress";
 import StudyGuidePage from "@/pages/study-guide";
 import { LandingPage } from "@/pages/landing";
-import DocLibraryPage from "@/pages/doc-library";
 
 import { Navbar } from "@/components/ui/navbar";
 
@@ -61,7 +60,7 @@ function MainContent() {
   };
 
   return (
-    <div className="flex flex-col flex-1 min-h-screen bg-transparent">
+    <div className="flex flex-col flex-1 min-h-screen bg-gfg-bg">
       <Navbar />
       <main className="flex-1 overflow-auto p-4 md:p-6">
         <ErrorBoundary>
@@ -80,7 +79,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="eduquest-theme">
+      <ThemeProvider defaultTheme="system" storageKey="eduquest-theme">
         <AuthProvider>
           <TooltipProvider>
             <AppContent />
@@ -131,11 +130,6 @@ function AppContent() {
       <ProtectedRoute path="/settings" component={() => (
         <ErrorBoundary>
           <SettingsPage />
-        </ErrorBoundary>
-      )} />
-      <ProtectedRoute path="/docs" component={() => (
-        <ErrorBoundary>
-          <DocLibraryPage />
         </ErrorBoundary>
       )} />
       <Route path="/">

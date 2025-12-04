@@ -12,8 +12,6 @@ export default {
       },
       colors: {
         // GFG Brand Colors - Mapped to CSS Variables
-        "es-green": "#22c55e",
-        "es-teal": "#14b8a6",
         "gfg-green": {
           DEFAULT: "var(--gfg-green)",
           light: "var(--gfg-green-light)",
