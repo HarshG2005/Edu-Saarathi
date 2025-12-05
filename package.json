@@ -7,6 +7,7 @@
     "dev": "tsx watch server/index.ts",
     "build": "tsx script/build.ts",
     "start": "NODE_ENV=production node dist/index.cjs",
+    "db:migrate": "node dist/migrate.cjs",
     "check": "tsc"
   },
   "dependencies": {
