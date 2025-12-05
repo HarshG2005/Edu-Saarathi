@@ -249,6 +249,16 @@ export async function registerRoutes(
     }
   });
 
+  // Get all MCQ sets
+  app.get("/api/mcq", requireAuth, async (req, res) => {
+    try {
+      const mcqSets = await storage.getMCQSets(req.user!.id);
+      res.json(mcqSets);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to get MCQ sets" });
+    }
+  });
+
   // Generate Flashcards
   app.post("/api/flashcards/generate", requireAuth, async (req, res) => {
     try {

@@ -73,7 +73,17 @@ router.post("/login", async (req, res) => {
         const { email, password } = loginSchema.parse(req.body);
 
         const user = await storage.getUserByEmail(email);
-        if (!user || !(await comparePasswords(password, user.passwordHash))) {
+        console.log("Login attempt for:", email, "User found:", !!user);
+
+        if (!user) {
+            console.log("User not found");
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
+        const isValid = await comparePasswords(password, user.passwordHash);
+        console.log("Password valid:", isValid);
+
+        if (!isValid) {
             return res.status(401).json({ message: "Invalid email or password" });
         }
 
@@ -156,7 +166,7 @@ router.post("/guest-login", async (req, res) => {
 });
 
 // POST /api/refresh
-router.post("/refresh", (req, res) => {
+router.post("/refresh", async (req, res) => {
     const refreshToken = req.cookies["refresh_token"];
     if (!refreshToken) {
         return res.status(401).json({ message: "No refresh token provided" });
@@ -164,6 +174,14 @@ router.post("/refresh", (req, res) => {
 
     try {
         const payload = verifyRefreshToken(refreshToken);
+        const user = await storage.getUser(payload.sub);
+
+        if (!user) {
+            res.clearCookie("refresh_token");
+            res.clearCookie("access_token");
+            return res.status(401).json({ message: "User not found" });
+        }
+
         const newAccessToken = signAccessToken({ sub: payload.sub, email: payload.email });
 
         res.cookie("access_token", newAccessToken, {
@@ -175,6 +193,8 @@ router.post("/refresh", (req, res) => {
 
         res.json({ message: "Token refreshed" });
     } catch (error) {
+        res.clearCookie("refresh_token");
+        res.clearCookie("access_token");
         return res.status(403).json({ message: "Invalid refresh token" });
     }
 });
@@ -202,6 +222,8 @@ router.get("/user", async (req, res) => {
         const payload = verifyAccessToken(token);
         const user = await storage.getUser(payload.sub);
         if (!user) {
+            res.clearCookie("refresh_token");
+            res.clearCookie("access_token");
             return res.status(401).json({ message: "User not found" });
         }
         res.json({

@@ -21,15 +21,15 @@ import {
 } from "@/components/ui/select";
 import { useAppStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import type { MCQSet, QuizResult, QuizAnswer } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from "recharts";
 
 type QuizState = "setup" | "active" | "results";
 
 export function QuizPage() {
-  const { mcqSets, quizResults, addQuizResult, documents, currentDocumentId, addMCQSet } = useAppStore();
+  const { mcqSets, addMCQSet, quizResults, addQuizResult, documents, currentDocumentId } = useAppStore();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -58,6 +58,19 @@ export function QuizPage() {
 
   const hasDocumentSelected = genDocId && genDocId !== "none";
 
+  // Fetch MCQ sets to keep store in sync
+  const { data: serverMCQSets } = useQuery<MCQSet[]>({
+    queryKey: ["/api/mcq"],
+    queryFn: async () => {
+      const res = await fetch("/api/mcq");
+      if (!res.ok) throw new Error("Failed to fetch quizzes");
+      return res.json();
+    },
+  });
+
+  // Use server data if available, otherwise store
+  const displayMCQSets = serverMCQSets || mcqSets;
+
   // MCQ generation mutation
   const generateMCQsMutation = useMutation({
     mutationFn: async (): Promise<MCQSet> => {
@@ -72,6 +85,7 @@ export function QuizPage() {
       return response.json();
     },
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/mcq"] });
       addMCQSet(data);
       setCurrentMCQSet(data);
       setCurrentIndex(0);
@@ -87,7 +101,40 @@ export function QuizPage() {
         description: `${data.mcqs.length} questions generated. Good luck!`,
       });
     },
-    onError: (error: Error) => {
+    onError: async (error: Error) => {
+      // Attempt recovery: check if quiz was actually created despite timeout
+      try {
+        // Force fetch latest data
+        const latestSets = await queryClient.fetchQuery<MCQSet[]>({
+          queryKey: ["/api/mcq"],
+          staleTime: 0,
+        });
+
+        // Find most recent set
+        const recentSet = latestSets.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+        // If created in last 2 minutes, assume it's ours
+        if (recentSet && (Date.now() - new Date(recentSet.createdAt).getTime() < 120000)) {
+          addMCQSet(recentSet);
+          setCurrentMCQSet(recentSet);
+          setCurrentIndex(0);
+          setAnswers([]);
+          setStartTime(Date.now());
+          setQuestionStartTime(Date.now());
+          if (timedMode) {
+            setTimeRemaining(timePerQuestion);
+          }
+          setQuizState("active");
+          toast({
+            title: "Quiz Started",
+            description: "Generation took a bit longer, but we found your quiz!",
+          });
+          return;
+        }
+      } catch (e) {
+        console.error("Recovery failed", e);
+      }
+
       toast({
         title: "Generation failed",
         description: error.message,
@@ -143,7 +190,7 @@ export function QuizPage() {
   }, [currentMCQ, currentMCQSet, currentIndex, answers, timePerQuestion]);
 
   const startQuiz = () => {
-    const mcqSet = mcqSets.find((s) => s.id === selectedSetId);
+    const mcqSet = displayMCQSets.find((s) => s.id === selectedSetId);
     if (!mcqSet) {
       toast({
         title: "No MCQ set selected",
@@ -188,6 +235,7 @@ export function QuizPage() {
         setTimeRemaining(timePerQuestion);
       }
     } else {
+      // Finish quiz immediately after last answer
       finishQuiz(newAnswers);
     }
   };
@@ -356,16 +404,20 @@ export function QuizPage() {
                         <SelectValue placeholder="Choose an MCQ set to quiz on" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
-                        {mcqSets.length === 0 ? (
+                        {displayMCQSets.length === 0 ? (
                           <SelectItem value="empty" disabled>
                             No MCQ sets available - generate some first!
                           </SelectItem>
                         ) : (
-                          mcqSets.slice().reverse().slice(0, 5).map((set) => (
-                            <SelectItem key={set.id} value={set.id} className="hover:bg-white/5 cursor-pointer">
-                              {set.topic || "MCQ Set"} ({(set.mcqs as any[]).length} questions) - {formatDate(set.createdAt)}
-                            </SelectItem>
-                          ))
+                          displayMCQSets
+                            .slice()
+                            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                            .slice(0, 5)
+                            .map((set) => (
+                              <SelectItem key={set.id} value={set.id} className="hover:bg-white/5 cursor-pointer">
+                                {set.topic || "MCQ Set"} ({(set.mcqs as any[]).length} questions) - {formatDate(set.createdAt)}
+                              </SelectItem>
+                            ))
                         )}
                       </SelectContent>
                     </Select>
@@ -373,7 +425,7 @@ export function QuizPage() {
 
                   <Button
                     onClick={startQuiz}
-                    disabled={!selectedSetId || mcqSets.length === 0}
+                    disabled={!selectedSetId || displayMCQSets.length === 0}
                     className="w-full bg-green-600 hover:bg-green-500 text-white"
                     data-testid="button-start-quiz"
                   >
