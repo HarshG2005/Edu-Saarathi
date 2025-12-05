@@ -27,7 +27,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function AuthPage() {
-    const { user, loginMutation, registerMutation } = useAuth();
+    const { user, loginMutation, registerMutation, guestLoginMutation } = useAuth();
     const [_, setLocation] = useLocation();
     const [showPassword, setShowPassword] = useState(false);
     const [activeTab, setActiveTab] = useState("login");
@@ -285,7 +285,25 @@ export default function AuthPage() {
                             </Form>
                         )}
                     </CardContent>
-                    <CardFooter className="bg-gfg-bg dark:bg-gfg-dark-panel p-4 border-t border-gfg-border dark:border-gfg-dark-border flex justify-center rounded-b-lg">
+                    <CardFooter className="bg-gfg-bg dark:bg-gfg-dark-panel p-4 border-t border-gfg-border dark:border-gfg-dark-border flex flex-col gap-4 justify-center rounded-b-lg">
+                        <Button
+                            variant="outline"
+                            type="button"
+                            className="w-full border-gfg-green text-gfg-green hover:bg-gfg-green/10 dark:border-gfg-green-light dark:text-gfg-green-light dark:hover:bg-gfg-green-light/10"
+                            onClick={() => {
+                                guestLoginMutation.mutate();
+                            }}
+                            disabled={guestLoginMutation.isPending}
+                        >
+                            {guestLoginMutation.isPending ? (
+                                <div className="flex items-center gap-2">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <span>Creating guest account...</span>
+                                </div>
+                            ) : (
+                                "Continue as Guest"
+                            )}
+                        </Button>
                         <p className="text-[11px] text-gfg-text-light dark:text-gfg-dark-muted text-center">
                             By continuing you agree to our <span className="text-gfg-green dark:text-gfg-green-light hover:underline cursor-pointer">Terms</span> & <span className="text-gfg-green dark:text-gfg-green-light hover:underline cursor-pointer">Privacy Policy</span>
                         </p>

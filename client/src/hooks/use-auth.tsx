@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAppStore } from "../lib/store";
 
 type AuthContextType = {
     user: SelectUser | null;
@@ -11,6 +12,7 @@ type AuthContextType = {
     loginMutation: any;
     logoutMutation: any;
     registerMutation: any;
+    guestLoginMutation: any;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -26,12 +28,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         queryFn: getQueryFn({ on401: "returnNull" }),
     });
 
+
+
     const loginMutation = useMutation({
         mutationFn: async (credentials: InsertUser) => {
             const res = await apiRequest("POST", "/api/login", credentials);
             return await res.json();
         },
         onSuccess: (user: SelectUser) => {
+            queryClient.resetQueries();
+            useAppStore.getState().reset(); // Clear persisted store
             queryClient.setQueryData(["/api/user"], user);
         },
         onError: (error: Error) => {
@@ -49,11 +55,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return await res.json();
         },
         onSuccess: (user: SelectUser) => {
+            queryClient.resetQueries();
+            useAppStore.getState().reset(); // Clear persisted store
             queryClient.setQueryData(["/api/user"], user);
         },
         onError: (error: Error) => {
             toast({
                 title: "Registration failed",
+                description: error.message,
+                variant: "destructive",
+            });
+        },
+    });
+
+    const guestLoginMutation = useMutation({
+        mutationFn: async () => {
+            const res = await apiRequest("POST", "/api/guest-login");
+            return await res.json();
+        },
+        onSuccess: (user: SelectUser) => {
+            queryClient.resetQueries();
+            useAppStore.getState().reset(); // Clear persisted store
+            queryClient.setQueryData(["/api/user"], user);
+        },
+        onError: (error: Error) => {
+            toast({
+                title: "Guest login failed",
                 description: error.message,
                 variant: "destructive",
             });
@@ -66,7 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         onSuccess: () => {
             queryClient.setQueryData(["/api/user"], null);
-            queryClient.clear(); // Clear all cached data (documents, etc.)
+            queryClient.clear();
+            useAppStore.getState().reset(); // Clear persisted store
         },
         onError: (error: Error) => {
             toast({
@@ -86,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 loginMutation,
                 logoutMutation,
                 registerMutation,
+                guestLoginMutation,
             }}
         >
             {children}

@@ -110,6 +110,51 @@ router.post("/login", async (req, res) => {
     }
 });
 
+// POST /api/guest-login
+router.post("/guest-login", async (req, res) => {
+    try {
+        // Generate random guest credentials
+        const randomId = Math.random().toString(36).substring(2, 10);
+        const email = `guest_${randomId}@eduquest.ai`;
+        const password = Math.random().toString(36).substring(2, 15);
+        const displayName = "Guest User";
+
+        const passwordHash = await hashPassword(password);
+        const user = await storage.createUser({
+            email,
+            passwordHash,
+            displayName,
+        });
+
+        const payload = { sub: user.id, email: user.email };
+        const accessToken = signAccessToken(payload);
+        const refreshToken = signRefreshToken(payload);
+
+        res.cookie("refresh_token", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
+        res.cookie("access_token", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000, // 15 minutes
+        });
+
+        res.status(201).json({
+            id: user.id,
+            email: user.email,
+            displayName: user.displayName,
+        });
+    } catch (error: any) {
+        console.error("Guest login error:", error);
+        res.status(500).json({ message: "Guest login failed", details: error.message });
+    }
+});
+
 // POST /api/refresh
 router.post("/refresh", (req, res) => {
     const refreshToken = req.cookies["refresh_token"];

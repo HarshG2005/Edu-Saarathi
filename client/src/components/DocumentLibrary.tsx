@@ -1,23 +1,8 @@
 import React from 'react';
-import { FileText, Search, Upload, ChevronRight, Clock } from 'lucide-react';
-
-// Sample data — replace with your real documents from backend
-interface Doc {
-    id: number;
-    title: string;
-    size: string;
-    pages: number;
-    date: string;
-    tag: string;
-    gradient: string;
-}
-
-const sampleDocs: Doc[] = [
-    { id: 1, title: 'DBMS Report', size: '1.5 MB', pages: 22, date: 'Dec 5, 2025', tag: 'DBMS', gradient: 'from-purple-600 to-indigo-700' },
-    { id: 2, title: 'RMIPR (1)', size: '222.7 KB', pages: 19, date: 'Dec 4, 2025', tag: 'RMIPR', gradient: 'from-sky-600 to-cyan-600' },
-    { id: 3, title: 'SE-PM Module-1 Notes', size: '1000.1 KB', pages: 15, date: 'Dec 3, 2025', tag: 'Notes', gradient: 'from-emerald-500 to-teal-600' },
-    { id: 4, title: 'Misc Lecture Slides', size: '2.2 MB', pages: 38, date: 'Nov 28, 2025', tag: 'Slides', gradient: 'from-orange-400 to-red-500' }
-];
+import { FileText, Search, Upload, ChevronRight, Clock, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Document } from '@shared/schema';
+import { format } from 'date-fns';
 
 // Reusable Icon component (small)
 const FileIcon = ({ className = '' }: { className?: string }) => (
@@ -27,20 +12,31 @@ const FileIcon = ({ className = '' }: { className?: string }) => (
 );
 
 // Document Card — visually polished
-function DocumentCard({ doc }: { doc: Doc }) {
+function DocumentCard({ doc }: { doc: Document }) {
+    // Generate a consistent gradient based on ID
+    const gradients = [
+        'from-purple-600 to-indigo-700',
+        'from-sky-600 to-cyan-600',
+        'from-emerald-500 to-teal-600',
+        'from-orange-400 to-red-500',
+        'from-pink-500 to-rose-500',
+        'from-blue-500 to-indigo-600'
+    ];
+    const gradient = gradients[doc.id % gradients.length];
+
     return (
         <div className={`rounded-2xl overflow-hidden drop-shadow-lg transform transition-all duration-300 hover:scale-[1.025] group`}>
             {/* Gradient header */}
-            <div className={`p-5 bg-gradient-to-br ${doc.gradient} relative`}>
+            <div className={`p-5 bg-gradient-to-br ${gradient} relative`}>
                 <div className="flex items-start gap-4">
                     <FileIcon />
                     <div className="flex-1">
-                        <h3 className="text-white font-semibold text-lg leading-tight">{doc.title}</h3>
-                        <p className="text-white/80 text-sm mt-1">{doc.tag}</p>
+                        <h3 className="text-white font-semibold text-lg leading-tight truncate" title={doc.name}>{doc.name}</h3>
+                        <p className="text-white/80 text-sm mt-1">PDF</p>
                     </div>
                     <div className="text-white/80 text-sm text-right">
-                        <div className="text-xs">{doc.pages} pages</div>
-                        <div className="text-xs opacity-80">{doc.size}</div>
+                        <div className="text-xs">{doc.pageCount} pages</div>
+                        <div className="text-xs opacity-80">{(doc.fileSize / 1024 / 1024).toFixed(1)} MB</div>
                     </div>
                 </div>
                 {/* subtle glow */}
@@ -53,9 +49,9 @@ function DocumentCard({ doc }: { doc: Doc }) {
             <div className="bg-neutral-900 p-5 border border-white/5 group-hover:border-white/10 transition-colors">
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <p className="text-gray-200 font-semibold truncate max-w-[120px]" title={doc.title}>{doc.title}</p>
+                        <p className="text-gray-200 font-semibold truncate max-w-[120px]" title={doc.name}>{doc.name}</p>
                         <p className="text-gray-400 text-sm mt-1 flex items-center gap-1">
-                            Uploaded • {doc.date}
+                            Uploaded • {format(new Date(doc.uploadedAt), 'MMM d, yyyy')}
                         </p>
                     </div>
                     <div className="flex gap-2 items-center">
@@ -66,10 +62,10 @@ function DocumentCard({ doc }: { doc: Doc }) {
 
                 <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-gray-400">
                     <div className="flex items-center gap-2">
-                        <span className="opacity-80">{doc.size}</span>
+                        <span className="opacity-80">{(doc.fileSize / 1024).toFixed(0)} KB</span>
                     </div>
                     <div className="flex items-center gap-2 justify-end">
-                        <span>{doc.pages} pages</span>
+                        <span>{doc.pageCount} pages</span>
                     </div>
                 </div>
             </div>
@@ -78,6 +74,10 @@ function DocumentCard({ doc }: { doc: Doc }) {
 }
 
 export default function DocumentLibrary() {
+    const { data: documents, isLoading } = useQuery<Document[]>({
+        queryKey: ['/api/documents'],
+    });
+
     return (
         <div className="min-h-screen p-8 bg-gradient-to-b from-[#0b0f12] to-[#071218] text-white">
             <div className="max-w-7xl mx-auto">
@@ -116,11 +116,21 @@ export default function DocumentLibrary() {
 
                 {/* Grid of cards */}
                 <section>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {sampleDocs.map(doc => (
-                            <DocumentCard doc={doc} key={doc.id} />
-                        ))}
-                    </div>
+                    {isLoading ? (
+                        <div className="flex justify-center py-12">
+                            <Loader2 className="w-8 h-8 animate-spin text-green-500" />
+                        </div>
+                    ) : documents && documents.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {documents.map(doc => (
+                                <DocumentCard doc={doc} key={doc.id} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 text-gray-500">
+                            No documents found. Upload one to get started!
+                        </div>
+                    )}
                 </section>
 
             </div>

@@ -91,18 +91,13 @@ export async function registerRoutes(
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      console.log("DEBUG: Uploading file:", req.file.originalname, "Size:", req.file.size);
-      console.log("DEBUG: Buffer length:", req.file.buffer.length);
-
       const { text, pageCount } = await extractTextFromPDF(req.file.buffer);
       const chunks = chunkText(text);
 
       const userId = req.user!.id;
 
       const pdfBase64 = req.file.buffer.toString("base64");
-      console.log("DEBUG: PDF Base64 length:", pdfBase64.length);
 
-      console.log("DEBUG: Creating doc for", userId);
       const document = await storage.createDocument({
         userId,
         name: req.file.originalname.replace(".pdf", ""),
@@ -115,7 +110,6 @@ export async function registerRoutes(
         chunks,
       });
 
-      console.log("DEBUG: Document created with ID:", document.id);
       res.json(document);
     } catch (error: any) {
       console.error("Error uploading document:", error);
@@ -128,7 +122,6 @@ export async function registerRoutes(
 
   // Get all documents
   app.get("/api/documents", requireAuth, async (req, res) => {
-    console.log("DEBUG: Getting docs for", req.user!.id);
     try {
       const documents = await storage.getDocuments(req.user!.id);
       // Don't send pdfData in list view to save bandwidth
@@ -159,20 +152,15 @@ export async function registerRoutes(
 
   // Serve PDF file
   app.get("/api/documents/:id/pdf", requireAuth, async (req, res) => {
-    console.log("DEBUG: Fetching PDF for doc ID:", req.params.id);
     try {
       const document = await storage.getDocument(req.params.id);
       if (!document) {
-        console.log("DEBUG: Document not found");
         return res.status(404).json({ message: "Document not found" });
       }
 
       if (!document.pdfData) {
-        console.log("DEBUG: pdfData is missing/empty for doc ID:", req.params.id);
         return res.status(404).json({ message: "Document or PDF data not found" });
       }
-
-      console.log("DEBUG: Found PDF data, length:", document.pdfData.length);
 
       if (document.userId !== req.user!.id) {
         return res.status(403).json({ message: "Unauthorized" });

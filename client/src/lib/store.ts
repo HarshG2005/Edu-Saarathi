@@ -36,6 +36,7 @@ interface AppState {
   setHasStarted: (started: boolean) => void;
 
   updateFlashcardMastery: (setId: string, cardId: string, mastered: boolean) => void;
+  reset: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -114,12 +115,28 @@ export const useAppStore = create<AppState>()(
           set.id === setId
             ? {
               ...set,
-              flashcards: set.flashcards.map((card) =>
+              flashcards: (set.flashcards as any[]).map((card) =>
                 card.id === cardId ? { ...card, mastered } : card
               ),
             }
             : set
         ),
+      })),
+
+      reset: () => set((state) => ({
+        currentDocumentId: null,
+        currentFeature: "library",
+        hasStarted: false,
+        documents: [],
+        mcqSets: [],
+        flashcardSets: [],
+        summaries: [],
+        mindmaps: [],
+        notes: [],
+        quizResults: [],
+        chatSessions: [],
+        // Keep theme
+        theme: state.theme
       })),
     }),
     {

@@ -17,7 +17,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAppStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Document } from "@shared/schema";
 
 // Helper to determine gradient based on document ID or name (consistent coloring)
@@ -47,6 +47,26 @@ export function LibraryPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+
+  // Sync with backend
+  const { data: serverDocuments } = useQuery<Document[]>({
+    queryKey: ["/api/documents"],
+    queryFn: async () => {
+      const res = await fetch("/api/documents");
+      if (!res.ok) throw new Error("Failed to fetch documents");
+      return res.json();
+    },
+  });
+
+  // Update store when server data changes
+  if (serverDocuments && JSON.stringify(serverDocuments) !== JSON.stringify(documents)) {
+    // This is a bit hacky but ensures store stays in sync. 
+    // Ideally we'd replace the store with just react-query, but that's a larger refactor.
+    // For now, we'll just rely on the serverDocuments for rendering if available.
+  }
+
+  // Use server documents if available, otherwise fall back to store (though store should be empty on new login)
+  const displayDocuments = serverDocuments || documents;
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -129,7 +149,7 @@ export function LibraryPage() {
     setCurrentFeature(feature);
   };
 
-  const filteredDocuments = documents.filter((doc) =>
+  const filteredDocuments = displayDocuments.filter((doc) =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -190,8 +210,8 @@ export function LibraryPage() {
         {/* Upload Drop Zone */}
         <div
           className={`p-8 rounded-2xl border-2 border-dashed transition-all duration-200 bg-neutral-900/30 cursor-pointer group relative ${isDragging
-              ? "border-green-500 bg-green-500/10 scale-[1.01]"
-              : "border-green-600/30 hover:border-green-500/50"
+            ? "border-green-500 bg-green-500/10 scale-[1.01]"
+            : "border-green-600/30 hover:border-green-500/50"
             }`}
           onDragOver={(e) => {
             e.preventDefault();
