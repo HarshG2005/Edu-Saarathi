@@ -174,10 +174,14 @@ Respond with JSON in this exact format:
 
         // Calculate positions (same logic as before)
         // Calculate positions and structure for React Flow
-        const nodesWithPositions = result.nodes.map((node: { id: string; label: string }, index: number) => {
+        // Calculate positions and structure for React Flow
+        const nodes = Array.isArray(result.nodes) ? result.nodes : [];
+        const edges = Array.isArray(result.edges) ? result.edges : [];
+
+        const nodesWithPositions = nodes.map((node: { id: string; label: string }, index: number) => {
             let position = { x: 400, y: 300 };
             if (index !== 0) {
-                const angle = ((index - 1) / (result.nodes.length - 1)) * 2 * Math.PI;
+                const angle = ((index - 1) / (nodes.length - 1)) * 2 * Math.PI;
                 const radius = 150 + (index % 3) * 80;
                 position = {
                     x: 400 + Math.cos(angle) * radius,
@@ -192,7 +196,13 @@ Respond with JSON in this exact format:
             };
         });
 
-        return { nodes: nodesWithPositions, edges: result.edges };
+        // Add IDs to edges
+        const edgesWithIds = edges.map((edge: { source: string; target: string }) => ({
+            ...edge,
+            id: `e${edge.source}-${edge.target}`
+        }));
+
+        return { nodes: nodesWithPositions, edges: edgesWithIds };
     }
 
     async generateNotes(

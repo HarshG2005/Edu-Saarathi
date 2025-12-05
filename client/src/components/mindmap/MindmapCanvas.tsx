@@ -134,13 +134,22 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
                 ...node,
                 data: {
                     ...node.data,
-                    onAddChild: handleAddChild,
                     onOpenSource: handleOpenSource,
                 },
                 type: 'custom', // Force custom type
             }));
             setNodes(nodesWithCallbacks);
-            setEdges(graph.edges || []);
+
+            // Force apply edge defaults to ensure visibility and fix missing IDs
+            const edgesWithStyles = (graph.edges || []).map((edge: any) => ({
+                ...edge,
+                ...edgeDefaults,
+                id: edge.id || `e${edge.source}-${edge.target}`,
+                source: edge.source,
+                target: edge.target,
+            }));
+            setEdges(edgesWithStyles);
+
             setTimeout(() => fitView(), 100);
         }
     }, [mindmap.id]); // Re-init when mindmap ID changes
@@ -256,7 +265,17 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
                 type: 'custom',
             }));
             setNodes(nodesWithCallbacks);
-            setEdges(graph.edges || []);
+
+            // Force apply edge defaults to snapshots too
+            const edgesWithStyles = (graph.edges || []).map((edge: any) => ({
+                ...edge,
+                ...edgeDefaults,
+                id: edge.id || `e${edge.source}-${edge.target}`,
+                source: edge.source,
+                target: edge.target,
+            }));
+            setEdges(edgesWithStyles);
+
             setTimeout(() => fitView(), 100);
             toast({ title: "Restored", description: "Snapshot restored. Don't forget to save if you want to keep this version." });
         }
@@ -334,7 +353,7 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
                     </Button>
                 </Panel>
             </ReactFlow>
-        </div>
+        </div >
     );
 }
 

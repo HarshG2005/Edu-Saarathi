@@ -217,29 +217,37 @@ router.post("/mindmap/generate", requireAuth, async (req, res) => {
             viewport: { x: 0, y: 0, zoom: 1 }
         };
 
-        const mindmap = await storage.createMindmap({
+        const mindmapData = {
             userId,
-            documentId: sanitizedDocId,
+            documentId: sanitizedDocId || undefined, // Use undefined for Drizzle to skip/null it
             name: finalTopic || "Generated Mindmap",
             graph
-        });
+        };
+
+        console.log("Creating mindmap with data:", JSON.stringify({ ...mindmapData, graph: "..." }));
+
+        const mindmap = await storage.createMindmap(mindmapData);
 
         res.status(201).json(mindmap);
     } catch (error: any) {
         console.error("Mindmap generation error:", error);
         const fs = await import("fs");
-        const errorDetails = {
-            message: error.message,
-            stack: error.stack,
-            sanitizedDocId: sanitizedDocId, // Log the value we tried to use
+
+        // Extract all properties including non-enumerable ones
+        const errorDetails: any = {};
+        Object.getOwnPropertyNames(error).forEach(key => {
+            errorDetails[key] = error[key];
+        });
+
+        // Add context
+        errorDetails.context = {
+            sanitizedDocId,
             originalDocId: documentId,
-            detail: error.detail,
-            code: error.code,
-            hint: error.hint,
-            where: error.where
+            payload: { topic, provider }
         };
+
         fs.writeFileSync("mindmap_error.log", `Error: ${JSON.stringify(errorDetails, null, 2)}\n`);
-        res.status(500).json({ message: "Failed to generate mindmap" });
+        res.status(500).json({ message: "Failed to generate mindmap", details: error.message });
     }
 });
 
