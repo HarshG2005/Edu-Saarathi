@@ -26,7 +26,7 @@ export function MindmapNodeToolbar({
     hasSource
 }: MindmapNodeToolbarProps) {
     return (
-        <NodeToolbar isVisible={true} position="top" className="flex gap-1 bg-white dark:bg-gfg-dark-card p-1 rounded-lg border border-gfg-border-light dark:border-gfg-dark-border shadow-sm">
+        <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex gap-1 bg-white dark:bg-gfg-dark-card p-1 rounded-lg border border-gfg-border-light dark:border-gfg-dark-border shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-50">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
@@ -34,7 +34,10 @@ export function MindmapNodeToolbar({
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 hover:bg-gfg-green-50 hover:text-gfg-green"
-                            onClick={() => onAddChild(nodeId)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onAddChild(nodeId);
+                            }}
                         >
                             <Plus className="h-3.5 w-3.5" />
                         </Button>
@@ -49,7 +52,10 @@ export function MindmapNodeToolbar({
                                 variant="ghost"
                                 size="icon"
                                 className="h-6 w-6 hover:bg-gfg-green-50 hover:text-gfg-green"
-                                onClick={() => onAttachNote(nodeId)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onAttachNote(nodeId);
+                                }}
                             >
                                 <FileText className="h-3.5 w-3.5" />
                             </Button>
@@ -65,7 +71,10 @@ export function MindmapNodeToolbar({
                                 variant="ghost"
                                 size="icon"
                                 className="h-6 w-6 hover:bg-gfg-green-50 hover:text-gfg-green"
-                                onClick={() => onOpenSource(nodeId)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onOpenSource(nodeId);
+                                }}
                             >
                                 <ExternalLink className="h-3.5 w-3.5" />
                             </Button>
@@ -80,7 +89,10 @@ export function MindmapNodeToolbar({
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 hover:bg-red-50 hover:text-red-500"
-                            onClick={() => onDelete(nodeId)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onDelete(nodeId);
+                            }}
                         >
                             <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -88,6 +100,6 @@ export function MindmapNodeToolbar({
                     <TooltipContent>Delete Node</TooltipContent>
                 </Tooltip>
             </TooltipProvider>
-        </NodeToolbar>
+        </div>
     );
 }

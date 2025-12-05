@@ -21,7 +21,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Save, Download, Layout, RotateCcw, History } from "lucide-react";
+import { Save, Download, Layout, RotateCcw, History, ArrowDown, ArrowRight } from "lucide-react";
 import { MindmapNodeToolbar } from "./NodeToolbar";
 import { nodeDefaults, edgeDefaults, getLayoutedElements } from "@/lib/mindmapUtils";
 import { Mindmap, MindmapSnapshot } from "@shared/schema";
@@ -38,7 +38,7 @@ import {
 import { getGradient } from "@/lib/utils";
 
 // Custom Node Component
-const CustomNode = ({ id, data, selected }: NodeProps) => {
+const CustomNode = ({ id, data, selected, sourcePosition, targetPosition }: NodeProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [label, setLabel] = useState(data.label as string);
     const { setNodes } = useReactFlow();
@@ -73,9 +73,9 @@ const CustomNode = ({ id, data, selected }: NodeProps) => {
 
     return (
         <div
-            className={`group px-4 py-3 shadow-lg rounded-xl min-w-[150px] text-center transition-all duration-200 ${selected
-                ? "ring-2 ring-white/60 scale-105"
-                : "hover:ring-1 hover:ring-white/20"
+            className={`group relative px-6 py-4 shadow-xl rounded-xl min-w-[180px] text-center transition-all duration-200 ${selected
+                ? "ring-4 ring-white/60 scale-105"
+                : "hover:ring-2 hover:ring-white/30"
                 } bg-gradient-to-br ${gradientClass}`}
             onDoubleClick={() => setIsEditing(true)}
         >
@@ -88,7 +88,7 @@ const CustomNode = ({ id, data, selected }: NodeProps) => {
             />
             <Handle
                 type="target"
-                position={Position.Top}
+                position={targetPosition || Position.Top}
                 className="w-3 h-3 !bg-white border-2 border-white/20 opacity-0 group-hover:opacity-100 transition-opacity"
             />
 
@@ -97,16 +97,16 @@ const CustomNode = ({ id, data, selected }: NodeProps) => {
                     value={label}
                     onChange={onLabelChange}
                     onBlur={onLabelBlur}
-                    className="h-6 text-sm text-center border-none shadow-none focus-visible:ring-0 p-0 bg-transparent text-white placeholder:text-white/50"
+                    className="h-7 text-base font-bold text-center border-none shadow-none focus-visible:ring-0 p-0 bg-transparent text-white placeholder:text-white/50"
                     autoFocus
                 />
             ) : (
-                <div className="text-sm font-bold text-white drop-shadow-md">{data.label as string}</div>
+                <div className="text-base font-bold text-white drop-shadow-lg tracking-wide leading-tight">{data.label as string}</div>
             )}
 
             <Handle
                 type="source"
-                position={Position.Bottom}
+                position={sourcePosition || Position.Bottom}
                 className="w-3 h-3 !bg-white border-2 border-white/20 opacity-0 group-hover:opacity-100 transition-opacity"
             />
         </div>
@@ -189,10 +189,11 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
         toast({ title: "Opening source...", description: "Feature coming soon" });
     }, [toast]);
 
-    const handleLayout = useCallback(() => {
+    const handleLayout = useCallback((direction = 'TB') => {
         const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
             nodes,
-            edges
+            edges,
+            direction
         );
         setNodes([...layoutedNodes]);
         setEdges([...layoutedEdges]);
@@ -282,10 +283,24 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
                 />
 
                 <Panel position="top-right" className="flex gap-2">
-                    <Button size="sm" onClick={handleLayout} className="bg-green-600 hover:bg-green-700 text-white border-green-500 hover:border-green-600 shadow-md transition-all">
-                        <Layout className="mr-2 h-4 w-4" />
-                        Auto Layout
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white border-green-500 hover:border-green-600 shadow-md transition-all">
+                                <Layout className="mr-2 h-4 w-4" />
+                                Auto Layout
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="dark:bg-neutral-900 dark:border-neutral-800">
+                            <DropdownMenuItem onClick={() => handleLayout('LR')} className="dark:focus:bg-neutral-800">
+                                <ArrowDown className="mr-2 h-4 w-4" />
+                                Vertical
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleLayout('TB')} className="dark:focus:bg-neutral-800">
+                                <ArrowRight className="mr-2 h-4 w-4" />
+                                Horizontal
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>

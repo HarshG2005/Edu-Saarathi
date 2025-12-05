@@ -35,7 +35,7 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'T
     dagreGraph.setGraph({ rankdir: direction });
 
     nodes.forEach((node) => {
-        dagreGraph.setNode(node.id, { width: 150, height: 50 }); // Estimate dimensions
+        dagreGraph.setNode(node.id, { width: 220, height: 80 }); // Estimate dimensions
     });
 
     edges.forEach((edge) => {
