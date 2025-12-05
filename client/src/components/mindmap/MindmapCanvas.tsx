@@ -35,6 +35,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { getGradient } from "@/lib/utils";
+
 // Custom Node Component
 const CustomNode = ({ id, data, selected }: NodeProps) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -62,20 +64,19 @@ const CustomNode = ({ id, data, selected }: NodeProps) => {
     };
 
     const onAddChild = () => {
-        // Handled by parent via context or event, but for now simple implementation
-        // We need access to addNode function, which is easier if passed via data or context
-        // For simplicity, we'll trigger a custom event or use a store if available
-        // But here we are inside the node.
-        // Let's use the data callback pattern if we passed it.
         if (typeof data.onAddChild === 'function') {
             (data.onAddChild as (id: string) => void)(id);
         }
     };
 
+    const gradientClass = useMemo(() => getGradient(id), [id]);
+
     return (
         <div
-            className={`px-4 py-2 shadow-md rounded-md bg-white dark:bg-gfg-dark-card border-2 min-w-[150px] text-center transition-all ${selected ? "border-gfg-green" : "border-gfg-border-light dark:border-gfg-dark-border"
-                }`}
+            className={`group px-4 py-3 shadow-lg rounded-xl min-w-[150px] text-center transition-all duration-200 ${selected
+                ? "ring-2 ring-white/60 scale-105"
+                : "hover:ring-1 hover:ring-white/20"
+                } bg-gradient-to-br ${gradientClass}`}
             onDoubleClick={() => setIsEditing(true)}
         >
             <MindmapNodeToolbar
@@ -85,21 +86,29 @@ const CustomNode = ({ id, data, selected }: NodeProps) => {
                 hasSource={!!data.source}
                 onOpenSource={data.onOpenSource as any}
             />
-            <Handle type="target" position={Position.Top} className="w-2 h-2 !bg-gfg-text-light" />
+            <Handle
+                type="target"
+                position={Position.Top}
+                className="w-3 h-3 !bg-white border-2 border-white/20 opacity-0 group-hover:opacity-100 transition-opacity"
+            />
 
             {isEditing ? (
                 <Input
                     value={label}
                     onChange={onLabelChange}
                     onBlur={onLabelBlur}
-                    className="h-6 text-xs text-center border-none shadow-none focus-visible:ring-0 p-0"
+                    className="h-6 text-sm text-center border-none shadow-none focus-visible:ring-0 p-0 bg-transparent text-white placeholder:text-white/50"
                     autoFocus
                 />
             ) : (
-                <div className="text-sm font-medium text-gfg-text">{data.label as string}</div>
+                <div className="text-sm font-bold text-white drop-shadow-md">{data.label as string}</div>
             )}
 
-            <Handle type="source" position={Position.Bottom} className="w-2 h-2 !bg-gfg-text-light" />
+            <Handle
+                type="source"
+                position={Position.Bottom}
+                className="w-3 h-3 !bg-white border-2 border-white/20 opacity-0 group-hover:opacity-100 transition-opacity"
+            />
         </div>
     );
 };
@@ -265,29 +274,33 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
                 className="bg-gfg-bg-secondary/5"
             >
                 <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#6b7280" />
-                <Controls />
-                <MiniMap nodeColor="#2F8D46" maskColor="rgba(255, 255, 255, 0.8)" />
+                <Controls className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 [&>button]:dark:bg-neutral-900 [&>button]:dark:border-neutral-800 [&>button]:dark:fill-white [&>button:hover]:dark:bg-neutral-800" />
+                <MiniMap
+                    nodeColor="#4ade80"
+                    maskColor="rgba(0, 0, 0, 0.6)"
+                    className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800"
+                />
 
                 <Panel position="top-right" className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleLayout} className="bg-white/80 backdrop-blur">
+                    <Button size="sm" onClick={handleLayout} className="bg-green-600 hover:bg-green-700 text-white border-green-500 hover:border-green-600 shadow-md transition-all">
                         <Layout className="mr-2 h-4 w-4" />
                         Auto Layout
                     </Button>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="bg-white/80 backdrop-blur">
+                            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white border-green-500 hover:border-green-600 shadow-md transition-all">
                                 <History className="mr-2 h-4 w-4" />
                                 History
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuItem onClick={() => snapshotMutation.mutate()}>
+                        <DropdownMenuContent align="end" className="w-56 dark:bg-neutral-900 dark:border-neutral-800">
+                            <DropdownMenuItem onClick={() => snapshotMutation.mutate()} className="dark:focus:bg-neutral-800">
                                 <Save className="mr-2 h-4 w-4" />
                                 Create Snapshot
                             </DropdownMenuItem>
                             {snapshots?.map((snap) => (
-                                <DropdownMenuItem key={snap.id} onClick={() => handleRestoreSnapshot(snap)}>
+                                <DropdownMenuItem key={snap.id} onClick={() => handleRestoreSnapshot(snap)} className="dark:focus:bg-neutral-800">
                                     <RotateCcw className="mr-2 h-4 w-4" />
                                     {new Date(snap.createdAt).toLocaleString()}
                                 </DropdownMenuItem>
@@ -299,7 +312,7 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
                         size="sm"
                         onClick={() => saveMutation.mutate()}
                         disabled={saveMutation.isPending}
-                        className="bg-gfg-green hover:bg-gfg-green/90 text-white"
+                        className="bg-gfg-green hover:bg-gfg-green/90 text-white border-0 shadow-md"
                     >
                         <Save className="mr-2 h-4 w-4" />
                         Save

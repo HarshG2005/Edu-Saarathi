@@ -8,29 +8,21 @@ export type FlowEdge = Edge;
 
 export const nodeDefaults = {
     style: {
-        padding: "12px 20px",
-        borderRadius: "12px",
-        border: "1px solid #d1d5db", // gfg-border-light
-        background: "#ffffff", // white
-        color: "#1f2937", // gfg-text
-        fontSize: 14,
-        fontWeight: 500,
-        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-        minWidth: "150px",
-        textAlign: "center" as const,
+        // We remove visual styles here to let CustomNode handle them via Tailwind
+        // Only keep layout-related styles if necessary, or empty
+        width: 150, // Default width
     },
 };
 
 export const edgeDefaults = {
     style: {
-        stroke: "#2F8D46", // gfg-green
-        strokeWidth: 2,
-        opacity: 0.6,
+        stroke: "#ffffff",
+        strokeWidth: 3,
     },
-    animated: true,
+    animated: false,
     markerEnd: {
         type: MarkerType.ArrowClosed,
-        color: "#2F8D46",
+        color: "#ffffff",
     },
 };
 
