@@ -119,7 +119,7 @@ export default function StudyGuidePage() {
                         <SelectTrigger className="w-full md:w-[400px] bg-white/5 border-white/10 text-white">
                             <SelectValue placeholder="Select a document..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                        <SelectContent className="bg-card border-border text-white">
                             {sortedDocuments.map((doc) => (
                                 <SelectItem key={doc.id} value={doc.id} className="hover:bg-white/5 cursor-pointer">
                                     {doc.name}

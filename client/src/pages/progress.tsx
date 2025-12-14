@@ -78,7 +78,7 @@ export function ProgressPage() {
       </div>
 
       {/* New Student Progress Bar */}
-      <Card className="bg-[#0b0f12] border-white/10 overflow-hidden shadow-sm">
+      <Card className="bg-card border-border overflow-hidden shadow-sm">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
@@ -135,7 +135,7 @@ export function ProgressPage() {
             <SelectTrigger className="w-[250px] bg-white/5 border-white/10 text-white">
               <SelectValue placeholder="Filter by Document" />
             </SelectTrigger>
-            <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+            <SelectContent className="bg-card border-border text-white">
               <SelectItem value="all" className="hover:bg-white/5 cursor-pointer">All Documents</SelectItem>
               {[...documents]
                 .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
@@ -151,7 +151,7 @@ export function ProgressPage() {
             <SelectTrigger className="w-[150px] bg-white/5 border-white/10 text-white">
               <SelectValue placeholder="Time Range" />
             </SelectTrigger>
-            <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+            <SelectContent className="bg-card border-border text-white">
               <SelectItem value="week" className="hover:bg-white/5 cursor-pointer">Last 7 Days</SelectItem>
               <SelectItem value="month" className="hover:bg-white/5 cursor-pointer">Last 30 Days</SelectItem>
               <SelectItem value="all" className="hover:bg-white/5 cursor-pointer">All Time</SelectItem>

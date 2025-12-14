@@ -130,7 +130,7 @@ export function TutorPage() {
             <SelectTrigger className="w-48 bg-white/5 border-white/10 text-white" data-testid="select-document">
               <SelectValue placeholder="No document context" />
             </SelectTrigger>
-            <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+            <SelectContent className="bg-card border-border text-white">
               <SelectItem value="none" className="hover:bg-white/5 cursor-pointer">No document context</SelectItem>
               {[...documents]
                 .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())

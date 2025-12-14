@@ -155,7 +155,7 @@ export function SummaryPage() {
         </TabsList>
 
         <TabsContent value="generate" className="mt-6">
-          <Card className="bg-[#0b0f12] border-white/10">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
                 <FileText className="h-5 w-5 text-green-400" />
@@ -169,7 +169,7 @@ export function SummaryPage() {
                   <SelectTrigger id="document" className="bg-white/5 border-white/10 text-white" data-testid="select-document">
                     <SelectValue placeholder="Select a document or enter a topic" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                  <SelectContent className="bg-card border-border text-white">
                     <SelectItem value="none" className="hover:bg-white/5 cursor-pointer">No document (use topic only)</SelectItem>
                     {[...documents]
                       .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())

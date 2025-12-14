@@ -13,7 +13,7 @@ export function MindmapPage() {
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
 
   return (
-    <div className="flex h-[calc(100vh-theme(spacing.16))] overflow-hidden bg-[#0b0f12]">
+    <div className="flex h-[calc(100vh-theme(spacing.16))] overflow-hidden bg-background">
       <MindmapSidebar
         mindmaps={mindmaps}
         selectedId={selectedMindmap?.id}
@@ -27,7 +27,7 @@ export function MindmapPage() {
         }}
       />
 
-      <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-[#0b0f12]">
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-background">
         {selectedMindmap ? (
           <MindmapCanvas
             key={selectedMindmap.id} // Force re-mount on change

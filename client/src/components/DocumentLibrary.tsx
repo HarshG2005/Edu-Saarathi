@@ -79,7 +79,7 @@ export default function DocumentLibrary() {
     });
 
     return (
-        <div className="min-h-screen p-8 bg-gradient-to-b from-[#0b0f12] to-[#071218] text-white">
+        <div className="min-h-screen p-8 bg-background text-foreground">
             <div className="max-w-7xl mx-auto">
                 <header className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                     <div>

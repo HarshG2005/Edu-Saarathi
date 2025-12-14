@@ -188,7 +188,7 @@ export function NotesPage() {
                   <SelectTrigger id="document" className="bg-white/5 border-white/10 text-white" data-testid="select-document">
                     <SelectValue placeholder="Select a document or enter a topic" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                  <SelectContent className="bg-card border-border text-white">
                     <SelectItem value="none" className="hover:bg-white/5 cursor-pointer">No document (use topic only)</SelectItem>
                     {[...documents]
                       .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())

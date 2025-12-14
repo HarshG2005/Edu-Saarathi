@@ -11,85 +11,44 @@ export default {
         sm: "0.25rem", // 4px
       },
       colors: {
-        // GFG Brand Colors - Mapped to CSS Variables
-        "es-green": "#22c55e",
-        "es-teal": "#14b8a6",
-        "gfg-green": {
-          DEFAULT: "var(--gfg-green)",
-          light: "var(--gfg-green-light)",
-          cta: "var(--gfg-green-cta)",
-        },
-        "gfg-text": {
-          DEFAULT: "var(--gfg-text)",
-          light: "var(--gfg-muted)",
-        },
-        "gfg-bg": {
-          DEFAULT: "var(--gfg-bg)",
-          card: "var(--gfg-card)",
-          nav: "var(--gfg-nav)",
-          secondary: "var(--gfg-bg)", // Fallback/alias
-        },
-        "gfg-border": {
-          DEFAULT: "var(--gfg-border)",
-          light: "var(--gfg-border)",
-          medium: "var(--gfg-border)",
-        },
+        // SAJID METHOD - Core Mapping
+        background: "var(--bg-base)",
+        foreground: "var(--text-primary)",
 
-        // Dark Mode Specific Tokens (Strict GFG Theme)
-        "gfg-dark": {
-          bg: "#0A0A0A",
-          panel: "#0C0C0C",
-          card: "#111111",
-          border: "rgba(255,255,255,0.06)",
-          text: "#E6F0E9",
-          muted: "#9DBAA7",
-          accent: "#2F8D46",
-          "accent-2": "#28A745",
-          positive: "#00C96B",
-          warning: "#E3A008",
-          danger: "#EF4444",
-        },
-
-        // Semantic Colors
-        success: "#28A745",
-        warning: "#FFC107",
-        error: "#DC3545",
-        info: "#17A2B8",
-
-        // Keeping existing shadcn/ui variables mapped to GFG colors where appropriate
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "var(--bg-surface)",
+          foreground: "var(--text-primary)",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "var(--bg-elevated)",
+          foreground: "var(--text-primary)",
         },
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "var(--brand-primary)",
+          foreground: "var(--brand-primary-text)",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "var(--bg-elevated)", // Secondary actions often on elevated surfaces
+          foreground: "var(--text-primary)",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "var(--bg-surface)", // Muted backgrounds usually match card surface
+          foreground: "var(--text-secondary)",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "var(--bg-elevated)", // Accents often hover states
+          foreground: "var(--brand-primary)",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "oklch(0.5 0.2 25)", // Accessible Red
+          foreground: "oklch(0.98 0 0)",
         },
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
+        border: "var(--border-subtle)",
+        input: "var(--border-subtle)",
+        ring: "var(--brand-primary)",
+
+        // Chart colors - keeping standard HSL for now or mapping specific palette if needed
+        // For strict Sajid method we would restrict these, but let's leave them for charts
         chart: {
           "1": "hsl(var(--chart-1))",
           "2": "hsl(var(--chart-2))",
@@ -97,15 +56,53 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+
+        // Sidebar - Mapping to Surface/Base
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+          DEFAULT: "var(--bg-base)",
+          foreground: "var(--text-primary)",
+          primary: "var(--brand-primary)",
+          "primary-foreground": "var(--brand-primary-text)",
+          accent: "var(--bg-elevated)",
+          "accent-foreground": "var(--text-primary)",
+          border: "var(--border-subtle)",
+          ring: "var(--brand-primary)",
+        },
+
+        // Legacy GFG Tokens - Remapped for Backward Compatibility
+        "gfg-green": {
+          DEFAULT: "var(--brand-primary)",
+          light: "var(--brand-primary-hover)",
+          cta: "var(--brand-primary)",
+        },
+        "gfg-text": {
+          DEFAULT: "var(--text-primary)",
+          light: "var(--text-secondary)",
+        },
+        "gfg-bg": {
+          DEFAULT: "var(--bg-base)",
+          card: "var(--bg-surface)",
+          nav: "var(--bg-elevated)",
+          secondary: "var(--bg-surface)",
+        },
+        "gfg-border": {
+          DEFAULT: "var(--border-subtle)",
+          light: "var(--border-subtle)",
+          medium: "var(--highlight-top)",
+        },
+        // Dark Mode Specific Tokens (Strict GFG Theme) - Remapped to Sajid Method
+        "gfg-dark": {
+          bg: "var(--bg-base)",
+          panel: "var(--bg-elevated)", // Panels often elevated
+          card: "var(--bg-surface)",
+          border: "var(--border-subtle)",
+          text: "var(--text-primary)",
+          muted: "var(--text-secondary)",
+          accent: "var(--brand-primary)",
+          "accent-2": "var(--brand-primary-hover)",
+          positive: "var(--gfg-dark-positive)", // Keep specific colors if variables not defined, or define them
+          warning: "var(--gfg-dark-warning)",
+          danger: "var(--gfg-dark-danger)",
         },
       },
       fontFamily: {
@@ -127,8 +124,10 @@ export default {
         "48px": "48px",
       },
       boxShadow: {
-        "gfg-light": "0 2px 6px rgba(0,0,0,0.06)",
-        "gfg-dark": "0 8px 28px rgba(0,0,0,0.65)",
+        "gfg-light": "var(--shadow-card)",
+        "gfg-dark": "var(--shadow-elevated)",
+        "sm": "var(--shadow-card)",
+        "md": "var(--shadow-elevated)",
       },
       keyframes: {
         "accordion-down": {

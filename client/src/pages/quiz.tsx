@@ -379,7 +379,7 @@ export function QuizPage() {
 
       {quizState === "setup" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="bg-[#0b0f12] border-white/10">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
                 <HelpCircle className="h-5 w-5 text-green-400" />
@@ -403,7 +403,7 @@ export function QuizPage() {
                       <SelectTrigger id="mcq-set" className="bg-white/5 border-white/10 text-white" data-testid="select-mcq-set">
                         <SelectValue placeholder="Choose an MCQ set to quiz on" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                      <SelectContent className="bg-card border-border text-white">
                         {displayMCQSets.length === 0 ? (
                           <SelectItem value="empty" disabled>
                             No MCQ sets available - generate some first!
@@ -441,7 +441,7 @@ export function QuizPage() {
                       <SelectTrigger id="gen-doc" className="bg-white/5 border-white/10 text-white">
                         <SelectValue placeholder="Or enter a topic below" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                      <SelectContent className="bg-card border-border text-white">
                         <SelectItem value="none" className="hover:bg-white/5 cursor-pointer">No document - use topic only</SelectItem>
                         {[...documents]
                           .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
@@ -472,7 +472,7 @@ export function QuizPage() {
                         <SelectTrigger className="bg-white/5 border-white/10 text-white">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                        <SelectContent className="bg-card border-border text-white">
                           <SelectItem value="5" className="hover:bg-white/5 cursor-pointer">5 questions</SelectItem>
                           <SelectItem value="10" className="hover:bg-white/5 cursor-pointer">10 questions</SelectItem>
                           <SelectItem value="20" className="hover:bg-white/5 cursor-pointer">20 questions</SelectItem>
@@ -486,7 +486,7 @@ export function QuizPage() {
                         <SelectTrigger className="bg-white/5 border-white/10 text-white">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                        <SelectContent className="bg-card border-border text-white">
                           <SelectItem value="easy" className="hover:bg-white/5 cursor-pointer">Easy</SelectItem>
                           <SelectItem value="medium" className="hover:bg-white/5 cursor-pointer">Medium</SelectItem>
                           <SelectItem value="hard" className="hover:bg-white/5 cursor-pointer">Hard</SelectItem>
@@ -544,7 +544,7 @@ export function QuizPage() {
                     <SelectTrigger data-testid="select-time" className="bg-white/5 border-white/10 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                    <SelectContent className="bg-card border-border text-white">
                       <SelectItem value="15" className="hover:bg-white/5 cursor-pointer">15 seconds</SelectItem>
                       <SelectItem value="30" className="hover:bg-white/5 cursor-pointer">30 seconds</SelectItem>
                       <SelectItem value="45" className="hover:bg-white/5 cursor-pointer">45 seconds</SelectItem>
@@ -558,7 +558,7 @@ export function QuizPage() {
           </Card>
 
           {quizResults.length > 0 && (
-            <Card className="bg-[#0b0f12] border-white/10">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <Trophy className="h-5 w-5 text-green-400" />
@@ -677,7 +677,7 @@ export function QuizPage() {
       {quizState === "results" && currentResult && (
         <div className="mx-auto w-full max-w-4xl">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="h-full bg-[#0b0f12] border-white/10">
+            <Card className="h-full bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <Trophy className="h-5 w-5 text-yellow-500" />
@@ -741,7 +741,7 @@ export function QuizPage() {
               </CardContent>
             </Card>
 
-            <Card className="h-full overflow-hidden bg-[#0b0f12] border-white/10">
+            <Card className="h-full overflow-hidden bg-card border-border">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-white">
                   <BarChart2 className="h-5 w-5 text-green-400" />
@@ -753,7 +753,7 @@ export function QuizPage() {
                     <SelectTrigger id="review-filter" className="h-8 w-[120px] bg-white/5 border-white/10 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
+                    <SelectContent className="bg-card border-border text-white">
                       <SelectItem value="all" className="hover:bg-white/5 cursor-pointer">All Questions</SelectItem>
                       <SelectItem value="incorrect" className="hover:bg-white/5 cursor-pointer">Incorrect Only</SelectItem>
                     </SelectContent>

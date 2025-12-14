@@ -1,48 +1,110 @@
-:root {
-    /* REAL GFG DARK THEME — No Blue Allowed */
-    --gfg-bg: #0A0A0A;
-    /* page background - pure near-black */
-    --gfg-card: #111111;
-    /* card surface */
-    --gfg-text: #E6F0E9;
-    /* soft off-white text */
-    --gfg-muted: #9DBAA7;
-    /* green-gray muted text */
-    --gfg-green: #2F8D46;
-    /* GFG primary green */
-    --gfg-green-light: #28A745;
-    /* lighter green for hover */
-    --gfg-green-cta: #28A745;
-    --gfg-border: rgba(255, 255, 255, 0.06);
-    --gfg-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
-    --gfg-nav: #0C0C0C;
-    /* slightly lighter black for nav/panels */
+@layer base {
+    :root {
+        /* 
+         * SAJID METHOD - COLOR SYSTEM
+         * Mathematical approach to color using OKLCH space
+         * Neutral Hue (H) = 0, Chroma (C) = 0
+         */
 
-    /* Additional Dark Mode Tokens */
-    --gfg-dark-panel: #0C0C0C;
-    --gfg-dark-accent: #2F8D46;
-    --gfg-dark-accent-2: #28A745;
-    --gfg-dark-positive: #00C96B;
-    --gfg-dark-warning: #E3A008;
-    --gfg-dark-danger: #EF4444;
-}
+        /* BRAND COLOR - Green/Teal (from original theme) */
+        /* oklch(L C H) */
+        --brand-primary: oklch(60% 0.15 150);
+        --brand-primary-hover: oklch(65% 0.15 150);
+        --brand-primary-text: oklch(98% 0 0);
 
-.dark {
-    /* Same as root for consistency */
-    --gfg-bg: #0A0A0A;
-    --gfg-card: #111111;
-    --gfg-text: #E6F0E9;
-    --gfg-muted: #9DBAA7;
-    --gfg-green: #2F8D46;
-    --gfg-green-light: #28A745;
-    --gfg-green-cta: #28A745;
-    --gfg-border: rgba(255, 255, 255, 0.06);
-    --gfg-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
-    --gfg-nav: #0C0C0C;
-    --gfg-dark-panel: #0C0C0C;
-    --gfg-dark-accent: #2F8D46;
-    --gfg-dark-accent-2: #28A745;
-    --gfg-dark-positive: #00C96B;
-    --gfg-dark-warning: #E3A008;
-    --gfg-dark-danger: #EF4444;
+        /* ----------------------------------------------------
+         * DEFAULT THEME (Likely used as Light Mode or Base)
+         * ---------------------------------------------------- 
+         * Implementing Light Mode Flip here if :root is default
+         * But usually apps default to one. Let's assume Light Mode is default for :root
+         * unless user prefers system dark. 
+         * HOWEVER, the prompt says "Define ... for both a [data-theme="dark"] and [data-theme="light"] block."
+         */
+    }
+
+
+    [data-theme="light"],
+    :root,
+    .light {
+        /* LIGHT MODE - The "Flip" */
+        --bg-base: oklch(98% 0 0);
+        /* Very light grey, almost white */
+        --bg-surface: oklch(100% 0 0);
+        /* Pure white for cards */
+        --bg-elevated: oklch(100% 0 0);
+        /* Pure white */
+
+        /* TEXT - Inverted Lightness */
+        --text-primary: oklch(10% 0 0);
+        /* Deep black-grey ~10% L */
+        --text-secondary: oklch(45% 0 0);
+        /* Muted grey ~45% L */
+        --text-tertiary: oklch(65% 0 0);
+        /* Very subtle */
+
+        /* BORDERS */
+        --border-subtle: oklch(90% 0 0);
+        /* Light grey border */
+        --border-highlight: oklch(95% 0 0);
+
+        /* SHADOWS - Realistic Depth */
+        /* Short, darker shadow + Longer, lighter shadow */
+        --shadow-card:
+            0 1px 2px -1px oklch(0% 0 0 / 0.1),
+            0 4px 6px -2px oklch(0% 0 0 / 0.05);
+        --shadow-elevated:
+            0 4px 6px -1px oklch(0% 0 0 / 0.1),
+            0 10px 15px -3px oklch(0% 0 0 / 0.1);
+
+        /* LEGACY MAPPING (For compatibility) */
+        --gfg-bg: var(--bg-base);
+        --gfg-card: var(--bg-surface);
+        --gfg-text: var(--text-primary);
+        --gfg-muted: var(--text-secondary);
+        --gfg-border: var(--border-subtle);
+        --gfg-green: var(--brand-primary);
+    }
+
+    [data-theme="dark"],
+    .dark {
+        /* DARK MODE - Mathematical Shading 
+         * Base: 2% L (Deep Black)
+         * Surface: 15% L (Distinct Card)
+         * Elevated: 20% L (Popups/Modals)
+         */
+        --bg-base: oklch(2% 0 0);
+        /* Deepest Black */
+        --bg-surface: oklch(15% 0 0);
+        /* Lighter for contrast */
+        --bg-elevated: oklch(20% 0 0);
+        /* Elevated / Important */
+
+        /* TEXT */
+        --text-primary: oklch(98% 0 0);
+        /* Brighter white for better readibility on lighter darks */
+        --text-secondary: oklch(85% 0 0);
+        /* Legible muted */
+        --text-tertiary: oklch(65% 0 0);
+
+        /* BORDERS & HIGHLIGHTS */
+        --border-subtle: oklch(30% 0 0);
+        /* Stronger border for visibility */
+        --border-highlight: oklch(40% 0 0);
+        /* For top highlight */
+
+        /* HIGHLIGHTS (Simulating overhead light) */
+        --highlight-top: 1px solid oklch(40% 0 0);
+
+        /* SHADOWS */
+        --shadow-card: 0 4px 20px -5px oklch(0% 0 0 / 0.5);
+        --shadow-elevated: 0 10px 30px -5px oklch(0% 0 0 / 0.7);
+
+        /* LEGACY MAPPING */
+        --gfg-bg: var(--bg-base);
+        --gfg-card: var(--bg-surface);
+        --gfg-text: var(--text-primary);
+        --gfg-muted: var(--text-secondary);
+        --gfg-border: var(--border-subtle);
+        --gfg-green: var(--brand-primary);
+    }
 }

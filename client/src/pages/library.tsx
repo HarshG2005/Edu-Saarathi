@@ -168,7 +168,7 @@ export function LibraryPage() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-gradient-to-b from-[#0b0f12] to-[#071218] text-white rounded-xl">
+    <div className="min-h-screen p-4 md:p-8 bg-background text-foreground rounded-xl">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <header className="flex flex-col md:flex-row items-center justify-between gap-4">
