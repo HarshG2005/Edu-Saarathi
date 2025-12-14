@@ -130,8 +130,8 @@ export function ChatSidebar({ documentId }: ChatSidebarProps) {
                                 )}
                                 <div
                                     className={`max-w-[85%] rounded-lg p-3 text-sm ${msg.role === "user"
-                                            ? "bg-primary text-primary-foreground"
-                                            : "bg-muted border border-border"
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-muted border border-border"
                                         }`}
                                 >
                                     <p className="whitespace-pre-wrap leading-relaxed">
@@ -172,7 +172,7 @@ export function ChatSidebar({ documentId }: ChatSidebarProps) {
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        className="min-h-[80px] resize-none pr-12 text-sm bg-muted/50"
+                        className="min-h-[80px] resize-none pr-12 text-sm bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                     />
                     <Button
                         size="icon"
