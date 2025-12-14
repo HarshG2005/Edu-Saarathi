@@ -143,6 +143,13 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      fontSize: {
+        "fluid-h1": "clamp(2.5rem, 5vw + 1rem, 4.5rem)",
+        "fluid-h2": "clamp(2rem, 4vw + 0.5rem, 3.75rem)",
+        "fluid-h3": "clamp(1.5rem, 3vw + 0.5rem, 2.5rem)",
+        "fluid-base": "clamp(1rem, 1vw + 0.5rem, 1.25rem)",
+        "fluid-sm": "clamp(0.875rem, 0.5vw + 0.5rem, 1rem)",
+      },
     },
   },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],

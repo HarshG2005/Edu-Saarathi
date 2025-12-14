@@ -82,7 +82,7 @@ export function LandingPage() {
                                 transition={{ duration: 0.5 }}
                                 className="space-y-8 text-center lg:text-left"
                             >
-                                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight lg:text-7xl text-foreground leading-tight">
+                                <h1 className="text-fluid-h1 font-extrabold tracking-tight text-foreground leading-tight">
                                     Your AI Charioteer for <span className="text-primary">Academic Success</span>
                                 </h1>
                                 <p className="text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto lg:mx-0">
@@ -141,7 +141,7 @@ export function LandingPage() {
                 <section id="features" className="py-20 bg-background">
                     <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                         <div className="text-center mb-16 space-y-4">
-                            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl text-foreground">Everything you need to ace your exams</h2>
+                            <h2 className="text-fluid-h2 font-bold tracking-tighter text-foreground">Everything you need to ace your exams</h2>
                             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
                                 We simplify the learning process so you can focus on understanding, not just memorizing.
                             </p>
