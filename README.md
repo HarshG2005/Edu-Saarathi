@@ -63,17 +63,35 @@ Preferred communication style: Simple, everyday language.
 *Upload and manage your study materials.*
 ![Document Library](client/public/assets/library.png)
 
-### 3. Flashcards
+### 3. Mindmaps
+*Visualize complex topics with interactive diagrams.*
+![Mindmaps](client/public/assets/mindmap.png)
+
+### 4. Flashcards
 *Master concepts detailed with spaced repetition.*
 ![Flashcards](client/public/assets/flashcards.png)
 
-### 4. Summaries
+### 5. Quiz Mode
+*Test your knowledge with timed or untimed quizzes.*
+![Quiz Mode](client/public/assets/quiz.png)
+
+### 6. Summaries
 *Get concise, AI-generated summaries of your documents.*
 ![Summaries](client/public/assets/summaries.png)
 
-### 5. AI Tutor
+*Detailed view of key takeaways and terms.*
+![Detailed Summaries](client/public/assets/summaries-detail.png)
+
+### 7. AI Tutor
+*Start a conversation to clear your doubts.*
+![AI Tutor Start](client/public/assets/tutor-start.png)
+
 *Ask questions and get instant answers anchored to your text.*
-![AI Tutor](client/public/assets/tutor.png)
+![AI Tutor Chat](client/public/assets/tutor.png)
+
+### 8. Progress Dashboard
+*Track your learning momentum and topic mastery.*
+![Progress Dashboard](client/public/assets/progress.png)
 
 ## System Architecture
 
