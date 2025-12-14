@@ -37,6 +37,9 @@ interface AppState {
 
   updateFlashcardMastery: (setId: string, cardId: string, mastered: boolean) => void;
   reset: () => void;
+
+  pdfTargetPage: number | null;
+  setPdfTargetPage: (page: number | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -122,6 +125,9 @@ export const useAppStore = create<AppState>()(
             : set
         ),
       })),
+
+      pdfTargetPage: null,
+      setPdfTargetPage: (page) => set({ pdfTargetPage: page }),
 
       reset: () => set((state) => ({
         currentDocumentId: null,

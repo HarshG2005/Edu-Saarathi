@@ -294,27 +294,27 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
                 className="bg-gfg-bg-secondary/5"
             >
                 <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#6b7280" />
-                <Controls className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 [&>button]:dark:bg-neutral-900 [&>button]:dark:border-neutral-800 [&>button]:dark:fill-white [&>button:hover]:dark:bg-neutral-800" />
+                <Controls className="bg-card border-border fill-foreground [&>button]:fill-foreground [&>button:hover]:bg-muted" />
                 <MiniMap
                     nodeColor="#4ade80"
                     maskColor="rgba(0, 0, 0, 0.6)"
-                    className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800"
+                    className="bg-card border-border"
                 />
 
                 <Panel position="top-right" className="flex gap-2">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white border-green-500 hover:border-green-600 shadow-md transition-all">
+                            <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground border-primary/50 shadow-md transition-all">
                                 <Layout className="mr-2 h-4 w-4" />
                                 Auto Layout
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="dark:bg-neutral-900 dark:border-neutral-800">
-                            <DropdownMenuItem onClick={() => handleLayout('LR')} className="dark:focus:bg-neutral-800">
+                        <DropdownMenuContent align="end" className="bg-card border-border">
+                            <DropdownMenuItem onClick={() => handleLayout('LR')} className="focus:bg-muted cursor-pointer">
                                 <ArrowDown className="mr-2 h-4 w-4" />
                                 Vertical
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleLayout('TB')} className="dark:focus:bg-neutral-800">
+                            <DropdownMenuItem onClick={() => handleLayout('TB')} className="focus:bg-muted cursor-pointer">
                                 <ArrowRight className="mr-2 h-4 w-4" />
                                 Horizontal
                             </DropdownMenuItem>
@@ -323,18 +323,18 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white border-green-500 hover:border-green-600 shadow-md transition-all">
+                            <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground border-primary/50 shadow-md transition-all">
                                 <History className="mr-2 h-4 w-4" />
                                 History
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56 dark:bg-neutral-900 dark:border-neutral-800">
-                            <DropdownMenuItem onClick={() => snapshotMutation.mutate()} className="dark:focus:bg-neutral-800">
+                        <DropdownMenuContent align="end" className="w-56 bg-card border-border">
+                            <DropdownMenuItem onClick={() => snapshotMutation.mutate()} className="focus:bg-muted cursor-pointer">
                                 <Save className="mr-2 h-4 w-4" />
                                 Create Snapshot
                             </DropdownMenuItem>
                             {snapshots?.map((snap) => (
-                                <DropdownMenuItem key={snap.id} onClick={() => handleRestoreSnapshot(snap)} className="dark:focus:bg-neutral-800">
+                                <DropdownMenuItem key={snap.id} onClick={() => handleRestoreSnapshot(snap)} className="focus:bg-muted cursor-pointer">
                                     <RotateCcw className="mr-2 h-4 w-4" />
                                     {new Date(snap.createdAt).toLocaleString()}
                                 </DropdownMenuItem>
@@ -346,7 +346,7 @@ function MindmapCanvasContent({ mindmap, onSave }: MindmapCanvasProps) {
                         size="sm"
                         onClick={() => saveMutation.mutate()}
                         disabled={saveMutation.isPending}
-                        className="bg-gfg-green hover:bg-gfg-green/90 text-white border-0 shadow-md"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-md"
                     >
                         <Save className="mr-2 h-4 w-4" />
                         Save

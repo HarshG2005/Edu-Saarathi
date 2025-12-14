@@ -9,6 +9,7 @@ import { Loader2, StickyNote, GraduationCap } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 import { FlashcardsList } from "@/components/flashcards/FlashcardsList";
+import { ChatSidebar } from "@/components/tutor/ChatSidebar";
 
 interface AnnotationSidebarProps {
     documentId: string;
@@ -25,8 +26,11 @@ export const AnnotationSidebar: React.FC<AnnotationSidebarProps> = ({ documentId
                 <h2 className="font-semibold text-lg">My Annotations</h2>
             </div>
 
-            <Tabs defaultValue="notes" className="flex-1 flex flex-col min-h-0">
+            <Tabs defaultValue="chat" className="flex-1 flex flex-col min-h-0">
                 <TabsList className="w-full justify-start rounded-none border-b px-4 h-12 bg-transparent">
+                    <TabsTrigger value="chat" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none shadow-none">
+                        Chat
+                    </TabsTrigger>
                     <TabsTrigger value="notes" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none shadow-none">
                         Notes ({notes.length})
                     </TabsTrigger>
@@ -34,6 +38,10 @@ export const AnnotationSidebar: React.FC<AnnotationSidebarProps> = ({ documentId
                         Flashcards
                     </TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="chat" className="flex-1 min-h-0 m-0">
+                    <ChatSidebar documentId={documentId} />
+                </TabsContent>
 
                 <TabsContent value="notes" className="flex-1 min-h-0 m-0">
                     <ScrollArea className="h-full p-4">

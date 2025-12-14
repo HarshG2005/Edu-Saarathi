@@ -3,60 +3,56 @@
         /* 
          * SAJID METHOD - COLOR SYSTEM
          * Mathematical approach to color using OKLCH space
-         * Neutral Hue (H) = 0, Chroma (C) = 0
          */
 
-        /* BRAND COLOR - Green/Teal (from original theme) */
-        /* oklch(L C H) */
-        --brand-primary: oklch(60% 0.15 150);
-        --brand-primary-hover: oklch(65% 0.15 150);
-        --brand-primary-text: oklch(98% 0 0);
+        /* BRAND COLOR - Vibrant Orange (PromptVibely) */
+        /* oklch(L C H) - approx #FF5E1A */
+        --brand-primary: oklch(65% 0.22 35);
+        --brand-primary-hover: oklch(60% 0.22 35);
+        --brand-primary-text: oklch(100% 0 0);
 
-        /* ----------------------------------------------------
-         * DEFAULT THEME (Likely used as Light Mode or Base)
-         * ---------------------------------------------------- 
-         * Implementing Light Mode Flip here if :root is default
-         * But usually apps default to one. Let's assume Light Mode is default for :root
-         * unless user prefers system dark. 
-         * HOWEVER, the prompt says "Define ... for both a [data-theme="dark"] and [data-theme="light"] block."
-         */
+        /* CHART COLORS - Vibrant Data Viz */
+        --chart-1: 30 0.15 25;
+        /* Red/Orange */
+        --chart-2: 60 0.15 250;
+        /* Blue */
+        --chart-3: 60 0.20 20;
+        /* Deep Red */
+        --chart-4: 70 0.15 150;
+        /* Green/Teal */
+        --chart-5: 70 0.15 45;
+        /* Amber */
     }
-
 
     [data-theme="light"],
     :root,
     .light {
-        /* LIGHT MODE - The "Flip" */
-        --bg-base: oklch(98% 0 0);
-        /* Very light grey, almost white */
+        /* LIGHT MODE - PromptVibely Peach Theme */
+
+        /* Backgrounds */
+        /* Soft Peach/White Tint */
+        --bg-base: oklch(99% 0.01 50);
+        /* Pure White for cards with soft warmth */
         --bg-surface: oklch(100% 0 0);
-        /* Pure white for cards */
         --bg-elevated: oklch(100% 0 0);
-        /* Pure white */
 
-        /* TEXT - Inverted Lightness */
-        --text-primary: oklch(10% 0 0);
-        /* Deep black-grey ~10% L */
-        --text-secondary: oklch(45% 0 0);
-        /* Muted grey ~45% L */
-        --text-tertiary: oklch(65% 0 0);
-        /* Very subtle */
+        /* TEXT - Warm Dark Greys */
+        --text-primary: oklch(20% 0.02 30);
+        --text-secondary: oklch(50% 0.02 30);
+        --text-tertiary: oklch(70% 0.02 30);
 
-        /* BORDERS */
-        --border-subtle: oklch(90% 0 0);
-        /* Light grey border */
-        --border-highlight: oklch(95% 0 0);
+        /* BORDERS - Warm/Peach Tinted */
+        --border-subtle: oklch(92% 0.01 50);
+        --border-highlight: oklch(96% 0.01 50);
 
-        /* SHADOWS - Realistic Depth */
-        /* Short, darker shadow + Longer, lighter shadow */
+        /* SHADOWS - Warm, soft shadows */
         --shadow-card:
-            0 1px 2px -1px oklch(0% 0 0 / 0.1),
-            0 4px 6px -2px oklch(0% 0 0 / 0.05);
+            0 4px 20px -5px oklch(65% 0.1 35 / 0.15),
+            0 1px 3px 0 oklch(0% 0 0 / 0.05);
         --shadow-elevated:
-            0 4px 6px -1px oklch(0% 0 0 / 0.1),
-            0 10px 15px -3px oklch(0% 0 0 / 0.1);
+            0 20px 40px -10px oklch(65% 0.1 35 / 0.2);
 
-        /* LEGACY MAPPING (For compatibility) */
+        /* LEGACY MAPPING */
         --gfg-bg: var(--bg-base);
         --gfg-card: var(--bg-surface);
         --gfg-text: var(--text-primary);
@@ -67,33 +63,24 @@
 
     [data-theme="dark"],
     .dark {
-        /* DARK MODE - Mathematical Shading 
-         * Base: 2% L (Deep Black)
-         * Surface: 15% L (Distinct Card)
-         * Elevated: 20% L (Popups/Modals)
+        /* DARK MODE - Preserving High Contrast / Deep Black aesthetics 
+         * but updated accent to Orange 
          */
-        --bg-base: oklch(2% 0 0);
-        /* Deepest Black */
-        --bg-surface: oklch(15% 0 0);
-        /* Lighter for contrast */
-        --bg-elevated: oklch(20% 0 0);
-        /* Elevated / Important */
+        --bg-base: oklch(4% 0.01 35);
+        /* Deep Warm Black */
+        --bg-surface: oklch(12% 0.01 35);
+        --bg-elevated: oklch(18% 0.01 35);
 
         /* TEXT */
         --text-primary: oklch(98% 0 0);
-        /* Brighter white for better readibility on lighter darks */
         --text-secondary: oklch(85% 0 0);
-        /* Legible muted */
         --text-tertiary: oklch(65% 0 0);
 
-        /* BORDERS & HIGHLIGHTS */
-        --border-subtle: oklch(30% 0 0);
-        /* Stronger border for visibility */
-        --border-highlight: oklch(40% 0 0);
-        /* For top highlight */
+        /* BORDERS */
+        --border-subtle: oklch(25% 0 0);
+        --border-highlight: oklch(35% 0 0);
 
-        /* HIGHLIGHTS (Simulating overhead light) */
-        --highlight-top: 1px solid oklch(40% 0 0);
+        --highlight-top: 1px solid oklch(35% 0 0);
 
         /* SHADOWS */
         --shadow-card: 0 4px 20px -5px oklch(0% 0 0 / 0.5);

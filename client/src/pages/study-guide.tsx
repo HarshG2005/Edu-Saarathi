@@ -103,25 +103,25 @@ export default function StudyGuidePage() {
                     </p>
                 </div>
                 <Link href="/settings">
-                    <Button variant="outline" size="icon" className="border-white/10 text-gray-400 hover:bg-white/5 hover:text-white">
+                    <Button variant="outline" size="icon" className="border-border text-muted-foreground hover:bg-muted hover:text-foreground">
                         <Settings className="h-4 w-4" />
                     </Button>
                 </Link>
             </div>
 
-            <Card className="border-white/10 shadow-sm bg-[#0b0f12]">
+            <Card className="border-border shadow-sm bg-card">
                 <CardHeader>
-                    <CardTitle className="text-white">Select Document</CardTitle>
-                    <CardDescription className="text-gray-400">Choose a document to view its study guide</CardDescription>
+                    <CardTitle className="text-foreground">Select Document</CardTitle>
+                    <CardDescription className="text-muted-foreground">Choose a document to view its study guide</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Select value={selectedDocId} onValueChange={setSelectedDocId}>
-                        <SelectTrigger className="w-full md:w-[400px] bg-white/5 border-white/10 text-white">
+                        <SelectTrigger className="w-full md:w-[400px] bg-muted border-border text-foreground">
                             <SelectValue placeholder="Select a document..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-card border-border text-white">
+                        <SelectContent className="bg-card border-border text-foreground">
                             {sortedDocuments.map((doc) => (
-                                <SelectItem key={doc.id} value={doc.id} className="hover:bg-white/5 cursor-pointer">
+                                <SelectItem key={doc.id} value={doc.id} className="hover:bg-muted cursor-pointer">
                                     {doc.name}
                                 </SelectItem>
                             ))}
@@ -133,68 +133,68 @@ export default function StudyGuidePage() {
             {selectedDocId && (
                 <div className="flex-1 flex flex-col min-h-0">
                     <Tabs defaultValue="overview" className="flex-1 flex flex-col">
-                        <TabsList className="bg-white/5 border border-white/10">
-                            <TabsTrigger value="overview" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400">Overview</TabsTrigger>
-                            <TabsTrigger value="notes" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400">Notes ({notes.length})</TabsTrigger>
-                            <TabsTrigger value="flashcards" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400">Flashcards ({flashcards.length})</TabsTrigger>
-                            <TabsTrigger value="highlights" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400">Highlights ({highlights.length})</TabsTrigger>
+                        <TabsList className="bg-muted border border-border">
+                            <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Overview</TabsTrigger>
+                            <TabsTrigger value="notes" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Notes ({notes.length})</TabsTrigger>
+                            <TabsTrigger value="flashcards" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Flashcards ({flashcards.length})</TabsTrigger>
+                            <TabsTrigger value="highlights" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Highlights ({highlights.length})</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="overview" className="mt-6 space-y-6">
                             <div className="grid gap-4 md:grid-cols-3">
-                                <Card className="border-white/10 shadow-sm bg-[#0b0f12]">
+                                <Card className="border-border shadow-sm bg-card">
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium text-white">Total Notes</CardTitle>
-                                        <StickyNote className="h-4 w-4 text-gray-400" />
+                                        <CardTitle className="text-sm font-medium text-foreground">Total Notes</CardTitle>
+                                        <StickyNote className="h-4 w-4 text-muted-foreground" />
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold text-green-400">{notes.length}</div>
+                                        <div className="text-2xl font-bold text-primary">{notes.length}</div>
                                     </CardContent>
                                 </Card>
-                                <Card className="border-white/10 shadow-sm bg-[#0b0f12]">
+                                <Card className="border-border shadow-sm bg-card">
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium text-white">Total Flashcards</CardTitle>
-                                        <GraduationCap className="h-4 w-4 text-gray-400" />
+                                        <CardTitle className="text-sm font-medium text-foreground">Total Flashcards</CardTitle>
+                                        <GraduationCap className="h-4 w-4 text-muted-foreground" />
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold text-green-400">{flashcards.length}</div>
+                                        <div className="text-2xl font-bold text-primary">{flashcards.length}</div>
                                     </CardContent>
                                 </Card>
-                                <Card className="border-white/10 shadow-sm bg-[#0b0f12]">
+                                <Card className="border-border shadow-sm bg-card">
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium text-white">Total Highlights</CardTitle>
-                                        <Highlighter className="h-4 w-4 text-gray-400" />
+                                        <CardTitle className="text-sm font-medium text-foreground">Total Highlights</CardTitle>
+                                        <Highlighter className="h-4 w-4 text-muted-foreground" />
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold text-green-400">{highlights.length}</div>
+                                        <div className="text-2xl font-bold text-primary">{highlights.length}</div>
                                     </CardContent>
                                 </Card>
                             </div>
 
                             {selectedDoc && (
-                                <Card className="border-white/10 shadow-sm bg-[#0b0f12]">
+                                <Card className="border-border shadow-sm bg-card">
                                     <CardHeader>
-                                        <CardTitle className="flex items-center gap-2 text-white">
-                                            <FileText className="h-5 w-5 text-green-400" />
+                                        <CardTitle className="flex items-center gap-2 text-foreground">
+                                            <FileText className="h-5 w-5 text-primary" />
                                             Document Details
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
-                                        <div className="flex justify-between py-1 border-b border-white/10">
-                                            <span className="font-medium text-white">Name</span>
-                                            <span className="text-gray-400">{selectedDoc.name}</span>
+                                        <div className="flex justify-between py-1 border-b border-border">
+                                            <span className="font-medium text-foreground">Name</span>
+                                            <span className="text-muted-foreground">{selectedDoc.name}</span>
                                         </div>
-                                        <div className="flex justify-between py-1 border-b border-white/10">
-                                            <span className="font-medium text-white">File Name</span>
-                                            <span className="text-gray-400">{selectedDoc.fileName}</span>
+                                        <div className="flex justify-between py-1 border-b border-border">
+                                            <span className="font-medium text-foreground">File Name</span>
+                                            <span className="text-muted-foreground">{selectedDoc.fileName}</span>
                                         </div>
-                                        <div className="flex justify-between py-1 border-b border-white/10">
-                                            <span className="font-medium text-white">Uploaded</span>
-                                            <span className="text-gray-400">{formatDate(selectedDoc.uploadedAt)}</span>
+                                        <div className="flex justify-between py-1 border-b border-border">
+                                            <span className="font-medium text-foreground">Uploaded</span>
+                                            <span className="text-muted-foreground">{formatDate(selectedDoc.uploadedAt)}</span>
                                         </div>
                                         <div className="flex justify-between py-1">
-                                            <span className="font-medium text-white">Pages</span>
-                                            <span className="text-gray-400">{selectedDoc.pageCount}</span>
+                                            <span className="font-medium text-foreground">Pages</span>
+                                            <span className="text-muted-foreground">{selectedDoc.pageCount}</span>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -202,24 +202,24 @@ export default function StudyGuidePage() {
                         </TabsContent>
 
                         <TabsContent value="notes" className="mt-6">
-                            <ScrollArea className="h-[600px] rounded-md border border-white/10 p-4 bg-[#0b0f12]">
+                            <ScrollArea className="h-[600px] rounded-md border border-border p-4 bg-card">
                                 {isLoadingNotes ? (
                                     <div className="flex justify-center p-8">
-                                        <Loader2 className="h-8 w-8 animate-spin text-green-400" />
+                                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
                                 ) : notes.length === 0 ? (
-                                    <div className="text-center text-gray-400 p-8">No notes found.</div>
+                                    <div className="text-center text-muted-foreground p-8">No notes found.</div>
                                 ) : (
                                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                         {notes.map((note) => (
-                                            <Card key={note.id} className="border-white/10 shadow-sm bg-white/5">
+                                            <Card key={note.id} className="border-border shadow-sm bg-muted/50">
                                                 <CardHeader>
-                                                    <CardTitle className="text-sm font-medium text-gray-300">
+                                                    <CardTitle className="text-sm font-medium text-muted-foreground">
                                                         {formatDate(note.createdAt)}
                                                     </CardTitle>
                                                 </CardHeader>
                                                 <CardContent>
-                                                    <p className="whitespace-pre-wrap text-white">{note.text}</p>
+                                                    <p className="whitespace-pre-wrap text-foreground">{note.text}</p>
                                                 </CardContent>
                                             </Card>
                                         ))}
@@ -229,13 +229,13 @@ export default function StudyGuidePage() {
                         </TabsContent>
 
                         <TabsContent value="flashcards" className="mt-6">
-                            <ScrollArea className="h-[600px] rounded-md border border-white/10 p-4 bg-[#0b0f12]">
+                            <ScrollArea className="h-[600px] rounded-md border border-border p-4 bg-card">
                                 {isLoadingFlashcards ? (
                                     <div className="flex justify-center p-8">
-                                        <Loader2 className="h-8 w-8 animate-spin text-green-400" />
+                                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
                                 ) : flashcards.length === 0 ? (
-                                    <div className="text-center text-gray-400 p-8">No flashcards found.</div>
+                                    <div className="text-center text-muted-foreground p-8">No flashcards found.</div>
                                 ) : (
                                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                                         {flashcards.map((card) => (
@@ -247,25 +247,25 @@ export default function StudyGuidePage() {
                         </TabsContent>
 
                         <TabsContent value="highlights" className="mt-6">
-                            <ScrollArea className="h-[600px] rounded-md border border-white/10 p-4 bg-[#0b0f12]">
+                            <ScrollArea className="h-[600px] rounded-md border border-border p-4 bg-card">
                                 {isLoadingHighlights ? (
                                     <div className="flex justify-center p-8">
-                                        <Loader2 className="h-8 w-8 animate-spin text-green-400" />
+                                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
                                 ) : highlights.length === 0 ? (
-                                    <div className="text-center text-gray-400 p-8">No highlights found.</div>
+                                    <div className="text-center text-muted-foreground p-8">No highlights found.</div>
                                 ) : (
                                     <div className="space-y-4">
                                         {highlights.map((highlight) => (
-                                            <Card key={highlight.id} className="border-white/10 shadow-sm bg-white/5">
+                                            <Card key={highlight.id} className="border-border shadow-sm bg-muted/50">
                                                 <CardContent className="p-4 flex gap-4">
                                                     <div
                                                         className="w-1 self-stretch rounded-full shrink-0"
                                                         style={{ backgroundColor: highlight.color || "yellow" }}
                                                     />
                                                     <div>
-                                                        <p className="italic text-white">"{highlight.text}"</p>
-                                                        <p className="text-xs text-gray-400 mt-2">
+                                                        <p className="italic text-foreground">"{highlight.text}"</p>
+                                                        <p className="text-xs text-muted-foreground mt-2">
                                                             Page {highlight.page} • {formatDate(highlight.createdAt)}
                                                         </p>
                                                     </div>

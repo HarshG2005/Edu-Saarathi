@@ -141,7 +141,7 @@ export function TutorPage() {
                 ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={handleNewChat} className="border-green-500/50 text-green-400 hover:bg-green-500/10 hover:text-green-300" data-testid="button-new-chat">
+          <Button variant="outline" onClick={handleNewChat} className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary" data-testid="button-new-chat">
             <Plus className="mr-2 h-4 w-4" />
             New Chat
           </Button>
@@ -149,8 +149,8 @@ export function TutorPage() {
       </div>
 
       <div className="flex flex-1 gap-6 overflow-hidden">
-        <Card className="flex flex-1 flex-col overflow-hidden border-white/10 bg-[#0b0f12]">
-          <CardHeader className="border-b border-white/10 px-6 py-4 bg-white/5">
+        <Card className="flex flex-1 flex-col overflow-hidden border-border bg-card">
+          <CardHeader className="border-b border-border px-6 py-4 bg-muted/50">
             <CardTitle className="flex items-center gap-2 text-lg text-white">
               <MessageSquare className="h-5 w-5 text-green-400" />
               {currentSession ? "Conversation" : "Start a Conversation"}
@@ -163,7 +163,7 @@ export function TutorPage() {
             </CardTitle>
           </CardHeader>
 
-          <ScrollArea className="flex-1 p-6 bg-[#0b0f12]" ref={scrollRef}>
+          <ScrollArea className="flex-1 p-6 bg-card" ref={scrollRef}>
             {currentSession && (currentSession.messages as ChatMessage[]).length > 0 ? (
               <div className="space-y-6">
                 {(currentSession.messages as ChatMessage[]).map((msg) => (
@@ -182,8 +182,8 @@ export function TutorPage() {
                     )}
                     <div
                       className={`max-w-[70%] rounded-lg p-4 ${msg.role === "user"
-                        ? "bg-green-600 text-white"
-                        : "bg-white/5 text-gray-300 border border-white/10"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-foreground border border-border"
                         }`}
                     >
                       <p className="whitespace-pre-wrap text-sm leading-relaxed">
@@ -206,9 +206,9 @@ export function TutorPage() {
                         <Bot className="h-4 w-4" />
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex items-center gap-2 rounded-lg bg-white/5 p-4 border border-white/10">
-                      <Loader2 className="h-4 w-4 animate-spin text-green-400" />
-                      <span className="text-sm text-gray-400">Thinking...</span>
+                    <div className="flex items-center gap-2 rounded-lg bg-muted p-4 border border-border">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      <span className="text-sm text-muted-foreground">Thinking...</span>
                     </div>
                   </div>
                 )}
@@ -248,14 +248,16 @@ export function TutorPage() {
             )}
           </ScrollArea>
 
-          <div className="border-t border-white/10 p-4 bg-[#0b0f12]">
+          <div className="border-t border-border p-4 bg-card">
             <div className="flex gap-2">
               <Textarea
                 placeholder="Type your question here..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="min-h-[60px] resize-none bg-white/5 border-white/10 text-white focus-visible:ring-green-500 placeholder:text-gray-500"
+                onKeyDown={handleKeyDown}
+                className="min-h-[60px] resize-none bg-muted border-border text-foreground focus-visible:ring-primary placeholder:text-muted-foreground"
+                data-testid="input-message"
                 data-testid="input-message"
               />
               <Button
@@ -277,37 +279,39 @@ export function TutorPage() {
           </div>
         </Card>
 
-        {chatSessions.length > 0 && (
-          <Card className="hidden w-64 shrink-0 lg:block border-white/10 bg-[#0b0f12]">
-            <CardHeader className="border-b border-white/10 px-4 py-3 bg-white/5">
-              <CardTitle className="text-sm font-medium text-white">Chat History</CardTitle>
-            </CardHeader>
-            <ScrollArea className="h-[calc(100%-3rem)] bg-[#0b0f12]">
-              <div className="space-y-1 p-2">
-                {chatSessions.slice().reverse().slice(0, 5).map((session) => (
-                  <button
-                    key={session.id}
-                    onClick={() => setCurrentSession(session)}
-                    className={`flex w-full items-start gap-2 rounded-lg p-3 text-left transition-colors hover:bg-white/5 ${currentSession?.id === session.id ? "bg-white/5 border border-white/10" : ""
-                      }`}
-                    data-testid={`button-session-${session.id}`}
-                  >
-                    <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-                    <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 text-sm text-white">
-                        {(session.messages as ChatMessage[])[0]?.content.slice(0, 50) || "New conversation"}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500">
-                        {(session.messages as ChatMessage[]).length} messages
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </ScrollArea>
-          </Card>
-        )}
-      </div>
-    </Section>
+        {
+          chatSessions.length > 0 && (
+            <Card className="hidden w-64 shrink-0 lg:block border-border bg-card">
+              <CardHeader className="border-b border-border px-4 py-3 bg-muted/50">
+                <CardTitle className="text-sm font-medium text-foreground">Chat History</CardTitle>
+              </CardHeader>
+              <ScrollArea className="h-[calc(100%-3rem)] bg-card">
+                <div className="space-y-1 p-2">
+                  {chatSessions.slice().reverse().slice(0, 5).map((session) => (
+                    <button
+                      key={session.id}
+                      onClick={() => setCurrentSession(session)}
+                      className={`flex w-full items-start gap-2 rounded-lg p-3 text-left transition-colors hover:bg-white/5 ${currentSession?.id === session.id ? "bg-white/5 border border-white/10" : ""
+                        }`}
+                      data-testid={`button-session-${session.id}`}
+                    >
+                      <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-2 text-sm text-white">
+                          {(session.messages as ChatMessage[])[0]?.content.slice(0, 50) || "New conversation"}
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500">
+                          {(session.messages as ChatMessage[]).length} messages
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
+            </Card>
+          )
+        }
+      </div >
+    </Section >
   );
 }

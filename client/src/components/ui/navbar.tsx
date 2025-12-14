@@ -1,81 +1,46 @@
-import * as React from "react"
-import { Menu, User } from "lucide-react"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { SearchBar } from "@/components/ui/search-bar"
-import { Button } from "@/components/ui/button"
-import { useAuth } from "@/hooks/use-auth"
-import { Link } from "wouter"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { UserNav } from "@/components/user-nav";
+import { BookOpen, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export function Navbar() {
-    const { user, logoutMutation } = useAuth()
+    const { user } = useAuth();
+    const [location] = useLocation();
+
+    if (!user) return null;
 
     return (
-        <header className="sticky top-0 z-50 flex h-[60px] w-full items-center justify-between border-b border-white/5 bg-[#0b0f12]/80 backdrop-blur-md px-4 shadow-sm transition-colors duration-300">
-            <div className="flex items-center gap-4">
-                <SidebarTrigger className="text-gfg-text hover:bg-gfg-bg-secondary hover:text-gfg-green dark:text-gfg-dark-text dark:hover:bg-gfg-dark-panel dark:hover:text-gfg-green-light" />
-                <Link href="/">
-                    <div className="flex items-center gap-2 cursor-pointer">
-                        <img
-                            src="/logo.png"
-                            alt="Edu Saarathi Logo"
-                            className="h-10 w-auto mix-blend-multiply dark:invert dark:mix-blend-screen"
-                        />
-                        <span className="hidden text-xl font-bold text-white md:inline-block">
-                            Edu Saarathi
-                        </span>
+        <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="flex h-16 items-center px-4 gap-4">
+                <SidebarTrigger className="-ml-2" />
+
+                <div className="flex items-center gap-2 font-bold text-xl mr-4 text-foreground">
+                    <div className="p-1 rounded-md bg-primary/10">
+                        <BookOpen className="h-6 w-6 text-primary" />
                     </div>
-                </Link>
-            </div>
+                    <span className="hidden md:inline-block">Edu Saarathi</span>
+                </div>
 
-            <div className="hidden flex-1 items-center justify-center px-8 md:flex">
-                <SearchBar className="max-w-md w-full" placeholder="Search courses, tutorials..." />
-            </div>
+                <div className="flex-1 flex max-w-xl mx-auto">
+                    <div className="relative w-full">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            type="search"
+                            placeholder="Search courses, tutorials..."
+                            className="w-full bg-muted pl-9 md:w-[300px] lg:w-[400px] border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
+                        />
+                    </div>
+                </div>
 
-            <div className="flex items-center gap-4">
-                <ThemeToggle />
-
-                {user ? (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                                <Avatar className="h-8 w-8 border border-gfg-border dark:border-gfg-dark-border">
-                                    <AvatarFallback className="bg-gfg-green text-white font-semibold">
-                                        {(user.displayName || user.email || "U").charAt(0).toUpperCase()}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 bg-gfg-bg-card border-gfg-border dark:bg-gfg-dark-card dark:border-gfg-dark-border" align="end" forceMount>
-                            <div className="px-2 py-1.5 text-sm font-semibold text-gfg-text dark:text-gfg-dark-text">
-                                {user.displayName || user.email}
-                            </div>
-                            <DropdownMenuItem className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel cursor-pointer">
-                                Profile
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel cursor-pointer">
-                                Settings
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => logoutMutation.mutate()} className="text-gfg-text dark:text-gfg-dark-text hover:bg-gfg-bg dark:hover:bg-gfg-dark-panel cursor-pointer">
-                                Log out
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                ) : (
-                    <Link href="/auth">
-                        <Button variant="cta" size="sm">
-                            Sign In
-                        </Button>
-                    </Link>
-                )}
+                <div className="ml-auto flex items-center space-x-4">
+                    <ThemeToggle />
+                    <UserNav />
+                </div>
             </div>
         </header>
-    )
+    );
 }

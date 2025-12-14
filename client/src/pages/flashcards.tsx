@@ -152,20 +152,20 @@ export function FlashcardsPage() {
     <Section className="flex flex-col gap-6">
       <div className="flex items-start justify-between shrink-0">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-teal-300 bg-clip-text text-transparent" data-testid="text-page-title">Flashcards</h1>
-          <p className="text-gray-300 text-base">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent" data-testid="text-page-title">Flashcards</h1>
+          <p className="text-muted-foreground text-base">
             Master concepts through active recall and spaced repetition
           </p>
         </div>
         <div className="flex gap-2">
           <Link href="/flashcards/smart-review">
-            <Button variant="outline" className="gap-2 border-green-500/50 text-green-400 hover:bg-green-500/10 hover:text-green-300">
+            <Button variant="outline" className="gap-2 border-primary/50 text-primary hover:bg-primary/10">
               <Sparkles className="h-4 w-4" />
               Try Smart Review Mode
             </Button>
           </Link>
           <Link href="/settings">
-            <Button variant="outline" size="icon" className="border-white/10 text-gray-400 hover:bg-white/5 hover:text-white">
+            <Button variant="outline" size="icon" className="border-border text-muted-foreground hover:bg-muted hover:text-foreground">
               <Settings className="h-4 w-4" />
             </Button>
           </Link>
@@ -173,50 +173,50 @@ export function FlashcardsPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "generate" | "study")} className="flex-1 flex flex-col min-h-0">
-        <div className="flex items-center justify-between border-b border-white/5 pb-2 shrink-0">
-          <TabsList className="bg-white/5 p-1 h-9 border border-white/5">
-            <TabsTrigger value="generate" className="px-4 text-xs data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400" data-testid="tab-generate">Generate</TabsTrigger>
-            <TabsTrigger value="study" className="px-4 text-xs data-[state=active]:bg-green-600 data-[state=active]:text-white text-gray-400" data-testid="tab-study" disabled={!currentSet}>
+        <div className="flex items-center justify-between border-b border-border pb-2 shrink-0">
+          <TabsList className="bg-muted p-1 h-9 border border-border">
+            <TabsTrigger value="generate" className="px-4 text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground" data-testid="tab-generate">Generate</TabsTrigger>
+            <TabsTrigger value="study" className="px-4 text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground" data-testid="tab-study" disabled={!currentSet}>
               Study Mode
             </TabsTrigger>
           </TabsList>
 
           {activeTab === "study" && currentSet && (
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-white">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <Trophy className="h-4 w-4 text-yellow-500" />
                 <span>Mastery: {masteryCount}/{(currentSet.flashcards as Flashcard[]).length}</span>
               </div>
-              <Progress value={progress} className="w-32 h-2 bg-white/10" />
+              <Progress value={progress} className="w-32 h-2 bg-muted" />
             </div>
           )}
         </div>
 
         <TabsContent value="generate" className="mt-6">
-          <Card className="max-w-xl mx-auto border-white/10 shadow-lg bg-[#0b0f12]">
+          <Card className="max-w-xl mx-auto border-border shadow-lg bg-card">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-white">
-                <Sparkles className="h-5 w-5 text-green-400" />
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <Sparkles className="h-5 w-5 text-primary" />
                 Create New Deck
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-muted-foreground">
                 Generate flashcards from your documents or a specific topic
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="document" className="text-white">Source Document (Optional)</Label>
+                  <Label htmlFor="document" className="text-foreground">Source Document (Optional)</Label>
                   <Select value={selectedDocId} onValueChange={setSelectedDocId}>
-                    <SelectTrigger id="document" className="bg-white/5 border-white/10 text-white" data-testid="select-document">
+                    <SelectTrigger id="document" className="bg-background border-border text-foreground" data-testid="select-document">
                       <SelectValue placeholder="Select a document..." />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
-                      <SelectItem value="none" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">No document (use topic only)</SelectItem>
+                    <SelectContent className="bg-card border-border text-foreground">
+                      <SelectItem value="none" className="hover:bg-muted focus:bg-muted cursor-pointer">No document (use topic only)</SelectItem>
                       {[...documents]
                         .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
                         .map((doc) => (
-                          <SelectItem key={doc.id} value={doc.id} className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">
+                          <SelectItem key={doc.id} value={doc.id} className="hover:bg-muted focus:bg-muted cursor-pointer">
                             {doc.name}
                           </SelectItem>
                         ))}
@@ -225,28 +225,28 @@ export function FlashcardsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="count" className="text-white">Number of Cards</Label>
+                  <Label htmlFor="count" className="text-foreground">Number of Cards</Label>
                   <Select value={count} onValueChange={setCount}>
-                    <SelectTrigger id="count" className="bg-white/5 border-white/10 text-white" data-testid="select-count">
+                    <SelectTrigger id="count" className="bg-background border-border text-foreground" data-testid="select-count">
                       <SelectValue placeholder="Select count" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#0b0f12] border-white/10 text-white">
-                      <SelectItem value="5" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">5 Cards</SelectItem>
-                      <SelectItem value="10" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">10 Cards</SelectItem>
-                      <SelectItem value="15" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">15 Cards</SelectItem>
-                      <SelectItem value="20" className="hover:bg-white/5 focus:bg-white/5 cursor-pointer">20 Cards</SelectItem>
+                    <SelectContent className="bg-card border-border text-foreground">
+                      <SelectItem value="5" className="hover:bg-muted focus:bg-muted cursor-pointer">5 Cards</SelectItem>
+                      <SelectItem value="10" className="hover:bg-muted focus:bg-muted cursor-pointer">10 Cards</SelectItem>
+                      <SelectItem value="15" className="hover:bg-muted focus:bg-muted cursor-pointer">15 Cards</SelectItem>
+                      <SelectItem value="20" className="hover:bg-muted focus:bg-muted cursor-pointer">20 Cards</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="topic" className="text-white">Topic {!hasDocumentSelected && "(Required)"}</Label>
+                  <Label htmlFor="topic" className="text-foreground">Topic {!hasDocumentSelected && "(Required)"}</Label>
                   <Input
                     id="topic"
                     placeholder="e.g., Key Concepts of Biology, Historical Dates"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="bg-white/5 border-white/10 focus-visible:ring-green-500 text-white placeholder:text-gray-500"
+                    className="bg-background border-border focus-visible:ring-primary text-foreground placeholder:text-muted-foreground"
                     data-testid="input-topic"
                   />
                 </div>
@@ -255,7 +255,7 @@ export function FlashcardsPage() {
               <Button
                 onClick={() => generateMutation.mutate()}
                 disabled={generateMutation.isPending || (!hasDocumentSelected && !topic.trim())}
-                className="w-full bg-green-600 hover:bg-green-500 text-white"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                 data-testid="button-generate-flashcards"
               >
                 {generateMutation.isPending ? (
@@ -275,12 +275,12 @@ export function FlashcardsPage() {
 
           {flashcardSets.length > 0 && (
             <div className="mt-8">
-              <h3 className="mb-4 text-lg font-semibold text-white">Recent Decks</h3>
+              <h3 className="mb-4 text-lg font-semibold text-foreground">Recent Decks</h3>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {flashcardSets.slice().reverse().slice(0, 5).map((set, index) => (
                   <div
                     key={set.id}
-                    className="group relative overflow-hidden rounded-xl transition-all hover:scale-[1.02] cursor-pointer"
+                    className="group relative overflow-hidden rounded-xl transition-all hover:scale-[1.02] cursor-pointer shadow-sm hover:shadow-md"
                     onClick={() => {
                       setCurrentSet(set);
                       setCurrentIndex(0);
@@ -308,10 +308,10 @@ export function FlashcardsPage() {
                     </div>
 
                     {/* Card Body */}
-                    <div className="bg-neutral-900 p-4 border border-white/5 border-t-0 group-hover:border-white/10">
+                    <div className="bg-card p-4 border border-border border-t-0 group-hover:border-primary/50">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-400">{(set.flashcards as Flashcard[]).length} cards</span>
-                        <Button variant="ghost" size="sm" className="h-auto p-0 text-green-400 hover:text-green-300 hover:bg-transparent">
+                        <span className="text-muted-foreground">{(set.flashcards as Flashcard[]).length} cards</span>
+                        <Button variant="ghost" size="sm" className="h-auto p-0 text-primary hover:text-primary/80 hover:bg-transparent">
                           Study Now &rarr;
                         </Button>
                       </div>
@@ -327,7 +327,7 @@ export function FlashcardsPage() {
           {currentSet && (
             <div className="w-full max-w-3xl flex flex-col gap-8 items-center">
               <div className="w-full flex justify-between items-center px-4">
-                <Button variant="ghost" size="icon" onClick={handlePrev} className="h-12 w-12 rounded-full hover:bg-white/10 hover:text-green-400 text-white">
+                <Button variant="ghost" size="icon" onClick={handlePrev} className="h-12 w-12 rounded-full hover:bg-muted hover:text-primary text-muted-foreground">
                   <ChevronLeft className="h-6 w-6" />
                 </Button>
 
@@ -339,14 +339,14 @@ export function FlashcardsPage() {
                   >
                     {/* Front */}
                     <div className="absolute inset-0 backface-hidden">
-                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 bg-gradient-to-br from-[#cc2b5e] to-[#753a88] shadow-lg">
-                        <div className="absolute top-4 left-4 text-xs font-bold text-white/80 uppercase tracking-wider">
+                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 bg-gradient-to-br from-primary to-orange-400 shadow-lg text-primary-foreground">
+                        <div className="absolute top-4 left-4 text-xs font-bold opacity-80 uppercase tracking-wider">
                           Question
                         </div>
-                        <p className="text-2xl font-medium leading-relaxed text-white drop-shadow-sm">
+                        <p className="text-2xl font-medium leading-relaxed drop-shadow-sm">
                           {(currentSet.flashcards as Flashcard[])[currentIndex].front}
                         </p>
-                        <div className="absolute bottom-4 text-xs text-white/80 flex items-center gap-2">
+                        <div className="absolute bottom-4 text-xs opacity-80 flex items-center gap-2">
                           <RotateCw className="h-3 w-3" />
                           Click to flip
                         </div>
@@ -355,11 +355,11 @@ export function FlashcardsPage() {
 
                     {/* Back */}
                     <div className="absolute inset-0 backface-hidden rotate-y-180">
-                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 shadow-lg bg-gradient-to-br from-[#141E30] to-[#243B55] text-white">
-                        <div className="absolute top-4 left-4 text-xs font-bold text-white/80 uppercase tracking-wider">
+                      <Card className="w-full h-full flex flex-col items-center justify-center p-8 text-center border-0 shadow-lg bg-card text-card-foreground border-border">
+                        <div className="absolute top-4 left-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                           Answer
                         </div>
-                        <p className="text-xl leading-relaxed text-white drop-shadow-sm">
+                        <p className="text-xl leading-relaxed text-foreground drop-shadow-sm">
                           {(currentSet.flashcards as Flashcard[])[currentIndex].back}
                         </p>
                       </Card>
@@ -367,7 +367,7 @@ export function FlashcardsPage() {
                   </motion.div>
                 </div>
 
-                <Button variant="ghost" size="icon" onClick={handleNext} className="h-12 w-12 rounded-full hover:bg-white/10 hover:text-green-400 text-white">
+                <Button variant="ghost" size="icon" onClick={handleNext} className="h-12 w-12 rounded-full hover:bg-muted hover:text-primary text-muted-foreground">
                   <ChevronRight className="h-6 w-6" />
                 </Button>
               </div>
@@ -378,7 +378,7 @@ export function FlashcardsPage() {
                     variant={mastery[currentIndex] ? "default" : "outline"}
                     size="lg"
                     onClick={toggleMastery}
-                    className={`gap-2 min-w-[140px] transition-all ${mastery[currentIndex] ? "bg-green-600 hover:bg-green-500 border-green-600 text-white" : "border-green-500 text-green-400 hover:bg-green-500/10"}`}
+                    className={`gap-2 min-w-[140px] transition-all ${mastery[currentIndex] ? "bg-primary hover:bg-primary/90 text-primary-foreground border-primary" : "border-primary text-primary hover:bg-primary/10"}`}
                   >
                     {mastery[currentIndex] ? (
                       <>
@@ -399,16 +399,16 @@ export function FlashcardsPage() {
                     <div
                       key={idx}
                       className={`h-2 w-2 rounded-full transition-all duration-300 ${idx === currentIndex
-                        ? "bg-green-500 w-6"
+                        ? "bg-primary w-6"
                         : mastery[idx]
-                          ? "bg-green-500/50"
-                          : "bg-white/10"
+                          ? "bg-primary/50"
+                          : "bg-muted"
                         }`}
                     />
                   ))}
                 </div>
 
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-muted-foreground">
                   Card {currentIndex + 1} of {(currentSet.flashcards as Flashcard[]).length}
                 </p>
               </div>

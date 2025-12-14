@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+import { useAppStore } from "@/lib/store";
 import { HighlightLayer } from "./HighlightLayer";
 import { HighlightMenu } from "./HighlightMenu";
 import { Highlight } from "@shared/schema";
@@ -42,6 +43,8 @@ export const PdfViewer = React.forwardRef<PdfViewerHandle, PdfViewerProps>(({
     const containerRef = useRef<HTMLDivElement>(null);
     const pageRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
+    const { pdfTargetPage, setPdfTargetPage } = useAppStore(); // Connected to global store
+
     React.useImperativeHandle(ref, () => ({
         scrollToPage: (page: number) => {
             const pageEl = pageRefs.current[page];
@@ -55,11 +58,24 @@ export const PdfViewer = React.forwardRef<PdfViewerHandle, PdfViewerProps>(({
                 const pageEl = pageRefs.current[highlight.page];
                 if (pageEl) {
                     pageEl.scrollIntoView({ behavior: "smooth", block: "center" });
-                    // Optional: flash effect could be added here
                 }
             }
         }
     }));
+
+    // Effect for handling X-Ray citation clicks
+    useEffect(() => {
+        if (pdfTargetPage && pageRefs.current[pdfTargetPage]) {
+            const pageEl = pageRefs.current[pdfTargetPage];
+            if (pageEl) {
+                pageEl.scrollIntoView({ behavior: "smooth", block: "start" });
+                // Optional: visual flash could be added here
+
+                // Clear the target after scrolling so user can manually scroll away
+                setTimeout(() => setPdfTargetPage(null), 1000);
+            }
+        }
+    }, [pdfTargetPage, setPdfTargetPage]);
 
     function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
         setNumPages(numPages);

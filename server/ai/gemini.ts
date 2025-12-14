@@ -249,7 +249,7 @@ Respond with JSON in this exact format:
 - Provide examples when helpful
 - Encourage the student and build their confidence
 - Ask follow-up questions to check understanding
-${documentContext ? `\nYou have access to the following document content for reference:\n${documentContext.slice(0, 3000)}` : ""}`;
+${documentContext ? `\nYou have access to the following document content for reference. \nCRITICAL INSTRUCTION: When you use information from the document, you MUST cite the page number using the format [Page X] (e.g. "[Page 5]"). Place the citation immediately after the relevant sentence or paragraph.\n\nDocument Content:\n${documentContext.slice(0, 3000)}` : ""}`;
 
         const historyFormatted = conversationHistory.slice(-10).map((m) =>
             `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`

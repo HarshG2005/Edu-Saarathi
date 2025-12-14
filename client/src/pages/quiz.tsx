@@ -98,7 +98,7 @@ export function QuizPage() {
       setQuizState("active");
       toast({
         title: "Quiz started!",
-        description: `${data.mcqs.length} questions generated. Good luck!`,
+        description: `${(data.mcqs as any[]).length} questions generated. Good luck!`,
       });
     },
     onError: async (error: Error) => {

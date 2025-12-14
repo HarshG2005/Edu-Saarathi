@@ -34,18 +34,18 @@ export function MindmapPage() {
             mindmap={selectedMindmap}
           />
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-4">
-            <div className="bg-white/5 p-6 rounded-full shadow-sm border border-white/10">
-              <Layout className="h-12 w-12 text-green-400 opacity-80" />
+          <div className="h-full flex flex-col items-center justify-center text-muted-foreground gap-4">
+            <div className="bg-muted p-6 rounded-full shadow-sm border border-border">
+              <Layout className="h-12 w-12 text-primary opacity-80" />
             </div>
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">Mindmap Generator</h2>
-              <p className="max-w-md text-center text-gray-400">
+              <h2 className="text-2xl font-bold text-foreground">Mindmap Generator</h2>
+              <p className="max-w-md text-center text-muted-foreground">
                 Select a mindmap from the sidebar or create a new one to get started.
                 Visualize your notes and documents with AI-powered concept maps.
               </p>
             </div>
-            <Button onClick={() => setIsGenerateOpen(true)} className="mt-4 bg-green-600 hover:bg-green-500 text-white">
+            <Button onClick={() => setIsGenerateOpen(true)} className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground">
               <Sparkles className="mr-2 h-4 w-4" />
               Create New Mindmap
             </Button>
