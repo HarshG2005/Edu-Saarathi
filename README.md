@@ -53,6 +53,17 @@ EduQuest Local is a local-first AI-powered study companion application that help
 
 Preferred communication style: Simple, everyday language.
 
+## Screenshots
+
+### AI Tutor Chat (Dark Mode)
+![AI Tutor Chat](client/public/assets/chat-preview.png)
+
+### Landing Page
+*(Place your landing page screenshot here: `client/public/assets/landing-preview.png`)*
+
+### Document Library
+*(Place your library screenshot here: `client/public/assets/library-preview.png`)*
+
 ## System Architecture
 
 ### Frontend Architecture
