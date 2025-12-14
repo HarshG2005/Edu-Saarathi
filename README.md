@@ -55,43 +55,50 @@ Preferred communication style: Simple, everyday language.
 
 ## Screenshots
 
-### 1. Landing Page
-*The gateway to your AI study companion.*
+### 1. Getting Started
+**Landing Page** - *The gateway to your AI study companion.*
 ![Landing Page](client/public/assets/landing.png)
 
-### 2. Document Library
-*Upload and manage your study materials.*
+**Authentication** - *Secure login and registration.*
+![Authentication](client/public/assets/auth.png)
+
+### 2. Managing Content
+**Document Library** - *Upload and manage your PDF textbooks and study materials.*
 ![Document Library](client/public/assets/library.png)
 
-### 3. Mindmaps
-*Visualize complex topics with interactive diagrams.*
+### 3. Study Tools
+**Mindmaps** - *Visualize complex topics with interactive, AI-generated diagrams.*
 ![Mindmaps](client/public/assets/mindmap.png)
 
-### 4. Flashcards
-*Master concepts detailed with spaced repetition.*
+**Flashcards** - *Master concepts with spaced repetition and active recall.*
 ![Flashcards](client/public/assets/flashcards.png)
 
-### 5. Quiz Mode
-*Test your knowledge with timed or untimed quizzes.*
-![Quiz Mode](client/public/assets/quiz.png)
-
-### 6. Summaries
-*Get concise, AI-generated summaries of your documents.*
+**Summaries** - *Get concise, AI-generated summaries of your documents.*
 ![Summaries](client/public/assets/summaries.png)
 
-*Detailed view of key takeaways and terms.*
+**Detailed Key Takeaways** - *Deep dive into key points and terms.*
 ![Detailed Summaries](client/public/assets/summaries-detail.png)
 
-### 7. AI Tutor
-*Start a conversation to clear your doubts.*
+### 4. Assessment & Practice
+**Quiz Setup** - *Customize your quiz topics, difficulty, and length.*
+![Quiz Setup](client/public/assets/quiz-setup.png)
+
+**Quiz Mode** - *Test your knowledge with timed or untimed quizzes.*
+![Quiz Active](client/public/assets/quiz-active.png)
+
+### 5. AI Assistance
+**AI Tutor Initialization** - *Start a conversation to clear your doubts.*
 ![AI Tutor Start](client/public/assets/tutor-start.png)
 
-*Ask questions and get instant answers anchored to your text.*
+**Interactive Chat** - *Ask questions and get instant answers anchored to your text.*
 ![AI Tutor Chat](client/public/assets/tutor.png)
 
-### 8. Progress Dashboard
-*Track your learning momentum and topic mastery.*
+### 6. Analytics
+**Progress Dashboard** - *Track your learning momentum and topic mastery.*
 ![Progress Dashboard](client/public/assets/progress.png)
+
+**Detailed Metrics** - *Analyze your performance trends over time.*
+![Progress Metrics](client/public/assets/progress-metrics.png)
 
 ## System Architecture
 
