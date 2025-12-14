@@ -55,14 +55,25 @@ Preferred communication style: Simple, everyday language.
 
 ## Screenshots
 
-### AI Tutor Chat (Dark Mode)
-![AI Tutor Chat](client/public/assets/chat-preview.png)
+### 1. Landing Page
+*The gateway to your AI study companion.*
+![Landing Page](client/public/assets/landing.png)
 
-### Landing Page
-*(Place your landing page screenshot here: `client/public/assets/landing-preview.png`)*
+### 2. Document Library
+*Upload and manage your study materials.*
+![Document Library](client/public/assets/library.png)
 
-### Document Library
-*(Place your library screenshot here: `client/public/assets/library-preview.png`)*
+### 3. Flashcards
+*Master concepts detailed with spaced repetition.*
+![Flashcards](client/public/assets/flashcards.png)
+
+### 4. Summaries
+*Get concise, AI-generated summaries of your documents.*
+![Summaries](client/public/assets/summaries.png)
+
+### 5. AI Tutor
+*Ask questions and get instant answers anchored to your text.*
+![AI Tutor](client/public/assets/tutor.png)
 
 ## System Architecture
 
